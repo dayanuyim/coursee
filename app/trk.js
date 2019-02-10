@@ -1,20 +1,9 @@
 'use strict';
 
 import './css/trk.css';
-
-//import * as markdown from './markdown';
-//import { markdown} from './markdown';
 import {Markdown} from './markdown';
 import {GPXParser} from './loadgpx';
-//import {GoogleMaps} from '@google/maps';
 import * as googleMaps from 'google-maps-api';
-
-/*
-const googleMapsClient = GoogleMaps.createClient({
-    key: 'AIzaSyDoRAou_pmXgeqexPAUlX3Xkg0eKJ_FMhg',
-    language: 'zh-TW',
-});
-*/
 
 let Gmap;
 let Gpxparser;

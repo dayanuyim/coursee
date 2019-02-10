@@ -3,12 +3,9 @@
 import './css/main.css';
 import './css/font-awesome.css';
 import * as templates from './templates';
+//import * as fs from 'fs';
 import { loadRec } from './trk';
-
-function getText(elem){
-    if(!elem) return null;
-    return elem.innerHTML;
-}
+import trekInfo from './data/trek-info';
 
 async function showView()
 {
@@ -23,20 +20,22 @@ async function showView()
     }
 }
 
+function groupItems(arr, getKeyFun)
+{
+    const group = {};
+    arr.forEach(item => {
+        const key =  getKeyFun(item);
+        if(!(key in group))
+            group[key] = [];
+        group[key].push(item);
+    });
+    return group;
+}
+
 function showIndex()
 {
-    document.body.innerHTML = templates.main();
-    //add link to Title
-    document.querySelectorAll(".trk-title").forEach(elem => {
-        const item = (<HTMLElement>elem).closest('li');
-        const title = getText(item.querySelector('.trk-title'));
-        const days = getText(item.querySelector('.trk-days')) || 1;
-        const date = getText(item.querySelector('.trk-date'));
-        const facebook = getText(item.querySelector('.trk-facebook'));
-        const keepon = getText(item.querySelector('.trk-keepon'));
-        const id = `${date}_${title}`;
-        item.innerHTML = templates.trekItem({ id, title, date, days, facebook, keepon });
-    });
+    const treks = groupItems(trekInfo, trek => trek.date.slice(0, 4)); //group by years
+    document.body.innerHTML = templates.main({treks});
 }
 
 function showTrek(id){

@@ -140,7 +140,7 @@ GPXParser.prototype.createMarker = function(point) {
     });
 
     if(name) marker.setLabel(name);
-    if(sym) marker.setIcon("images/gps_icon/x32/" + sym + ".png");
+    if(sym) marker.setIcon("images/gps_icon/32/" + sym + ".png");
     /*
     if(sym){
         var icon = {
