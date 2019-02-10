@@ -1,0 +1,108 @@
+@font-face {
+    //仿宋
+    font-family: 'cwTeXFangSong';
+    font-style: normal;
+    font-weight: 500;
+    src: url(//fonts.gstatic.com/ea/cwtexfangsong/v3/cwTeXFangSong-zhonly.eot);
+    src: url(//fonts.gstatic.com/ea/cwtexfangsong/v3/cwTeXFangSong-zhonly.eot?#iefix) format('embedded-opentype'),
+    url(//fonts.gstatic.com/ea/cwtexfangsong/v3/cwTeXFangSong-zhonly.woff2) format('woff2'),
+    url(//fonts.gstatic.com/ea/cwtexfangsong/v3/cwTeXFangSong-zhonly.woff) format('woff'),
+    url(//fonts.gstatic.com/ea/cwtexfangsong/v3/cwTeXFangSong-zhonly.ttf) format('truetype');
+}
+
+body{
+    font-family: Open Sans;
+    color:silver;
+    background-color:#202020;
+}
+
+nav{
+    width: 98%;
+    position: fixed;
+    z-index:9;
+    background-color: black;
+    border: 1px solid gray;
+}
+
+nav > ul > li{
+    display: inline;
+    padding-right: 1em;
+}
+
+nav + *{
+    padding-top: 40px;
+}
+
+a:link    {color:#c0c0c0; text-decoration:none;} 
+a:visited {color:#808080; text-decoration:none;} 
+a:hover   {color:#3399ff; text-decoration:underline;} 
+a:active  {text-decoration:underline;}
+
+li:hover {background-color: #404040;}
+
+section{
+    box-sizing: border-box;
+    padding: 10px;
+    background: #101010;
+    background: linear-gradient(#101010, #202020);
+}
+
+time{
+    color: white;
+    font-weight: bold;
+}
+
+/************ Travel **********************/
+.title{
+    position: absolute;
+    left: 12em;
+    display: inline-block;
+}
+
+/************ Trk **********************/
+
+.trk-date{
+}
+
+.trk-days:before{ content:"("; }
+.trk-days:after{ content:")"; }
+
+.trk-days{
+    display: inline-block;
+    font-style: italic;
+    color: gray;
+}
+
+.trk-days-1{
+    display: none;
+}
+
+.trk-title{
+    position: absolute;
+    left: 12em;
+    display: inline-block;
+}
+.trk-title:hover {
+    font-weight: bold;
+} 
+
+.trk-gpx {
+    position: absolute;
+    left: 70%;
+}
+
+.trk-rec{
+    position: absolute;
+    left: calc(70% + 1.5em);
+}
+
+.trk-keepon{
+    position: absolute;
+    left: calc(70% + 3em);
+}
+
+.trk-facebook {
+    position: absolute;
+    left: calc(70% + 4.5em);
+}
+
