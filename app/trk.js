@@ -244,12 +244,37 @@ function loadText(elem, fname)
         });
 }
 
+function setRecNotFounc(recElem)
+{
+    recElem.innerHTML = "[Record not found]";
+    document.getElementById('download_rec').hidden = true;
+    document.getElementById("container").style.display = "flex";
+    document.getElementById("container").style["flex-flow"] = "column";
+    document.getElementById("rec").style.flex = "none";
+
+    const map_elem = document.getElementById("map");
+    if(map_elem){
+        map_elem.style.position = "static";
+        map_elem.style.flex = "auto";
+        map_elem.style.width = "100%";
+
+        const gmap = document.getElementById('gmap');
+        const rec = document.getElementById('rec');
+        const adjust_height = gmap.scrollHeight - rec.scrollHeight - 40;
+        gmap.style.height = `${adjust_height}px`;
+    }
+}
+
 async function loadMarkdown(rec_file)
 {
     const recElem = document.getElementById("rec");
 
     try{
         const resp = await fetch(rec_file, {contentType: "text/markdown;charset=UTF-8;"});
+        if(!resp.ok)
+            return setRecNotFounc(recElem);
+
+        console.log(resp);
         const text = await resp.text();
         setRecContent(recElem, Markdown.toHTML(text));
         document.getElementById('download_rec').href = rec_file;
@@ -257,23 +282,7 @@ async function loadMarkdown(rec_file)
     }
     catch(err){
         console.log(err);
-        document.getElementById('download_rec').hidden = true;
-        recElem.innerHTML = "[Record not found]";
-        document.getElementById("container").style.display = "flex";
-        document.getElementById("container").style["flex-flow"] = "column";
-        document.getElementById("rec").style.flex = "none";
-
-        const map_elem = document.getElementById("map");
-        if(map_elem){
-            map_elem.style.position = "static";
-            map_elem.style.flex = "auto";
-            map_elem.style.width = "100%";
-
-            const gmap = document.getElementById('gmap');
-            const rec = document.getElementById('rec');
-            const adjust_height = gmap.height() - rec.height() - 40;
-            gmap.height(adjust_height);
-        }
+        setRecNotFounc(recElem);
     }
 }
 

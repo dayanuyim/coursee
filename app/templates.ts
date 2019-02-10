@@ -65,20 +65,6 @@ export const main = Handlebars.compile(`
     </footer>
 `);
 
-export const trekItem = Handlebars.compile(`
-    <time class="trk-date">{{fmtDate date}}</time>
-    <span class="trk-days trk-days-{{days}}">{{days}}</span>
-    <label class="trk-title"><a href="#trek/{{id}}">{{title}}</a></label>
-    <span class="trk-gpx"><a href="data/treks/{{id}}.gpx"><i class="fa fa-map-marker"></i></a></span>
-    <span class="trk-rec"><a href="data/treks/{{id}}.md"><i class='fa fa-pencil-square-o'></i></a></span>
-    {{#if keepon}}
-        <span class="trk-keepon"><a href="{{keepon}}"><i class='fa fa-map-signs'></i></a></span>
-    {{/if}}
-    {{#if facebook}}
-        <span class="trk-facebook"><a href="{{facebook}}"><i class="fa fa-facebook-square"></i></a></span>
-    {{/if}}
-`);
-
 export const trek = Handlebars.compile(`
     <div id="download">
     下載:
