@@ -18,7 +18,7 @@ module.exports = {
   },
   plugins: [
       new HtmlWebpackPlugin({
-          title: 'Trekkr',
+          title: "DAYANUYIM's",
           favicon: 'app/images/favicon.ico',
       }),
       new webpack.ProvidePlugin({
