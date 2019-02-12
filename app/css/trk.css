@@ -33,7 +33,7 @@ section#map{
     width: 50%;
 }
 
-div#gmap {
+div#map-content {
     height: calc(100vh - 20px);
 }
 

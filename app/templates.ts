@@ -1,12 +1,17 @@
 import * as Handlebars from '../node_modules/handlebars/dist/handlebars.js';
 
-Handlebars.registerHelper('fmtTime', function(moment) {
-    return moment.format('YYYY-MM-DD HH:mm:ss');
-});
-
 Handlebars.registerHelper('fmtDate', function(date) {
     return date;
     //return `${date.getFullYear()}__${date.getDate()}`;
+});
+
+Handlebars.registerHelper('fmtRecTime', function(time) {
+    return time.format('HHmm');
+});
+
+Handlebars.registerHelper('timeStr', function(time) {
+    //return time.format('YYYY-MM-DDTHH:mm:ss+08:00');
+    return time.format();
 });
 
 export const main = Handlebars.compile(`
@@ -43,7 +48,7 @@ export const main = Handlebars.compile(`
         <li>
             <time class="trk-date">{{fmtDate date}}</time>
             <span class="trk-days trk-days-{{days}}">{{days}}</span>
-            <label class="trk-title"><a href="#trek/{{filename}}">{{title}}</a></label>
+            <label class="trk-title"><a href="#trek-{{filename}}">{{title}}</a></label>
             <span class="trk-gpx"><a href="data/treks/{{filename}}.gpx"><i class="fa fa-map-marker"></i></a></span>
             <span class="trk-rec"><a href="data/treks/{{filename}}.md"><i class='fa fa-pencil-square-o'></i></a></span>
             {{#if keepon}}
@@ -68,17 +73,33 @@ export const main = Handlebars.compile(`
 export const trek = Handlebars.compile(`
     <div id="download">
     下載:
-    <a id="download_trk"><i class="fa fa-map-marker"></i>航跡</a>&nbsp; 
-    <a id="download_rec"><i class="fa fa-pencil-square-o"></i>記錄</a>
+    <a id="download-trk"><i class="fa fa-map-marker"></i>航跡</a>&nbsp; 
+    <a id="download-rec"><i class="fa fa-pencil-square-o"></i>記錄</a>
     </div>
 
     <section id="container">
         <section id="rec">
-            <div class="rec-content">[Record loading...]</div>
+            <div class="rec-content">[Record >oading...]</div>
         </section>
             
         <section id="map">
-            <div id="gmap">[The Map to display]</div>
+            <div id="map-content">[The Map to Display]</div>
         </section>
     </section>
+`);
+
+export const toTimestamp = Handlebars.compile(`
+    <div class="rec-timestamp">
+        <time datetime="{{timeStr time1}}">{{fmtRecTime time1}}</time> {{content}}
+    </div>
+`);
+
+export const toTimestamp2 = Handlebars.compile(`
+    <div class="rec-timestamp">
+        <time datetime="{{timeStr time1}}">{{fmtRecTime time1}}</time>{{delimiter}}<time datetime="{{timeStr time2}}">{{fmtRecTime time2}}</time> {{content}}
+    </div>
+`);
+
+export const toTimethru = Handlebars.compile(`
+    <div class="rec-timethru">{{content}}</div>
 `);

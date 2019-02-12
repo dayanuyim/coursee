@@ -4,27 +4,33 @@ import './css/trk.css';
 import {Markdown} from './markdown';
 import {GPXParser} from './loadgpx';
 import * as googleMaps from 'google-maps-api';
+import * as templates from './templates';
+import * as moment from 'moment-timezone';
 
-let Gmap;
-let Gpxparser;
+// utils ================================
+Date.prototype.addDays = function(days) {
+    var result = new Date(this);
+    result.setDate(result.getDate() + days);
+    return result;
+}
 
-async function drawMap(gpx_data){
+// map ===============================
+async function initMap(gpx, mapElem){
     const container = document.querySelector('#map');
     container.hidden = true;
 
-    const googleMapsApi = googleMaps({
+    await googleMaps({
         key: 'AIzaSyDoRAou_pmXgeqexPAUlX3Xkg0eKJ_FMhg',
         language: 'zh-TW',
-    });
-    const googlemaps = await googleMapsApi();
+    })();
 
-    const gmap = new googlemaps.Map(document.getElementById('gmap'), {
+    const map = new google.maps.Map(mapElem, {
         center: {lat: 24.279609, lng: 121.025882},
-        mapTypeId: googlemaps.MapTypeId.TERRAIN,
+        mapTypeId: google.maps.MapTypeId.TERRAIN,
         zoom: 15
     });
 
-    const parser = new GPXParser(gpx_data, gmap, googlemaps);
+    const parser = new GPXParser(gpx, map);
     parser.setTrackColour("#ff0000");      // Set the track line colour
     parser.setTrackWidth(5);               // Set the track line width
     parser.setMinTrackPointDelta(0.0001);   // Set the minimum distance between track points
@@ -34,126 +40,91 @@ async function drawMap(gpx_data){
 
     container.hidden = false;
 
-    //set global
-    Gmap = gmap;
-    Gpxparser = parser;
+    return [parser, map];
 }
 
+function setMapNotFound(mapElem, errmsg)
+{
+    mapElem.innerHTML = errmsg;
+    document.getElementById('download-trk').hidden = true;
+}
 
+// return a handler for GPX/Map
 async function loadMap(url)
 {
-    const gmap = document.getElementById('gmap');
-    document.getElementById('download_trk').href = url;
+    document.getElementById('download-trk').href = url;
 
+    const mapElem = document.getElementById('map-content');
     try{
         const resp = await fetch(url, { method: 'get', dataType: 'xml' });
+        if(!resp.ok)
+            return setMapNotFound(mapElem, 'Gpx Not Found');
+
         const text = await resp.text();
         const xml = (new window.DOMParser()).parseFromString(text, 'text/xml');
-        await drawMap(xml);
+        const [gpxparser, map] =  await initMap(xml, mapElem);
+
+        return {
+            locate: (time) => {
+                const loc = gpxparser.lookupLocation(time);
+                map.setCenter(loc);
+            }
+        };
     }
     catch(err){
-        document.getElementById('download_trk').hidden = true;
-        console.log(err);
-        gmap.innerHTML = "Google map is not initialized due to loading GPX error";
+        console.log(mapElem, err);
+        return setMapNotFound(`Error to init Google Map: ${err}`);
     }
 }
 
-/*********** Records ***********************/
-Date.prototype.addDays = function(days) {
-    var result = new Date(this);
-    result.setDate(result.getDate() + days);
-    return result;
-}
-
-function padZero(txt, n)
+// rec ==============================================
+function toTimeStr(date, hh, mm)
 {
-    for(var i = 0; i < (n - txt.length); ++i){
-        txt = "0" + txt;
-    }
-    return txt;
-}
-
-function toDateTimeString(date, hh, mm)
-{
-    var txt = "";
-
-    //date
-    if(date){
-       var yyyy = date.getFullYear().toString();
-       var mon = (date.getMonth()+1).toString(); // getMonth() is zero-based
-       var dd  = date.getDate().toString();
-       //var hh = date.getHours().toString();
-       //var mm = date.getMinutes().toString();
-       txt = yyyy + '-' + padZero(mon, 2) + '-' + padZero(dd, 2) + 'T';
-    }
-
-    //time
-    txt += padZero(hh, 2) + ":" + padZero(mm, 2) + ":00+08:00";
-
-    return txt
-}
-
-function genTimeTag(date, hh, mm)
-{
-    if(date || hh || mm){
-        var dt_str = toDateTimeString(date, hh, mm);
-        return '<time datetime="' + dt_str + '">';
-    }
-
-    return '<time>';
+    return (date || hh || mm) ? toDateTimeString(date, hh, mm) : '';
 }
 
 function addTimeTag(line, date)
 {
-    var regex = /^(\d\d):?(\d\d)([~-]\d\d)?:?(\d\d)?(\D)/;
-    line = line.replace(regex, function(match, hh, mm, hh2, mm2, de2, offset, s){
-        //end time
-        if(hh2){
-            var de = hh2[0];
-            hh2 = hh2.substr(1);
-            if(!mm2){
-                mm2 = hh2;
-                hh2 = hh;
-            }
-        }
-
-        //add time tag
-        var res = genTimeTag(date, hh, mm) + hh + mm + '</time>';
-        if(hh2)
-            res += de + genTimeTag(date, hh2, mm2) + hh2 + mm2 + '</time>';
-        res += de2;
-        return res;
-    });
-
-    return line;
+    const data = parseRecLine(line, date);
+    if(data.time2)
+        return templates.toTimestamp2(data);
+    else if(data.time1)
+        return templates.toTimestamp(data);
+    else 
+        return templates.toTimethru(data);
 }
 
-function addRecTimeClass(line)
+function parseRecLine(line, date)
 {
-    var orig_line = line;
-    var trim_line = line.trim();
+    const regex = /^(\d\d):?(\d\d)([~-]\d\d)?:?(\d\d)?(.*)/;
+    const matches = line.match(regex);
+    if(!matches)
+        return {content: line.trim()};
 
-    if(!trim_line)
-        return "";
-    
-    if(orig_line.startsWith(' '))
-        return '<div class="rec-timethru">' + trim_line + '</div>';
-    else
-        return '<div class="rec-timestamp">' + trim_line + '</div>';
+    let [_, hh, mm, hh2, mm2, content] = matches;
+    content = content.trim();
+    const time1 = toMoment(date, hh, mm);
+    if(!hh2)
+        return {time1, content};
+
+    const delimiter = hh2[0];
+    hh2 = hh2.substr(1);
+    if(!mm2){
+        mm2 = hh2;
+        hh2 = hh;
+    }
+    const time2 = toMoment(date, hh2, mm2);
+    return { time1, delimiter, time2, content };
+}
+
+function toMoment(date, hh, mm){
+    return moment([date.getFullYear(), date.getMonth(), date.getDate(), hh, mm ])
 }
 
 function formatRecTag(txt, date)
 {
-    var lines = txt.split(/[\r\n]+/);
-
-    var res = "";
-    for(var i = 0; i < lines.length; ++i){
-        var line = lines[i];
-        line = addTimeTag(line, date);
-        line = addRecTimeClass(line);
-        res += line;
-    }
-    return res;
+    const lines = txt.split(/[\r\n]+/);
+    return lines.reduce((acc, line) => acc + addTimeTag(line, date), '');
 }
 
 //gen <div class="rec-content">, from content and title elemnt
@@ -198,12 +169,6 @@ function getDay(txt)
     return null;
 }
 
-function addDays(date, days) {
-    var result = new Date(date);
-    result.setDate(result.getDate() + days);
-    return result;
-}
-
 function setRecContent(elem, html)
 {
     elem.innerHTML = html.replace(/<pre><code>/g, "<article>").replace(/<\/code><\/pre>/g, "</article>");
@@ -211,7 +176,7 @@ function setRecContent(elem, html)
     //get start day
     var start_date = (elem.firstChild)? getStartDate(elem.firstChild.innerHTML): null;
     var base_date = start_date? start_date.addDays(-1): null;
-    console.log("base_date: " + base_date);
+    //console.log("base_date: " + base_date);
 
     for(let i = 0; i < elem.children.length; ++i){
         const curr = elem.children[i];
@@ -240,90 +205,80 @@ function loadText(elem, fname)
             elem.innerHTML = "<pre>" + res + "</pre>";
         })
         .catch(function(err){
-            elem.innerHTML = "Record not found";
+            elem.innerHTML = "Record Not Found";
         });
 }
 
-function setRecNotFounc(recElem)
+function setRecNotFound(recElem)
 {
-    recElem.innerHTML = "[Record not found]";
-    document.getElementById('download_rec').hidden = true;
+    recElem.innerHTML = "Record Not Found";
+    document.getElementById('download-rec').hidden = true;
+
+    //adjust rec section
     document.getElementById("container").style.display = "flex";
     document.getElementById("container").style["flex-flow"] = "column";
     document.getElementById("rec").style.flex = "none";
 
-    const map_elem = document.getElementById("map");
-    if(map_elem){
-        map_elem.style.position = "static";
-        map_elem.style.flex = "auto";
-        map_elem.style.width = "100%";
+    //adjust map section
+    const mapElem = document.getElementById("map");
+    mapElem.style.position = "static";
+    mapElem.style.flex = "auto";
+    mapElem.style.width = "100%";
 
-        const gmap = document.getElementById('gmap');
-        const rec = document.getElementById('rec');
-        const adjust_height = gmap.scrollHeight - rec.scrollHeight - 40;
-        gmap.style.height = `${adjust_height}px`;
-    }
+    const map = document.getElementById('map-content');
+    const adjust_height = map.scrollHeight - recElem.scrollHeight - 40;
+    map.style.height = `${adjust_height}px`;
 }
 
-async function loadMarkdown(rec_file)
+async function loadMarkdown(mdPath, mapHandler)
 {
+    document.getElementById('download-rec').href = mdPath;
+
     const recElem = document.getElementById("rec");
-
     try{
-        const resp = await fetch(rec_file, {contentType: "text/markdown;charset=UTF-8;"});
+        const resp = await fetch(mdPath, {contentType: "text/markdown;charset=UTF-8;"});
         if(!resp.ok)
-            return setRecNotFounc(recElem);
+            return setRecNotFound(recElem, `Rec Not Found`);
 
-        console.log(resp);
+        //console.log(resp);
         const text = await resp.text();
         setRecContent(recElem, Markdown.toHTML(text));
-        document.getElementById('download_rec').href = rec_file;
-        setRecTimestampFocus();
+        if(mapHandler)
+            setRecTimestampFocus(mapHandler);
     }
     catch(err){
         console.log(err);
-        setRecNotFounc(recElem);
+        return setRecNotFound(recElem, `Load Rec Error: ${err}`);
     }
 }
 
 // TODO @id -> @mdUrl
-export function loadRec(id)
+export async function loadRec(id)
 {
     if(!id){
         rec.innerHTML = "No such record.";
         return;
     }
 
-    loadMarkdown(`data/treks/${id}.md`);
-    loadMap(`data/treks/${id}.gpx`)
+    const gpxPath = `data/treks/${id}.gpx`;
+    const mdPath = `data/treks/${id}.md`;
+
+    //TODO Is it really worth to wait @mapHandler, then load Markdown?
+    const mapHandler = await loadMap(gpxPath);
+    loadMarkdown(mdPath, mapHandler);
 
     //const rec_txt = "data/treks/" + id + ".txt";
     //loadText(rec, rec_txt);
 }
 
-function setRecTimestampFocus()
+function setRecTimestampFocus(mapHandler)
 {
     document.querySelectorAll(".rec-timestamp").forEach(elem => {
-        const time = elem.getElementsByTagName('time');
-        if(time && time.length > 0){
-            const dt_str = time[0].getAttribute('datetime');
-            if (dt_str)
-                elem.addEventListener('click', () => focusLocation(dt_str));
-        }
+        const timeElem = elem.querySelector('time');
+        if(!timeElem) return;
+        const timeStr = timeElem.getAttribute('datetime');
+        if(!timeStr) return;
+        const date = new Date(timeStr);
+        elem.addEventListener('click', () => mapHandler.locate(date));
     });
-}
-
-function focusLocation(dt_str)
-{
-    var dt = new Date(dt_str);
-    var loc = Gpxparser.lookupLocation(dt);
-    Gmap.setCenter(loc);
-}
-
-function getId()
-{
-    var id = location.hash;
-    if(id.startsWith('#'))
-        id = id.substr(1)
-    return id;
 }

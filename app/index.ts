@@ -9,12 +9,12 @@ import trekInfo from './data/trek-info';
 
 async function showView()
 {
-    const [view, ...params] = window.location.hash.split('/');
+    const [view, param] = window.location.hash.split('-', 2);
     switch(view){
         case '#main':
             return showIndex();
         case '#trek':
-            return showTrek(params[0]);
+            return showTrek(param);
         default:
             throw Error(`Unrecognized view: ${view}`);
     }

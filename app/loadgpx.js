@@ -47,10 +47,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-export function GPXParser(xmlDoc, map, googlemaps) {
+export function GPXParser(xmlDoc, map) {
     this.xmlDoc = xmlDoc;
     this.map = map;
-    this.google = {maps: googlemaps}
     this.trackcolour = "#ff00ff"; // red
     this.trackwidth = 5;
     this.mintrackpointdelta = 0.0001;
@@ -134,8 +133,8 @@ GPXParser.prototype.createMarker = function(point) {
         }
     }
 
-    const marker = new this.google.maps.Marker({
-        position: new this.google.maps.LatLng(lat,lon),
+    const marker = new google.maps.Marker({
+        position: new google.maps.LatLng(lat,lon),
         map: this.map,
     });
 
@@ -158,12 +157,12 @@ GPXParser.prototype.createMarker = function(point) {
     }
     */
 
-    const infowindow = new this.google.maps.InfoWindow({
+    const infowindow = new google.maps.InfoWindow({
         content: html,
-        size: new this.google.maps.Size(50,50)
+        size: new google.maps.Size(50,50)
     });
 
-    this.google.maps.event.addListener(marker, "click", function() {
+    google.maps.event.addListener(marker, "click", function() {
         infowindow.open(this.map, marker);
         setTimeout(function(){infowindow.close();}, '2000');
     });
@@ -181,7 +180,7 @@ GPXParser.prototype.addTrackSegmentToMap = function(trackSegment, colour,
     // process first point
     var lastlon = parseFloat(trackpoints[0].getAttribute("lon"));
     var lastlat = parseFloat(trackpoints[0].getAttribute("lat"));
-    var latlng = new this.google.maps.LatLng(lastlat,lastlon);
+    var latlng = new google.maps.LatLng(lastlat,lastlon);
     pointarray.push(latlng);
 
     for(let i = 1; i < trackpoints.length; i++) {
@@ -195,13 +194,13 @@ GPXParser.prototype.addTrackSegmentToMap = function(trackSegment, colour,
                 > this.mintrackpointdelta) {
             lastlon = lon;
             lastlat = lat;
-            latlng = new this.google.maps.LatLng(lat,lon);
+            latlng = new google.maps.LatLng(lat,lon);
             pointarray.push(latlng);
         }
 
     }
 
-    var polyline = new this.google.maps.Polyline({
+    var polyline = new google.maps.Polyline({
         path: pointarray,
         strokeColor: colour,
         strokeWeight: width,
@@ -220,17 +219,17 @@ GPXParser.prototype.addTrackToMap = function(track, colour, width) {
 GPXParser.prototype.centerAndZoom = function() {
     //default location
     if(this._minlat == null || this._maxlat == null || this._minlon == null || this._maxlon == null){
-        this.map.setCenter(new this.google.maps.LatLng(49.327667, -122.942333), 14);
+        this.map.setCenter(new google.maps.LatLng(49.327667, -122.942333), 14);
     }
     //set
     else{
         var centerlon = (this._maxlon + this._minlon) / 2;
         var centerlat = (this._maxlat + this._minlat) / 2;
 
-        var bounds = new this.google.maps.LatLngBounds(
-                new this.google.maps.LatLng(this._minlat, this._minlon),
-                new this.google.maps.LatLng(this._maxlat, this._maxlon));
-        this.map.setCenter(new this.google.maps.LatLng(centerlat, centerlon));
+        var bounds = new google.maps.LatLngBounds(
+                new google.maps.LatLng(this._minlat, this._minlon),
+                new google.maps.LatLng(this._maxlat, this._maxlon));
+        this.map.setCenter(new google.maps.LatLng(centerlat, centerlon));
         this.map.fitBounds(bounds);
     }
 }
@@ -269,7 +268,7 @@ GPXParser.prototype.centerAndZoomOfSeg = function(trackSegment) {
     }
 
     if((minlat == maxlat) && (minlat == 0)) {
-        this.map.setCenter(new this.google.maps.LatLng(49.327667, -122.942333), 14);
+        this.map.setCenter(new google.maps.LatLng(49.327667, -122.942333), 14);
         return;
     }
 
@@ -277,15 +276,15 @@ GPXParser.prototype.centerAndZoomOfSeg = function(trackSegment) {
     var centerlon = (maxlon + minlon) / 2;
     var centerlat = (maxlat + minlat) / 2;
 
-    var bounds = new this.google.maps.LatLngBounds(
-            new this.google.maps.LatLng(minlat, minlon),
-            new this.google.maps.LatLng(maxlat, maxlon));
-    this.map.setCenter(new this.google.maps.LatLng(centerlat, centerlon));
+    var bounds = new google.maps.LatLngBounds(
+            new google.maps.LatLng(minlat, minlon),
+            new google.maps.LatLng(maxlat, maxlon));
+    this.map.setCenter(new google.maps.LatLng(centerlat, centerlon));
     this.map.fitBounds(bounds);
 }
 
 GPXParser.prototype.centerAndZoomToLatLngBounds = function(latlngboundsarray) {
-    var boundingbox = new this.google.maps.LatLngBounds();
+    var boundingbox = new google.maps.LatLngBounds();
     for(var i = 0; i < latlngboundsarray.length; i++) {
         if(!latlngboundsarray[i].isEmpty()) {
             boundingbox.extend(latlngboundsarray[i].getSouthWest());
@@ -297,7 +296,7 @@ GPXParser.prototype.centerAndZoomToLatLngBounds = function(latlngboundsarray) {
             boundingbox.getSouthWest().lat()) / 2;
     var centerlng = (boundingbox.getNorthEast().lng() +
             boundingbox.getSouthWest().lng()) / 2;
-    this.map.setCenter(new this.google.maps.LatLng(centerlat, centerlng),
+    this.map.setCenter(new google.maps.LatLng(centerlat, centerlng),
             this.map.getBoundsZoomLevel(boundingbox));
 }
 
@@ -373,7 +372,7 @@ GPXParser.prototype._getClosedLocation = function(table, time){
 
 GPXParser.prototype._estLocation = function(time, loc1, loc2)
 {
-    var lat, lon;
+    let _, lat, lon;
 
     if(loc1 == null){
         [_, lat, lon] = loc2;
@@ -382,13 +381,13 @@ GPXParser.prototype._estLocation = function(time, loc1, loc2)
         [_, lat, lon] = loc1;
     }
     else{
-        var [t2, lat2, lon2] = loc2;
-        var [t1, lat1, lon1] = loc1;
+        const [t2, lat2, lon2] = loc2;
+        const [t1, lat1, lon1] = loc1;
         lat = (lat2 - lat1) * (time - t1) / (t2 - t1) + lat1;
         lon = (lon2 - lon1) * (time - t1) / (t2 - t1) + lon1;
     }
 
-    return new this.google.maps.LatLng(lat, lon);
+    return new google.maps.LatLng(lat, lon);
 }
 
 GPXParser.prototype.lookupLocation = function(dt)
