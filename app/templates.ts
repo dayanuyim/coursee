@@ -14,6 +14,12 @@ Handlebars.registerHelper('timeStr', function(time) {
     return time.format();
 });
 
+Handlebars.registerHelper('eachYear', function(obj, options) {
+    return Object.keys(obj)
+        .sort((a, b) => Number(b) - Number(a))
+        .reduce((acc, key) => acc + options.fn({year: key, ytreks: obj[key]}), "");
+});
+
 export const main = Handlebars.compile(`
     <nav><ul>
         <li><a href="#app">Applications</a></li>
@@ -41,10 +47,10 @@ export const main = Handlebars.compile(`
     <section id="trk"><a name="trk"></a>
     <h3>Trekking</h3>
 
-    {{#each treks}}
-    <h4>{{@key}}</h4>
+    {{#eachYear treks}}
+    <h4>{{year}}</h4>
     <ul>
-        {{#each this}}
+        {{#each ytreks}}
         <li>
             <time class="trk-date">{{fmtDate date}}</time>
             <span class="trk-days trk-days-{{days}}">{{days}}</span>
@@ -60,7 +66,7 @@ export const main = Handlebars.compile(`
         </li>
         {{/each}}
     </ul>
-    {{/each}}
+    {{/eachYear}}
 
     </section>
 
@@ -79,7 +85,7 @@ export const trek = Handlebars.compile(`
 
     <section id="container">
         <section id="rec">
-            <div class="rec-content">[Record >oading...]</div>
+            <div class="rec-content">[Record Loading...]</div>
         </section>
             
         <section id="map">
@@ -96,7 +102,8 @@ export const toTimestamp = Handlebars.compile(`
 
 export const toTimestamp2 = Handlebars.compile(`
     <div class="rec-timestamp">
-        <time datetime="{{timeStr time1}}">{{fmtRecTime time1}}</time>{{delimiter}}<time datetime="{{timeStr time2}}">{{fmtRecTime time2}}</time> {{content}}
+        <time datetime="{{timeStr time1}}">{{fmtRecTime time1}}</time> {{delimiter}}
+        <time datetime="{{timeStr time2}}">{{fmtRecTime time2}}</time> {{content}}
     </div>
 `);
 
