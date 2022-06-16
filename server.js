@@ -23,7 +23,7 @@ console.log(`NODE_ENV ${NODE_ENV}`);
 
 const serviceUrl = new URL(nconf.get('serviceUrl'));
 const isHttps = serviceUrl.protocol === 'https:';
-const servicePort = serviceUrl.port || (isHttps? 443 : 80);
+const servicePort = serviceUrl.port || (isHttps? 8443 : 8080);
 
 // Express =============================
 const logFormatter = () => {

@@ -252,22 +252,22 @@ async function loadMarkdown(mdPath, mapHandler)
     }
 }
 
-// TODO @id -> @mdUrl
-export async function loadRec(id)
+// TODO @name -> @mdUrl
+export async function loadRec(name)
 {
-    if(!id){
+    if(!name){
         rec.innerHTML = "No such record.";
         return;
     }
 
-    const gpxPath = `data/treks/${id}.gpx`;
-    const mdPath = `data/treks/${id}.md`;
+    const gpxPath = `data/${name}/course.gpx`;
+    const mdPath = `data/${name}/course.md`;
 
     //TODO Is it really worth to wait @mapHandler, then load Markdown?
     const mapHandler = await loadMap(gpxPath);
     loadMarkdown(mdPath, mapHandler);
 
-    //const rec_txt = "data/treks/" + id + ".txt";
+    //const rec_txt = "data/treks/" + name + ".txt";
     //loadText(rec, rec_txt);
 }
 

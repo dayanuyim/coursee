@@ -5,11 +5,11 @@ import './css/font-awesome.css';
 import * as templates from './templates';
 import * as utils from './utils'
 import { loadRec } from './trk';
-import trekInfo from './data/trek-info';
+import trekInfo from './trek-info';
 
 async function showView()
 {
-    const [view, param] = window.location.hash.split('-', 2);
+    const [view, param] = getView(window.location.hash);
     switch(view){
         case '#main':
             return showIndex();
@@ -20,15 +20,20 @@ async function showView()
     }
 }
 
+function getView(s){
+    const i = s.indexOf('-');
+    return  (i < 0)? [s, null]: [s.slice(0,i), s.slice(i+1)];
+}
+
 function showIndex()
 {
     const treks = utils.groupItems(trekInfo, trek => trek.date.slice(0, 4)); //group by years
     document.body.innerHTML = templates.main({treks});
 }
 
-function showTrek(id){
+function showTrek(name){
     document.body.innerHTML = templates.trek();
-    loadRec(id);
+    loadRec(name);
 }
          
 (async () => {
