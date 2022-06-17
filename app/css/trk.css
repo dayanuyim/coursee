@@ -52,3 +52,7 @@ div#map-content {
 .rec-timethru{
     margin-left: 2.5em;
 }
+
+img[alt=markdown]{
+    width: 100%;
+}

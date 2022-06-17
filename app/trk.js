@@ -1,7 +1,6 @@
 'use strict';
 
 import './css/trk.css';
-import {Markdown} from './markdown';
 import {GPXParser} from './loadgpx';
 import * as googleMaps from 'google-maps-api';
 import * as templates from './templates';
@@ -73,7 +72,8 @@ async function loadMap(url)
     }
     catch(err){
         console.log(mapElem, err);
-        return setMapNotFound(`Error to init Google Map: ${err}`);
+        setMapNotFound(`Error to init Google Map: ${err}`);
+        return null;
     }
 }
 
@@ -242,9 +242,10 @@ async function loadMarkdown(mdPath, mapHandler)
 
         //console.log(resp);
         const text = await resp.text();
-        setRecContent(recElem, Markdown.toHTML(text));
-        if(mapHandler)
-            setRecTimestampFocus(mapHandler);
+        const md = require('markdown-it')();
+        const html = md.render(text);
+
+        setRecContent(recElem, html);
     }
     catch(err){
         console.log(err);
@@ -263,12 +264,13 @@ export async function loadRec(name)
     const gpxPath = `data/${name}/course.gpx`;
     const mdPath = `data/${name}/course.md`;
 
-    //TODO Is it really worth to wait @mapHandler, then load Markdown?
-    const mapHandler = await loadMap(gpxPath);
-    loadMarkdown(mdPath, mapHandler);
+    const [ mapHandler, _ ] = await Promise.all([
+        loadMap(gpxPath),
+        loadMarkdown(mdPath),
+    ]);
 
-    //const rec_txt = "data/treks/" + name + ".txt";
-    //loadText(rec, rec_txt);
+    if(mapHandler)
+        setRecTimestampFocus(mapHandler);
 }
 
 function setRecTimestampFocus(mapHandler)

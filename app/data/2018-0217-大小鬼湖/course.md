@@ -1,6 +1,6 @@
 # 大小鬼湖 (2018/02/17~2018/02/28) #
 -------------------------------------------------
-![](https://i.imgur.com/p4sQRsK.jpg)
+![markdown](https://i.imgur.com/p4sQRsK.jpg)
 
 
 #### TODO ####
