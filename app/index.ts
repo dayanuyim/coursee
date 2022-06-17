@@ -1,7 +1,10 @@
 'use strict';
 
 import './css/main.css';
-import './css/font-awesome.css';
+import '@fortawesome/fontawesome-free/js/fontawesome'
+import '@fortawesome/fontawesome-free/js/solid'
+import '@fortawesome/fontawesome-free/js/regular'
+import '@fortawesome/fontawesome-free/js/brands'
 import * as templates from './templates';
 import * as utils from './utils'
 import { loadRec } from './trk';

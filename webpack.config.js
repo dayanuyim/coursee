@@ -3,7 +3,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin')
 const webpack = require('webpack');
 
 module.exports = {
@@ -14,12 +14,15 @@ module.exports = {
       path: path.resolve(__dirname, 'dist'),
   },
   resolve: {
-      extensions: [".ts", ".tsx", ".js"]
+      extensions: [".ts", ".tsx", ".js", ".jsx", ".css"],
+      fallback: {
+          util: require.resolve("util/")
+      },
   },
   plugins: [
       new HtmlWebpackPlugin({
           title: "DAYANUYIM's",
-          favicon: 'app/images/favicon.ico',
+          favicon: 'app/images/favicon.png',
       }),
       new webpack.ProvidePlugin({
           $: 'jquery',
@@ -32,10 +35,12 @@ module.exports = {
           filename: "[name].css",
           chunkFilename: "[id].css"
       }),
-      new CopyWebpackPlugin([
-          {from: 'app/data', to: 'data'},
-          {from: 'app/images', to: 'images'},
-      ]),
+      new CopyPlugin({
+          patterns: [
+              {from: 'app/data', to: 'data'},
+              {from: 'app/images', to: 'images'},
+          ],
+      }),
   ],
   module: {
       rules: [{
@@ -46,7 +51,10 @@ module.exports = {
           use: [ MiniCssExtractPlugin.loader, 'css-loader',/* 'postcss-loader', 'sass-loader', */],
       }, {
           test: /\.(png|woff|woff2|eot|ttf|svg)$/,
-          loader: 'url-loader?limit=100000',
+          loader: 'url-loader',
+          options: {
+              limit: 100000,
+          },
       }],
   },
 };

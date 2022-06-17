@@ -39,7 +39,7 @@ export const main = Handlebars.compile(`
     <h3>Travel</h3>
     <h4>2016</h4><ul>
         <li><time class="trk-date">2016_0416</time>
-            <span class="title"><i class="fa fa-map-o"></i>羅東傳藝中心</span>
+            <span class="title"><i class="fa-regular fa-map"></i>羅東傳藝中心</span>
         </li>
     </ul>
     </section>
@@ -55,13 +55,13 @@ export const main = Handlebars.compile(`
             <time class="trk-date">{{fmtDate date}}</time>
             <span class="trk-days trk-days-{{days}}">{{days}}</span>
             <label class="trk-title"><a href="#trek-{{filename}}">{{title}}</a></label>
-            <span class="trk-gpx"><a href="data/treks/{{filename}}.gpx"><i class="fa fa-map-marker"></i></a></span>
-            <span class="trk-rec"><a href="data/treks/{{filename}}.md"><i class='fa fa-pencil-square-o'></i></a></span>
+            <span class="trk-gpx"><a href="data/treks/{{filename}}.gpx"><i class="fa-solid fa-location-dot"></i></a></span>
+            <span class="trk-rec"><a href="data/treks/{{filename}}.md"><i class="fa-regular fa-pen-to-square"></i></a></span>
             {{#if keepon}}
-                <span class="trk-keepon"><a href="{{keepon}}"><i class='fa fa-map-signs'></i></a></span>
+                <span class="trk-keepon"><a href="{{keepon}}"><i class='fa-solid fa-signs-post'></i></a></span>
             {{/if}}
             {{#if facebook}}
-                <span class="trk-facebook"><a href="{{facebook}}"><i class="fa fa-facebook-square"></i></a></span>
+                <span class="trk-facebook"><a href="{{facebook}}"><i class="fa-brands fa-facebook-square"></i></a></span>
             {{/if}}
         </li>
         {{/each}}
@@ -79,8 +79,8 @@ export const main = Handlebars.compile(`
 export const trek = Handlebars.compile(`
     <div id="download">
     下載:
-    <a id="download-trk"><i class="fa fa-map-marker"></i>航跡</a>&nbsp; 
-    <a id="download-rec"><i class="fa fa-pencil-square-o"></i>記錄</a>
+    <a id="download-trk"><i class="fa-solid fa-location-dot"></i>航跡</a>&nbsp;
+    <a id="download-rec"><i class="fa-regular fa-pen-to-square"></i>記錄</a>
     </div>
 
     <section id="container">
