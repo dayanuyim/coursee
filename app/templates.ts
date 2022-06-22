@@ -16,7 +16,11 @@ Handlebars.registerHelper('timeStr', function(time) {
 
 Handlebars.registerHelper('eachYear', function(obj, options) {
     return Object.keys(obj)
-        .sort((a, b) => Number(b) - Number(a))
+        .sort((a, b) => {
+            const x = isNaN(+a)? 2100: +a;     //not number -> plan for future, like 2100
+            const y = isNaN(+b)? 2100: +b;
+            return y - x;  //revert
+        })
         .reduce((acc, key) => acc + options.fn({year: key, ytreks: obj[key]}), "");
 });
 
@@ -54,9 +58,9 @@ export const main = Handlebars.compile(`
         <li>
             <time class="trk-date">{{fmtDate date}}</time>
             <span class="trk-days trk-days-{{days}}">{{days}}</span>
-            <label class="trk-title"><a href="#trek-{{filename}}">{{title}}</a></label>
-            <span class="trk-gpx"><a href="data/treks/{{filename}}.gpx"><i class="fa-solid fa-location-dot"></i></a></span>
-            <span class="trk-rec"><a href="data/treks/{{filename}}.md"><i class="fa-regular fa-pen-to-square"></i></a></span>
+            <label class="trk-title"><a href="#trek-{{date}}-{{title}}">{{title}}</a></label>
+            <span class="trk-gpx"><a href="data/{{date}}-{{title}}/course.gpx"><i class="fa-solid fa-location-dot"></i></a></span>
+            <span class="trk-rec"><a href="data/{{date}}-{{title}}/course.md"><i class="fa-regular fa-pen-to-square"></i></a></span>
             {{#if keepon}}
                 <span class="trk-keepon"><a href="{{keepon}}"><i class='fa-solid fa-signs-post'></i></a></span>
             {{/if}}
@@ -83,15 +87,15 @@ export const trek = Handlebars.compile(`
     <a id="download-rec"><i class="fa-regular fa-pen-to-square"></i>記錄</a>
     </div>
 
-    <section id="container">
-        <section id="rec">
+    <div id="container">
+        <div id="rec" class="">
             <div class="rec-content">[Record Loading...]</div>
-        </section>
+        </div>
             
-        <section id="map">
+        <div id="map" class="">
             <div id="map-content">[The Map to Display]</div>
-        </section>
-    </section>
+        </div>
+    </div>
 `);
 
 export const toTimestamp = Handlebars.compile(`

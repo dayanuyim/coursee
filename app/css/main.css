@@ -11,16 +11,21 @@
 }
 
 body{
-    font-family: Open Sans;
+    /*font-family: Open Sans;*/
+    font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+    /*
     color:silver;
     background-color:#202020;
+    */
+    padding: 1em;
+    background: lightyellow;
 }
 
 nav{
     width: 98%;
     position: fixed;
     z-index:9;
-    background-color: black;
+    background: rgba(248,248,248,.7);
     border: 1px solid gray;
 }
 
@@ -33,12 +38,23 @@ nav + *{
     padding-top: 40px;
 }
 
+a {
+    text-decoration: none;
+    color:black;
+}
+a:hover {
+    text-decoration: underline;
+    color:dimgray;
+}
+
+/*
 a:link    {color:#c0c0c0; text-decoration:none;} 
 a:visited {color:#808080; text-decoration:none;} 
 a:hover   {color:#3399ff; text-decoration:underline;} 
 a:active  {text-decoration:underline;}
+*/
 
-li:hover {background-color: #404040;}
+li:hover {background-color: lightblue;}
 
 section{
     box-sizing: border-box;
@@ -48,7 +64,7 @@ section{
 }
 
 time{
-    color: white;
+    /*color: white;*/
     font-weight: bold;
 }
 

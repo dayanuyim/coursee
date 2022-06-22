@@ -1,9 +1,10 @@
+
 div#download{
     position: fixed;
     top: 0;
     right: 0;
     z-index:9;
-    background-color: black;
+    /*background-color: black;*/
     border: 1px solid gray;
 }
 
@@ -40,15 +41,15 @@ div#map-content {
 .rec-content{
     font-family: cwTeXFangSong, serif;
     font-size: large;
-    background-color: #101010;
+    /*background-color: #101010;*/
 }
 
 .rec-timestamp:hover {
-    background-color: #004000;
+    background-color: lightblue;
     cursor: pointer;
 }
 
-.rec-timethru:hover {background-color: #404040;}
+.rec-timethru:hover {background-color: lightblue;}
 .rec-timethru{
     margin-left: 2.5em;
 }
@@ -56,3 +57,175 @@ div#map-content {
 img[alt=markdown]{
     width: 100%;
 }
+
+/*================================================================*/
+
+body {
+    padding: 1em;
+    background: lightyellow;
+    font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+}
+
+p {
+    margin-block-start: .5em;
+    margin-block-end: .5em;
+}
+
+ul {
+    padding-left: 1em;
+}
+
+
+.hide {
+    display: none;
+}
+
+
+  
+  nav {
+      background: rgba(248,248,248,.7);
+      position: fixed;
+      bottom: 2em;
+      right: 2em;
+      padding: 1em;
+      z-index: 999;
+      display: grid;
+  }
+  nav a{
+    color:black;
+  }
+  
+  nav .toc{
+    grid-column: 1;
+  }
+  
+  nav .utils{
+    list-style-type: none;
+    grid-column: 2;
+  }
+  
+  section{
+    margin: 1em 0;
+    padding:1em;
+    border-radius: 8px;
+    background: #fcf1ce;
+    border-right: dimgray 1px solid;
+    border-bottom: dimgray 1px solid;
+    position: relative;  /*for .sec-toggle to positon absolutely*/
+  }
+  .sec-toggle{
+      border-width: 0px;
+      background: transparent;
+      position: absolute;
+      left: -0.5em;
+      top: 1.5em;
+  }
+  
+  .sec-toggle::after{
+      content: '▼';
+  }
+  .sec-toggle.collapse::after{
+      content: '⯈';
+  }
+  
+  /*
+  section{
+    padding:1em;
+    border-radius: 8px;
+    border-right: transparent 1px solid;
+    border-bottom: transparent 1px solid;
+  }
+  section:hover{
+    background: lightgoldenrodyellow;
+    border-right: dimgray 1px solid;
+    border-bottom: dimgray 1px solid;
+  }
+  */
+  time {
+    color: #2f3c93;
+    font-weight: bold;
+  /*
+    color: white;
+    background: green;
+    font-weight: bold;
+    padding: 0 2px;
+    margin: 1px;
+    border-radius: 4px;
+  */
+  }
+  
+  h1 datetime{
+      font-size: 0.7em;
+      margin-left: 1em;
+  }
+  
+  h2{
+      margin-top: 0px;
+  }
+  
+  .lines > span{
+    display: block;
+  }
+  
+  .tag{
+      color: white;
+      background: dimgray;
+      /*font-weight: bold;*/
+      padding: 1px 4px 0px 4px;
+      border-radius: 4px;
+      display: inline-block;
+      margin: 0px 4px 2px 0;
+      /* min-width: 4em;*/
+  }
+  
+  .tag-vehicle{
+      color: white;
+      background: cornflowerblue;
+  }
+  
+  .join > :not(:last-child)::after {
+    content: ' | '
+  }
+  
+  ul.join,
+  ul.join > li {
+    display: inline;
+    padding-left: 0;
+  }
+  
+  .path > :not(:last-child)::after {
+    content: '➤'
+  }
+  
+  /* remove the newline between spans*/
+  /*
+  .path {
+    font-size: 0;
+  }
+  .path > span {
+    display: inline-block;
+    font-size: 16px;
+  }
+  */
+  
+header {
+    position: relative;
+    border: black 1px dashed;
+}
+
+header h1 {
+    padding: 0em;
+    text-align: center;
+}
+
+header time {
+    padding: 0.5em;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+  
+  .alt {
+    color: red;
+    font-size: smaller;
+  }

@@ -5,6 +5,8 @@ import {GPXParser} from './loadgpx';
 import * as googleMaps from 'google-maps-api';
 import * as templates from './templates';
 import * as moment from 'moment-timezone';
+import { innerElement } from './dom-utils';
+import { markdownElement } from './m2h';
 
 // utils ================================
 Date.prototype.addDays = function(days) {
@@ -15,6 +17,7 @@ Date.prototype.addDays = function(days) {
 
 // map ===============================
 async function initMap(gpx, mapElem){
+    mapElem.classList.remove('hide');
     const container = document.querySelector('#map');
     container.hidden = true;
 
@@ -146,18 +149,6 @@ function genRecContentElem(content, title, base_date)
     return null;
 }
 
-function getStartDate(txt)
-{
-    var re = /\d\d\d\d[\/.-]\d{1,2}[\/.-]\d{1,2}/m;
-    var arr =  txt.match(re);
-    if(arr && arr.length >= 1){
-        var date = arr[0].replace(/\//g, '-');
-        return new Date(date);
-    }
-
-    return null;
-}
-
 function getDay(txt)
 {
     var re = /D(\d+)\s/
@@ -167,34 +158,6 @@ function getDay(txt)
     }
 
     return null;
-}
-
-function setRecContent(elem, html)
-{
-    elem.innerHTML = html.replace(/<pre><code>/g, "<article>").replace(/<\/code><\/pre>/g, "</article>");
-
-    //get start day
-    var start_date = (elem.firstChild)? getStartDate(elem.firstChild.innerHTML): null;
-    var base_date = start_date? start_date.addDays(-1): null;
-    //console.log("base_date: " + base_date);
-
-    for(let i = 0; i < elem.children.length; ++i){
-        const curr = elem.children[i];
-        const last = (i == 0)? null: elem.children[i-1];
-
-        if(curr.tagName == "ARTICLE"){
-            //the rec per day, replace 'article' by 'content' elemnt
-            if (last && last.tagName == "H2"){
-                var content_elem = genRecContentElem(curr, last, base_date);
-                if(content_elem != null)
-                    elem.replaceChild(content_elem, curr);
-            }
-            //normal
-            else{
-                curr.innerHTML = curr.innerHTML.replace(/[\r\n]+/g, '<BR>');
-            }
-        }
-    }
 }
 
 function loadText(elem, fname)
@@ -209,9 +172,9 @@ function loadText(elem, fname)
         });
 }
 
-function setRecNotFound(recElem)
+function setRecNotFound(recElem, msg)
 {
-    recElem.innerHTML = "Record Not Found";
+    recElem.innerHTML = msg;
     document.getElementById('download-rec').hidden = true;
 
     //adjust rec section
@@ -230,7 +193,7 @@ function setRecNotFound(recElem)
     map.style.height = `${adjust_height}px`;
 }
 
-async function loadMarkdown(mdPath, mapHandler)
+async function loadMarkdown(mdPath)
 {
     document.getElementById('download-rec').href = mdPath;
 
@@ -242,10 +205,7 @@ async function loadMarkdown(mdPath, mapHandler)
 
         //console.log(resp);
         const text = await resp.text();
-        const md = require('markdown-it')();
-        const html = md.render(text);
-
-        setRecContent(recElem, html);
+        innerElement(recElem, markdownElement(text));
     }
     catch(err){
         console.log(err);
@@ -264,6 +224,7 @@ export async function loadRec(name)
     const gpxPath = `data/${name}/course.gpx`;
     const mdPath = `data/${name}/course.md`;
 
+    /*
     const [ mapHandler, _ ] = await Promise.all([
         loadMap(gpxPath),
         loadMarkdown(mdPath),
@@ -271,6 +232,8 @@ export async function loadRec(name)
 
     if(mapHandler)
         setRecTimestampFocus(mapHandler);
+    */
+    loadMarkdown(mdPath);
 }
 
 function setRecTimestampFocus(mapHandler)
