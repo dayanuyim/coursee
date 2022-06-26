@@ -114,6 +114,13 @@ ul {
     list-style-type: none;
     grid-column: 2;
   }
+
+  nav .toc li:first-child{
+    border-bottom: dimgray 1px dashed;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+    display: inline-block;
+  }
   
   section{
     margin: 1em 0;

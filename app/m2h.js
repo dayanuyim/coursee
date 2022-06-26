@@ -68,6 +68,7 @@ function renderRecord(html){
 }
 
 function renderHeader(el){
+    if(!el) return;
     const header = el.querySelector('h1');
     const [title, date] = header.textContent.split(/[()]/);
     header.outerHTML = `<header><h1>${title}</h1><time>${date}</time></header>`;   // move to template
@@ -75,6 +76,7 @@ function renderHeader(el){
 
 
 function renderSection(el, level=2){
+    if(!el) return;
     //workable but not accurate method:
     //return html.replace(/<h2>/g, "</section><section><h2>");
 
@@ -108,6 +110,8 @@ function renderSection(el, level=2){
 }
 
 function renderNavigation(el){
+    if(!el) return;
+
     const secs = Array.from(el.querySelectorAll('section'))
                     .filter(sec => sec.id)
                     .map(sec => {
@@ -159,6 +163,8 @@ function getStartDate(txt)
 
 function fixLocalPath(el)
 {
+    if(!el) return;
+
     const images = el.querySelectorAll('img');
     if(images.length <= 0)
         return;
@@ -178,6 +184,8 @@ function fixLocalPath(el)
 
 function renderImage(el)
 {
+    if(!el) return;
+
     el.querySelectorAll('img').forEach(img => {
 
         /*
@@ -220,6 +228,7 @@ function renderImage(el)
 
 function extendMap(el)
 {
+    if(!el) return;
     el.innerHTML = el.innerHTML.replace(/{map:(.*?)}/g, (orig, mapid) => {
         console.log(orig, mapid);
         if(mapid == 'trekkr') return templates.map_trekkr();
@@ -240,15 +249,15 @@ function renderRecBrief(el)
     // {yyyy} => <span class="alt">yyyy</span>
     el.querySelectorAll('li').forEach(li => {
         const trk = li.innerHTML;
-        let sp = trk.search(/ D\d+ /);
+        let sp = trk.search(/D\d+ /);
         if(sp < 0)
             return console.error(`Not valid trk line: ${trk}`)
-        const sp2 = trk.indexOf(' ', sp+1);
+        const sp2 = trk.indexOf(' ', sp);
 
         //split to 3 segments
         const weather = trk.substring(0, sp)
                         .replace(/{(.*?)}/, extendWeather);
-        const day = trk.substring(sp+1, sp2);
+        const day = trk.substring(sp, sp2);
         const path = trk.substring(sp2).split('-&gt;').map(loc => {
             loc = loc.trim()
                 .replace('code>', 'time>')                             //time
@@ -276,6 +285,8 @@ function extendAltitude(orig, value){
 
 
 function extendVehicle(el){
+    if(!el) return;
+
     el.querySelectorAll('li').forEach(li => {
         li.innerHTML = li.innerHTML.replace(/{(.*?)}/g, (orig, value) => {
             return `<span class="vehicle">${value}</span>`;

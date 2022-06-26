@@ -125,6 +125,7 @@ export const section = Handlebars.compile(`
 export const toc = Handlebars.compile(`
 <nav>
   <ul class="toc">
+    <li><a href="#main">回上層目錄</a></li>
     {{#each this}}
     <li><a href="#{{id}}">{{name}}</a></li>
     {{/each}}
