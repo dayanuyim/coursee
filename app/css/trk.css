@@ -1,3 +1,18 @@
+table{
+    border-collapse: collapse;
+    text-align: center;
+    border-bottom: gray 1px solid;
+}
+thead{
+    border-bottom: gray 1px solid;
+}
+tr:hover{
+    background-color:rgba(255,255,255,0.3);
+}
+th, td{
+    border: gray 1px dotted;
+    padding: 4px 8px;
+}
 
 div#download{
     position: fixed;
@@ -52,10 +67,6 @@ div#map-content {
 .rec-timethru:hover {background-color: lightblue;}
 .rec-timethru{
     margin-left: 2.5em;
-}
-
-img[alt=markdown]{
-    width: 100%;
 }
 
 /*================================================================*/
@@ -125,7 +136,11 @@ ul {
       content: '▼';
   }
   .sec-toggle.collapse::after{
-      content: '⯈';
+      content: '▶';
+  }
+
+  .sec-toggle.collapse+h2~*{
+    display:none;
   }
   
   /*
@@ -142,7 +157,7 @@ ul {
   }
   */
   time {
-    color: #2f3c93;
+    color: #1372d0;
     font-weight: bold;
   /*
     color: white;
@@ -172,15 +187,10 @@ ul {
       background: dimgray;
       /*font-weight: bold;*/
       padding: 1px 4px 0px 4px;
+      margin: 0px 4px 2px 0;
       border-radius: 4px;
       display: inline-block;
-      margin: 0px 4px 2px 0;
       /* min-width: 4em;*/
-  }
-  
-  .tag-vehicle{
-      color: white;
-      background: cornflowerblue;
   }
   
   .join > :not(:last-child)::after {
@@ -192,9 +202,34 @@ ul {
     display: inline;
     padding-left: 0;
   }
+
+  .trkseg-day {
+    color: white;
+    background: dimgray;
+    padding: 1px 4px 0px 4px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .trkseg time {
+    font-size: .875em;
+  }
+
+  /*
+  .trkseg-path > :not(:last-child)::after {
+    content: '➜';
+    content: '⇢';
+    content: '➢';
+    content: '➤';
+  }
+  */
   
-  .path > :not(:last-child)::after {
-    content: '➤'
+  .trkseg-path>span{
+    margin: 0 3px;
+    display: inline-block;
+  }
+  .trkseg-path span:hover{
+    background-color:rgba(255,255,255);
   }
   
   /* remove the newline between spans*/
@@ -225,7 +260,17 @@ header time {
     bottom: 0;
 }
   
-  .alt {
+.alt {
     color: red;
     font-size: smaller;
-  }
+}
+
+.vehicle{
+    color: white;
+    background: cornflowerblue;
+    padding: 1px 4px 0px 4px;
+    margin: 0px 4px 2px 0;
+    border-radius: 4px;
+    display: inline-block;
+}
+  

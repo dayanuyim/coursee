@@ -12,20 +12,21 @@ import trekInfo from './trek-info';
 
 async function showView()
 {
-    const [view, param] = getView(window.location.hash);
-    switch(view){
-        case '#main':
-            return showIndex();
-        case '#trek':
-            return showTrek(param);
-        default:
-            throw Error(`Unrecognized view: ${view}`);
-    }
+    const view = window.location.hash;
+
+    if(view === '#main')
+        return showIndex();
+    if(view.startsWith("#trek"))
+        return showTrek(getParam(view));
+    if(document.body.querySelector(view))  // normal anchor
+        return;
+
+    throw Error(`Unrecognized view: ${view}`);
 }
 
-function getView(s){
+function getParam(s){
     const i = s.indexOf('-');
-    return  (i < 0)? [s, null]: [s.slice(0,i), s.slice(i+1)];
+    return  (i < 0)? "": s.substring(i+1);
 }
 
 function showIndex()

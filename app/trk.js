@@ -1,6 +1,7 @@
 'use strict';
 
 import './css/trk.css';
+import './js/trk';
 import {GPXParser} from './loadgpx';
 import * as googleMaps from 'google-maps-api';
 import * as templates from './templates';

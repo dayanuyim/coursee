@@ -21,6 +21,12 @@ body{
     background: lightyellow;
 }
 
+/* mono for fontawesome */
+.svg-inline--fa {
+    width: 1em;
+}
+
+/*
 nav{
     width: 98%;
     position: fixed;
@@ -37,6 +43,7 @@ nav > ul > li{
 nav + *{
     padding-top: 40px;
 }
+*/
 
 a {
     text-decoration: none;
@@ -54,7 +61,11 @@ a:hover   {color:#3399ff; text-decoration:underline;}
 a:active  {text-decoration:underline;}
 */
 
-li:hover {background-color: lightblue;}
+/*
+li:hover {
+    background-color:rgba(255,255,255,0.3);
+}
+*/
 
 section{
     box-sizing: border-box;

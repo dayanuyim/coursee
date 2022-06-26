@@ -114,3 +114,41 @@ export const toTimestamp2 = Handlebars.compile(`
 export const toTimethru = Handlebars.compile(`
     <div class="rec-timethru">{{content}}</div>
 `);
+
+
+export const section = Handlebars.compile(`
+    <section id="{{id}}">
+      <button class="sec-toggle" onclick="this.classList.toggle('collapse')"></button>
+    </section>
+`);
+
+export const toc = Handlebars.compile(`
+<nav>
+  <ul class="toc">
+    {{#each this}}
+    <li><a href="#{{id}}">{{name}}</a></li>
+    {{/each}}
+  </ul>
+  <ul class="utils">
+    <li><button type="button" onclick="expandSecs()">Expand</button></li>
+    <li><button type="button" onclick="collapseSecs()">Collapse</button></li>
+    <li><button type="button" onclick="saveMarkdown()">Save MD</button></li>
+  </ul>
+</nav>
+`);
+
+export const svgObject = Handlebars.compile(`
+    <object data="{{src}}" type="image/svg+xml">Failed to Load SVG</object>
+`);
+
+export const svgObject2 = Handlebars.compile(`
+    <object data="{{src}}" type="image/svg+xml" width="{{width}}" height="{{height}}">Failed to Load SVG</object>
+`);
+
+export const map_trekkr = Handlebars.compile(`
+    <button onclick="toggleMap()">線上地圖</button>
+    <!--<embed class="hide" id="mapobj" src="" width="100%" height="600" ></embed>-->
+    <object class="hide" id="mapobj" type="text/html" data="" width="100%" height="600">
+      不支援嵌入，請連至<a href="https://dayanuyim.github.io/maps/">Trekkr</a>
+    </object>
+`);
