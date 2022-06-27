@@ -2,6 +2,10 @@ import * as templates from './templates';
 import { htmlToElement} from './dom-utils';
 import BiMap from 'bidirectional-map';
 
+function replaceRange(s, begin, end, s2){
+    return s.substring(0, begin) + s2 + s.substring(end);
+}
+
 //predefined section names
 const Sec_name = new BiMap({
     todo: "待辦事項",
@@ -35,7 +39,7 @@ export function markdownElement(markdown)
 {
     const md = require('markdown-it')()
                 .use(require('markdown-it-checkbox'))
-                .use(require("markdown-it-attrs"))
+                //.use(require("markdown-it-attrs"))
                 .use(require("markdown-it-anchor").default)
                 .use(require("markdown-it-table-of-contents"), {
                     containerClass: 'nav',
@@ -264,42 +268,45 @@ function extendTime(el)
 
 function renderRecBrief(el)
 {
-    /*
-    el.querySelectorAll('li code').forEach(code => {
-        code.outerHTML = `<time>${code.textContent}</time>`;
-    });
-    */
-
-    // `xxxx` => <time>xxxx</time>
-    // {yyyy} => <span class="alt">yyyy</span>
     el.querySelectorAll('li').forEach(li => {
-        const trk = li.innerHTML;
-        let sp = trk.search(/D\d+ /);
-        if(sp < 0)
-            return console.error(`Not valid trk line: ${trk}`)
-        const sp2 = trk.indexOf(' ', sp);
+        let html = li.innerHTML
+                    .replace(/{(.*?)}/g, extendWeather)
+                    .replace(/(D\d+ )/, extendTrkDay);
 
-        //split to 3 segments
-        const weather = trk.substring(0, sp)
-                        .replace(/{(.*?)}/, extendWeather);
-        const day = trk.substring(sp, sp2);
-        const path = trk.substring(sp2).split('-&gt;').map(loc => {
-            loc = loc.trim()
-                .replace(/{(\d+)}/, extendAltitude);    //altitude
-            return `<span>${loc}</span>`
-        }).join('➤');
+        //trkseg-path =========
+        let begin = html.indexOf('-&gt;');
+        if(begin > 0){
+            //range
+            begin = html.lastIndexOf(' ', begin) + 1;  //if not found, set to index 0
+            let end = html.indexOf(' ', begin)
+            if(end < 0) end = html.length;
+
+            //split
+            const path = html.substring(begin , end).split('-&gt;').map(loc => {
+                loc = loc.trim().replace(/{(\d+)}/, extendAltitude);    //altitude
+                return `<span>${loc}</span>`
+            }).join('➤');
+
+            //replace
+            html = replaceRange(html, begin, end, `<span class="trkseg-path">${path}</span>`);
+        }
 
         //re-format
         li.classList.add('trkseg');
-        li.innerHTML = `${weather} <span class="trkseg-day">${day}</span> <span class="trkseg-path">${path}</span>`;
+        li.innerHTML = html;
     });
 }
 
+function extendTrkDay(orig, day){
+    return `<span class="trkseg-day">${day}</span> `;
+}
+
 function extendWeather(orig, value){
+    console.log(orig, value);
     const key = Weather_name.getKey(value);
     if(!key)
         return orig;
-    return `<i class="fa-solid fa-${key}"></i>`
+    return `<i class="fa-solid fa-${key}" title="${value}"></i>`;
 }
 
 function extendAltitude(orig, value){
