@@ -2,21 +2,24 @@ import * as templates from './templates';
 import { htmlToElement} from './dom-utils';
 import BiMap from 'bidirectional-map';
 
+//predefined section names
 const Sec_name = new BiMap({
     todo: "待辦事項",
     weather:  "天氣預報",
     doc: "文件",
     mapx: "地圖",
     'trk-plan': "預計行程",
+    'trk-backup': "備案行程",
     'trk-facto': "實際行程",
     'trk-rec': "行程記錄",
     epilogue: "後記",
     info: "行程資訊",
     transport: "交通",
     lodge: "住宿",
-    'trk-ref': "行程參考",
+    'ref-rec': "參考記錄",
 });
 
+//predefined weather names
 const Weather_name = new BiMap({
     sun: "晴",
     wind: "風",
@@ -26,38 +29,40 @@ const Weather_name = new BiMap({
     "cloud-sun-rain": "變",
     smog: "霧",
     snowflake: "雪",
-
 });
 
-export function markdownElement(markdown){
-
+export function markdownElement(markdown)
+{
     const md = require('markdown-it')()
-                .use(require('markdown-it-checkbox'));
-                /*
-                .use(require('markdown-it-anchor').default, {
-                    level: 2,
-                    // slugify: string => string,
-                    permalink: false,
-                    // renderPermalink: (slug, opts, state, permalink) => {},
-                    permalinkClass: 'header-anchor',
-                    permalinkSymbol: '¶',
-                    permalinkBefore: true,
+                .use(require('markdown-it-checkbox'))
+                .use(require("markdown-it-attrs"))
+                .use(require("markdown-it-anchor").default)
+                .use(require("markdown-it-table-of-contents"), {
+                    containerClass: 'nav',
+                    includeLevel: [2,3,4],
                 });
-                */
 
-    let html = md.render(markdown);
+    //amend markdown ====
+    markdown = '[[toc]]\n' + markdown;
+
+    //amend html ====
+    let html = md.render(markdown)
     html = `<div>${html}</div>`;  //wrap to single element
     //html = renderRecord(html);
-    const  el = htmlToElement(html);
 
+    //amend element ========
+    const  el = htmlToElement(html);
     renderHeader(el);
     renderSection(el);
-    renderNavigation(el);
+    renderNavigation(el.querySelector('.nav'));
     fixLocalPath(el);
     renderImage(el);
+    el.querySelectorAll('section').forEach(sec => {
+        if(['trk-plan', 'trk-backup', 'trk-facto'].includes(sec.id) || sec.querySelectorAll('li code').length > 5)
+            renderRecBrief(sec.querySelector('h2+ul'));
+    })
+    extendTime(el);
     extendMap(el.querySelector('section#mapx'));
-    renderRecBrief(el.querySelector('section#trk-plan h2+ul'));
-    renderRecBrief(el.querySelector('section#trk-facto h2+ul'));
     extendVehicle(el.querySelector('section#transport'));
     //renderOthers(el);
     return el;
@@ -70,6 +75,7 @@ function renderRecord(html){
 function renderHeader(el){
     if(!el) return;
     const header = el.querySelector('h1');
+    if(!header) return;
     const [title, date] = header.textContent.split(/[()]/);
     header.outerHTML = `<header><h1>${title}</h1><time>${date}</time></header>`;   // move to template
 }
@@ -90,7 +96,8 @@ function renderSection(el, level=2){
 
         if(child.tagName == tag){ //new group
             secs.push([]);
-            sec_html += templates.section({id: Sec_name.getKey(child.textContent)});
+            const id = Sec_name.getKey(child.textContent) || `sec${secs.length}`;
+            sec_html += templates.section({id});
         }
 
         if(secs.length > 0)     //save to the current section
@@ -112,6 +119,13 @@ function renderSection(el, level=2){
 function renderNavigation(el){
     if(!el) return;
 
+    const toc = el.querySelector('ul');
+    toc.classList.add('toc');
+    toc.insertAdjacentHTML('afterbegin', '<li class="mainlink"><a href="#main">回上層目錄</a></li>');
+
+    el.insertAdjacentHTML('beforeend', templates.utils());
+
+    /*
     const secs = Array.from(el.querySelectorAll('section'))
                     .filter(sec => sec.id)
                     .map(sec => {
@@ -120,7 +134,7 @@ function renderNavigation(el){
                             name: sec.querySelector('h2').textContent,
                         };
                     });
-    el.insertAdjacentHTML('afterbegin', templates.toc(secs));
+    */
 }
 
 function renderOthers(el)
@@ -237,13 +251,24 @@ function extendMap(el)
     });
 }
 
-function renderRecBrief(el)
+function extendTime(el)
 {
     if(!el) return;
 
+    el.querySelectorAll('code').forEach(code => {
+        if(code.textContent.length == 4 && code.textContent.match(/[0-2][0-9][0-5][0-9]/))
+            code.outerHTML = `<time>${code.textContent}</time>`;
+    });
+
+}
+
+function renderRecBrief(el)
+{
+    /*
     el.querySelectorAll('li code').forEach(code => {
         code.outerHTML = `<time>${code.textContent}</time>`;
     });
+    */
 
     // `xxxx` => <time>xxxx</time>
     // {yyyy} => <span class="alt">yyyy</span>
@@ -260,7 +285,6 @@ function renderRecBrief(el)
         const day = trk.substring(sp, sp2);
         const path = trk.substring(sp2).split('-&gt;').map(loc => {
             loc = loc.trim()
-                .replace('code>', 'time>')                             //time
                 .replace(/{(\d+)}/, extendAltitude);    //altitude
             return `<span>${loc}</span>`
         }).join('➤');

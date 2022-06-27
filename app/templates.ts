@@ -122,20 +122,12 @@ export const section = Handlebars.compile(`
     </section>
 `);
 
-export const toc = Handlebars.compile(`
-<nav>
-  <ul class="toc">
-    <li><a href="#main">回上層目錄</a></li>
-    {{#each this}}
-    <li><a href="#{{id}}">{{name}}</a></li>
-    {{/each}}
-  </ul>
+export const utils = Handlebars.compile(`
   <ul class="utils">
     <li><button type="button" onclick="expandSecs()">Expand</button></li>
     <li><button type="button" onclick="collapseSecs()">Collapse</button></li>
     <li><button type="button" onclick="saveMarkdown()">Save MD</button></li>
   </ul>
-</nav>
 `);
 
 export const svgObject = Handlebars.compile(`
