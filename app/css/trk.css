@@ -103,33 +103,37 @@ ul {
     display: grid;
 }
 
-.nav a{
+.nav .toc{
+    grid-row: 1;
+    margin: 4px;
+}
+.nav .toc a{
     color:black;
 }
 
-.nav .toc{
-    grid-column: 1;
-}
-
+/* ======= submenu =====*/
 .nav .toc ul{
     list-style-type: none;
-    height: 0
+    margin: 0;
+    padding-left:0;
+    height: 0;
 }
 .nav .toc ul a{
+    font-size: smaller;
     color: transparent;
 }
-
 .nav .toc>li:hover ul{
-    list-style-type: revert;
     height: unset;
 }
 .nav .toc>li:hover ul a{
-    color: unset;
+    color: dimgray;
 }
 
 .nav .utils{
     list-style-type: none;
-    grid-column: 2;
+    grid-row: 2;
+    margin: 4px;
+    padding-left:0;
 }
 
 .nav .toc .mainlink{
@@ -285,7 +289,7 @@ header time {
 }
   
 .alt {
-    color: red;
+    color: dimgray;
     font-size: smaller;
 }
 
