@@ -248,7 +248,6 @@ function extendMap(el)
 {
     if(!el) return;
     el.innerHTML = el.innerHTML.replace(/{map:(.*?)}/g, (orig, mapid) => {
-        console.log(orig, mapid);
         if(mapid == 'trekkr') return templates.map_trekkr();
         //other maps...
         return orig;
@@ -260,15 +259,25 @@ function extendTime(el)
     if(!el) return;
 
     el.querySelectorAll('code').forEach(code => {
-        if(code.textContent.length == 4 && code.textContent.match(/[0-2][0-9][0-5][0-9]/))
+        if(isTimeFormat(code.textContent))
             code.outerHTML = `<time>${code.textContent}</time>`;
     });
-
 }
+
+function isTimeFormat(txt){
+    if (txt.length == 4 && txt.match(/[0-2][0-9][0-5][0-9]/)) return true;
+    if (txt.length == 7 && txt.match(/[0-2][0-9][0-5][0-9]~[0-5][0-9]/)) return true;
+    if (txt.length == 9 && txt.match(/[0-2][0-9][0-5][0-9]~[0-2][0-9][0-5][0-9]/)) return true;
+    return false;
+}
+
 
 function renderRecBrief(el)
 {
+    if(!el) return;
+
     el.querySelectorAll('li').forEach(li => {
+
         let html = li.innerHTML
                     .replace(/{(.*?)}/g, extendWeather)
                     .replace(/(D\d+ )/, extendTrkDay);
@@ -283,8 +292,7 @@ function renderRecBrief(el)
 
             //split
             const path = html.substring(begin , end).split('-&gt;').map(loc => {
-                loc = loc.trim().replace(/{(\d+)}/, extendAltitude);    //altitude
-                return `<span>${loc}</span>`
+                return `<span>${loc.trim()}</span>`
             }).join('➤');
 
             //replace
@@ -294,7 +302,15 @@ function renderRecBrief(el)
         //re-format
         li.classList.add('trkseg');
         li.innerHTML = html;
+        li.querySelectorAll('em').forEach(extendAltitude);
     });
+}
+
+function extendAltitude(em)
+{
+    if (!isNaN(em.textContent))
+        em.classList.add('alt');
+        //em.outerHTML = `<span class="alt">${em.textContent}</span>`;
 }
 
 function extendTrkDay(orig, day){
@@ -302,18 +318,11 @@ function extendTrkDay(orig, day){
 }
 
 function extendWeather(orig, value){
-    console.log(orig, value);
     const key = Weather_name.getKey(value);
     if(!key)
         return orig;
     return `<i class="fa-solid fa-${key}" title="${value}"></i>`;
 }
-
-function extendAltitude(orig, value){
-    //beacuse regex already check the value is a number 
-    return `<span class="alt">${value}</span>`;
-}
-
 
 function extendVehicle(el){
     if(!el) return;
