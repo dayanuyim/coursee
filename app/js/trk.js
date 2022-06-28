@@ -1,28 +1,26 @@
-  function toggleMap(){
+import { fireOnlyIfSingleClick } from '../dom-utils';
+
+function toggleMap(){
     const mapobj = document.getElementById('mapobj');
     mapobj.classList.toggle('hide');
     if(!mapobj.getAttribute('data')){
       mapobj.setAttribute('data', "https://dayanuyim.github.io/maps/");
       mapobj.focus();
     }
-  }
+}
 
 function toggleSec(target){
-    const sec = target.closest('section')
-    sec.querySelector('.sec-content').classList.toggle('hide');
-    sec.querySelector('.sec-toggle').classList.toggle('collapse');
+    fireOnlyIfSingleClick(()=>target.classList.toggle('collapse'));
 }
 
-function collapseSecs(){
-    document.querySelectorAll('.sec-content').forEach(e => e.classList.add('hide'));
-    document.querySelectorAll('.sec-toggle').forEach(e => e.classList.add('collapse'));
-}
+function toggleSecs(target){
+    const cls = 'collapse';
 
-function expandSecs(){
-    document.querySelectorAll('.sec-content').forEach(e => e.classList.remove('hide'));
-    document.querySelectorAll('.sec-toggle').forEach(e => e.classList.remove('collapse'));
+    const toggle = target.classList.contains(cls)?
+            el => el.classList.remove(cls):
+            el => el.classList.add(cls);
+    document.body.querySelectorAll('.sec-toggle').forEach(toggle);
 }
-
 function saveMarkdown(){
     const date = document.body.querySelector('header time').getAttribute('datetime');
     const hdr = document.body.querySelector('header h1').innerHTML;
@@ -34,5 +32,5 @@ function saveMarkdown(){
 }
 
 window.toggleMap = toggleMap;
-window.collapseSecs = collapseSecs;
-window.expandSecs = expandSecs;
+window.toggleSec = toggleSec;
+window.toggleSecs = toggleSecs;

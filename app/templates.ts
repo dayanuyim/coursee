@@ -118,14 +118,12 @@ export const toTimethru = Handlebars.compile(`
 
 export const section = Handlebars.compile(`
     <section id="{{id}}">
-      <button class="sec-toggle" onclick="this.classList.toggle('collapse')"></button>
+      <button class="sec-toggle" onclick="toggleSec(this)" ondblclick="toggleSecs(this)"></button>
     </section>
 `);
 
 export const utils = Handlebars.compile(`
   <ul class="utils">
-    <li><button type="button" onclick="expandSecs()">Expand</button></li>
-    <li><button type="button" onclick="collapseSecs()">Collapse</button></li>
     <li><button type="button" onclick="saveMarkdown()">Save MD</button></li>
   </ul>
 `);

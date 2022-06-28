@@ -302,3 +302,30 @@ export function getOffset(el: Element) {
 		width: rect.width,
 	}
 }
+
+var _click_timer;
+export function fireOnlyIfSingleClick(fn){
+    //double click
+    if (_click_timer){
+        clearTimeout(_click_timer);  //clear the earlier action
+        _click_timer = null;
+    }
+    //single click
+    else{
+        _click_timer = setTimeout(function() {
+            fn();
+            _click_timer = null;
+        }, 250);
+    }
+}
+
+export function fireClicksAsSingleClick(fn) {
+    if (_click_timer){
+        clearTimeout(_click_timer);
+        _click_timer = null;
+    }
+    _click_timer = setTimeout(function() {
+        fn();
+        _click_timer = null;
+    }, 250);
+}
