@@ -194,26 +194,6 @@ function setRecNotFound(recElem, msg)
     map.style.height = `${adjust_height}px`;
 }
 
-async function loadMarkdown(mdPath)
-{
-    document.getElementById('download-rec').href = mdPath;
-
-    const recElem = document.getElementById("rec");
-    try{
-        const resp = await fetch(mdPath, {contentType: "text/markdown;charset=UTF-8;"});
-        if(!resp.ok)
-            return setRecNotFound(recElem, `Rec Not Found`);
-
-        //console.log(resp);
-        const text = await resp.text();
-        innerElement(recElem, markdownElement(text));
-    }
-    catch(err){
-        console.log(err);
-        return setRecNotFound(recElem, `Load Rec Error: ${err}`);
-    }
-}
-
 // TODO @name -> @mdUrl
 export async function loadRec(name)
 {
@@ -235,6 +215,30 @@ export async function loadRec(name)
         setRecTimestampFocus(mapHandler);
     */
     loadMarkdown(mdPath);
+}
+
+async function loadMarkdown(mdPath)
+{
+    document.getElementById('download-rec').href = mdPath;
+
+    const recElem = document.getElementById("rec");
+    try{
+        //fetch
+        const resp = await fetch(mdPath, {contentType: "text/markdown;charset=UTF-8;"});
+        if(!resp.ok)
+            throw new Error(`Markdown '${mdPath}' not found`);
+
+        //markdown -> html element
+        const text = await resp.text();
+        innerElement(recElem, markdownElement(text, {
+            host: `${window.location.protocol}//${window.location.host}`,
+            subpath: mdPath.substring(0, mdPath.lastIndexOf("/")),
+        }));
+    }
+    catch(err){
+        console.log(err);
+        return setRecNotFound(recElem, `Load Rec Error: ${err}`);
+    }
 }
 
 function setRecTimestampFocus(mapHandler)

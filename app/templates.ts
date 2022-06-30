@@ -76,7 +76,7 @@ export const main = Handlebars.compile(`
 
     <hr>
     <footer>
-        <p>&copy; 2019</p>
+        <p>&copy; 2022</p>
     </footer>
 `);
 

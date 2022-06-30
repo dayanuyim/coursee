@@ -35,8 +35,13 @@ const Weather_name = new BiMap({
     snowflake: "雪",
 });
 
-export function markdownElement(markdown)
+let _opt = null;
+
+export function markdownElement(markdown, opt)
 {
+    //set options
+    _opt = opt;
+
     const md = require('markdown-it')()
                 .use(require('markdown-it-checkbox'))
                 //.use(require("markdown-it-attrs"))
@@ -68,7 +73,7 @@ export function markdownElement(markdown)
     extendTime(el);
     extendMap(el.querySelector('section#mapx'));
     extendVehicle(el.querySelector('section#transport'));
-    //renderOthers(el);
+    //renderRecContent(el);
     return el;
 }
 
@@ -141,7 +146,7 @@ function renderNavigation(el){
     */
 }
 
-function renderOthers(el)
+function renderRecContent(el)
 {
     //get start day
     var start_date = (el.firstChild)? getStartDate(el.firstChild.innerHTML): null;
@@ -183,21 +188,18 @@ function fixLocalPath(el)
 {
     if(!el) return;
 
-    const images = el.querySelectorAll('img');
-    if(images.length <= 0)
-        return;
+    el.querySelectorAll('img').forEach(img => img.src = _fixLocalPath(img.src));
+    el.querySelectorAll('object').forEach(obj => obj.data = _fixLocalPath(obj.data));
+}
 
-    const host = `${window.location.protocol}//${window.location.host}`;
-    const title = el.querySelector('header h1').textContent;
-    const date = el.querySelector('header time').textContent;
-    const subdir = `data/${date}-${title}`;
+function _fixLocalPath(url){
+    if(!_opt || !_opt.host || !_opt.subpath) return;
 
-    images.forEach(img => {
-        if(img.src.startsWith(host)){
-            const path = img.src.substring(host.length+1);
-            img.src = `${host}/${subdir}/${path}`
-        }
-    });
+    if(url.startsWith(_opt.host)){
+        const path = url.substring(_opt.host.length);
+        return `${_opt.host}/${_opt.subpath}${path}`
+    }
+    return url;
 }
 
 function renderImage(el)
