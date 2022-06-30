@@ -17,9 +17,10 @@ async function showView()
         return showIndex();
     if(view.startsWith("#trek"))
         return showTrek(getParam(view));
-    if(document.body.querySelector(view))  // normal anchor
+    if(document.getElementById(view.substring(1)))  // normal anchor
         return;
 
+    //console.debug(`Unrecognized view: ${view}`);
     throw Error(`Unrecognized view: ${view}`);
 }
 

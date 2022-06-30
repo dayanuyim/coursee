@@ -93,7 +93,7 @@ ul {
 
 
   
-.nav {
+nav,.nav {
     background: rgba(248,248,248,.7);
     position: fixed;
     top: 20vh;

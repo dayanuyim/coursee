@@ -25,31 +25,13 @@ Handlebars.registerHelper('eachYear', function(obj, options) {
 });
 
 export const main = Handlebars.compile(`
+    <!--
     <nav><ul>
-        <li><a href="#app">Applications</a></li>
-        <li><a href="#travel">Travel</a></li>
-        <li><a href="#trk">Trekking</a></li>
-        <li><a href="#trk_plan">Trakking Plan</a></li>
+        <li><a href="#index">Index</a></li>
     </ul></nav>
+    -->
 
-    <section id="app"><a name="app"></a>
-    <h3>Personal Applications</h3><dl>
-        <dt><a href="https://github.com/dayanuyim/GisEditor/blob/master/README.md">GisEditor</a></dt>
-        <dd>A map browsing adapter to WMTS, written in Python, running in Windows/Linux.</dd>
-    </dl>
-    </section>
-
-    <section id="travel"><a name="travel"></a>
-    <h3>Travel</h3>
-    <h4>2016</h4><ul>
-        <li><time class="trk-date">2016_0416</time>
-            <span class="title"><i class="fa-regular fa-map"></i>羅東傳藝中心</span>
-        </li>
-    </ul>
-    </section>
-
-    <section id="trk"><a name="trk"></a>
-    <h3>Trekking</h3>
+    <section id="index"><a name="index"></a>
 
     {{#eachYear treks}}
     <h4>{{year}}</h4>
@@ -62,10 +44,10 @@ export const main = Handlebars.compile(`
             <span class="trk-gpx"><a href="data/{{date}}-{{title}}/course.gpx"><i class="fa-solid fa-location-dot"></i></a></span>
             <span class="trk-rec"><a href="data/{{date}}-{{title}}/course.md"><i class="fa-regular fa-pen-to-square"></i></a></span>
             {{#if keepon}}
-                <span class="trk-keepon"><a href="{{keepon}}"><i class='fa-solid fa-signs-post'></i></a></span>
+                <span class="trk-keepon"><a href="{{keepon}}" target="_blank"><i class='fa-solid fa-signs-post'></i></a></span>
             {{/if}}
             {{#if facebook}}
-                <span class="trk-facebook"><a href="{{facebook}}"><i class="fa-brands fa-facebook-square"></i></a></span>
+                <span class="trk-facebook"><a href="{{facebook}}" target="_blank"><i class="fa-brands fa-facebook-square"></i></a></span>
             {{/if}}
         </li>
         {{/each}}
