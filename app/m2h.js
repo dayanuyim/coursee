@@ -21,6 +21,7 @@ const Sec_name = new BiMap({
     transport: "交通",
     lodge: "住宿",
     'ref-rec': "參考記錄",
+    'ref-trk': "參考行程",
 });
 
 //predefined weather names
@@ -43,7 +44,7 @@ export function markdownElement(markdown, opt)
     _opt = opt;
 
     const md = require('markdown-it')()
-                .use(require('markdown-it-checkbox'))
+                .use(require('markdown-it-task-checkbox'))
                 //.use(require("markdown-it-attrs"))
                 .use(require("markdown-it-anchor").default)
                 .use(require("markdown-it-table-of-contents"), {
