@@ -65,6 +65,7 @@ export function markdownElement(markdown, opt)
     renderSection(el);
     renderNavigation(el.querySelector('.nav'));
     fixLocalPath(el);
+    renderAnchor(el);
     renderImage(el);
     el.querySelectorAll('section').forEach(sec => {
         if(['trk-plan', 'trk-backup', 'trk-facto'].includes(sec.id) || sec.querySelectorAll('li code').length > 5)
@@ -200,6 +201,19 @@ function _fixLocalPath(url){
         return `${_opt.host}/${_opt.subpath}${path}`
     }
     return url;
+}
+
+function renderAnchor(el)
+{
+    if(!el) return;
+    if(!_opt || !_opt.host) return;
+
+    const bookmark_prefix = `${_opt.host}/#`;
+    el.querySelectorAll('a').forEach(a => {
+        if(a.href.startsWith(bookmark_prefix)) return;
+        if(a.target) return;
+        a.target = '_blank';
+    })
 }
 
 function renderImage(el)
