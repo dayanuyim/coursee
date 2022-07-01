@@ -212,7 +212,7 @@ function renderAnchor(el)
     if(!_opt || !_opt.host) return;
 
     const bookmark_prefix = `${_opt.host}/#`;
-    el.querySelectorAll('a').forEach(a => {
+    el.querySelectorAll('section a').forEach(a => {
         if(a.href.startsWith(bookmark_prefix)) return;
         if(a.target) return;
         a.target = '_blank';
