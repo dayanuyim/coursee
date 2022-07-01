@@ -46,7 +46,9 @@ export function markdownElement(markdown, opt)
     const md = require('markdown-it')()
                 .use(require('markdown-it-task-checkbox'))
                 //.use(require("markdown-it-attrs"))
-                .use(require("markdown-it-anchor").default)
+                .use(require("markdown-it-anchor").default, {
+                    slugify: s => (Sec_name.getKey(s) || 'sec') + '-header',
+                })
                 .use(require("markdown-it-table-of-contents"), {
                     containerClass: 'nav',
                     includeLevel: [2,3,4],
