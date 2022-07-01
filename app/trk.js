@@ -236,7 +236,7 @@ async function loadMarkdown(mdPath)
         }));
     }
     catch(err){
-        console.log(err);
+        console.error(err);
         return setRecNotFound(recElem, `Load Rec Error: ${err}`);
     }
 }

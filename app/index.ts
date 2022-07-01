@@ -29,10 +29,24 @@ function getParam(s){
     return  (i < 0)? "": s.substring(i+1);
 }
 
-function showIndex()
+async function showIndex()
 {
-    const treks = utils.groupItems(require('./data.json'), trek => trek.date.slice(0, 4)); //group by years
-    document.body.innerHTML = templates.main({treks});
+    //const treks = utils.groupItems(require('./data.json'), trek => trek.date.slice(0, 4)); //group by years
+    //document.body.innerHTML = templates.main({treks});
+
+    try{
+        //fetch
+        const resp = await fetch('./data.json');
+        if(!resp.ok)
+            throw new Error(`data.json not found`);
+
+        const json = await resp.json();
+        const treks = utils.groupItems(json, trek => trek.date.slice(0, 4)); //group by years
+        document.body.innerHTML = templates.main({treks});
+    }
+    catch(err){
+        console.error(err);
+    }
 }
 
 function showTrek(name){

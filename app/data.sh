@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dir="${0%/*}/data"
+dir="$(dirname "$0")/data"
 
 function parse()
 {
