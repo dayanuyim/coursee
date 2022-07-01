@@ -19,8 +19,10 @@ div#download{
     top: 0;
     right: 0;
     z-index:9;
-    /*background-color: black;*/
-    border: 1px solid gray;
+    background-color: rgba(255,255,255,0.7);
+    /*border: 1px solid gray;*/
+    padding: 2px;
+    border-radius: 0 0 0 4px;
 }
 
 div#download a{
@@ -94,6 +96,9 @@ ul {
 
   
 nav,.nav {
+    display: inline-block;
+    width: 20%;
+    max-width: 20%;
     background: rgba(248,248,248,.7);
     position: fixed;
     top: 20vh;
@@ -116,18 +121,22 @@ nav,.nav {
     list-style-type: none;
     margin: 0;
     padding-left:0;
-    height: 0;
+    white-space: nowrap;
+    display:none;
+    /*height: 0;*/
 }
 .nav .toc ul a{
     font-size: smaller;
-    color: transparent;
+    color: dimgray;
 }
 .nav .toc>li:hover ul{
-    height: unset;
+    display: unset;
+    /*height: unset;*/
 }
 .nav .toc>li:hover ul a{
     color: dimgray;
 }
+/* ======= submenu =====*/
 
 .nav .utils{
     list-style-type: none;
@@ -252,13 +261,18 @@ nav,.nav {
   }
   */
   
-  .trkseg-path>span{
+.trkseg-path{
+    color: dimgray;
+}
+
+.trkseg-path>span{
+    color: black;
     margin: 0 3px;
     display: inline-block;
-  }
-  .trkseg-path span:hover{
+}
+.trkseg-path span:hover{
     background-color:rgba(255,255,255);
-  }
+}
   
   /* remove the newline between spans*/
   /*

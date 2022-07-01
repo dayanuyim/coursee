@@ -242,8 +242,10 @@ function renderImage(el)
 
         //check if alt is specified size
         let width, height;
-        if(img.alt.match(/[0-9]+x[0-9]+/)){
+        if(img.alt.match(/[0-9]+.*x[0-9]+.*/)){
             [width, height] = img.alt.split('x');
+            if(!isNaN(width)) width += 'px';
+            if(!isNaN(height)) height += 'px';
             img.removeAttribute('alt');
         }
 
@@ -255,8 +257,8 @@ function renderImage(el)
         }
         //normal iamge
         else if(width && height){
-            img.width = width;
-            img.height = height;
+            img.style.width = width;
+            img.style.height = height;
         }
     });
 }

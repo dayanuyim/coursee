@@ -1,5 +1,19 @@
 import * as Handlebars from '../node_modules/handlebars/dist/handlebars.js';
 
+Handlebars.registerHelper('defVal', function (value, defValue) {
+    let out = value || defValue;
+    return out;
+    //return new Handlebars.SafeString(out);
+});
+
+Handlebars.registerHelper('name', function (date, days, title) {
+    let out = date;
+    if(title) out += `-${title}`;
+    if(days) out += `-${days}`;
+    return out;
+    //return new Handlebars.SafeString(out);
+});
+
 Handlebars.registerHelper('fmtDate', function(date) {
     return date;
     //return `${date.getFullYear()}__${date.getDate()}`;
@@ -39,16 +53,10 @@ export const main = Handlebars.compile(`
         {{#each ytreks}}
         <li>
             <time class="trk-date">{{fmtDate date}}</time>
-            <span class="trk-days trk-days-{{days}}">{{days}}</span>
-            <label class="trk-title"><a href="#trek-{{date}}-{{title}}">{{title}}</a></label>
+            <span class="trk-days trk-days-{{defVal days 1}}">{{defVal days 1}}</span>
+            <label class="trk-title"><a href="#trek-{{name date days title}}">{{title}}</a></label>
             <span class="trk-gpx"><a href="data/{{date}}-{{title}}/course.gpx"><i class="fa-solid fa-location-dot"></i></a></span>
             <span class="trk-rec"><a href="data/{{date}}-{{title}}/course.md"><i class="fa-regular fa-pen-to-square"></i></a></span>
-            {{#if keepon}}
-                <span class="trk-keepon"><a href="{{keepon}}" target="_blank"><i class='fa-solid fa-signs-post'></i></a></span>
-            {{/if}}
-            {{#if facebook}}
-                <span class="trk-facebook"><a href="{{facebook}}" target="_blank"><i class="fa-brands fa-facebook-square"></i></a></span>
-            {{/if}}
         </li>
         {{/each}}
     </ul>
@@ -115,7 +123,7 @@ export const svgObject = Handlebars.compile(`
 `);
 
 export const svgObject2 = Handlebars.compile(`
-    <object data="{{src}}" type="image/svg+xml" width="{{width}}" height="{{height}}">Failed to Load SVG</object>
+    <object data="{{src}}" type="image/svg+xml" style="width:{{width}};height:{{height}}" >Failed to Load SVG</object>
 `);
 
 export const map_trekkr = Handlebars.compile(`
