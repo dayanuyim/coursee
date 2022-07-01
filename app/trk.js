@@ -131,36 +131,6 @@ function formatRecTag(txt, date)
     return lines.reduce((acc, line) => acc + addTimeTag(line, date), '');
 }
 
-//gen <div class="rec-content">, from content and title elemnt
-function genRecContentElem(content, title, base_date)
-{
-    //parse date from title_elem
-    var day = getDay(title.innerHTML);
-    if(day != null){
-        //retag content_elem and as title_elem's child
-        var date = (base_date)? base_date.addDays(day): null;
-        var content_txt = formatRecTag(content.innerHTML, date);
-
-        var elem = document.createElement("DIV");
-        elem.className += "rec-content ";
-        elem.innerHTML = content_txt;
-        return elem;
-    }
-
-    return null;
-}
-
-function getDay(txt)
-{
-    var re = /D(\d+)\s/
-    var arr = txt.match(re);
-    if(arr && arr.length >= 2){
-        return parseInt(arr[1]);
-    }
-
-    return null;
-}
-
 function loadText(elem, fname)
 {
     fetch(fname, {contentType: "text/plain;charset=UTF-8;"})
@@ -205,6 +175,8 @@ export async function loadRec(name)
     const gpxPath = `data/${name}/course.gpx`;
     const mdPath = `data/${name}/course.md`;
 
+    setMarkdownDownload(mdPath);
+    loadMarkdown(mdPath);
     /*
     const [ mapHandler, _ ] = await Promise.all([
         loadMap(gpxPath),
@@ -214,13 +186,17 @@ export async function loadRec(name)
     if(mapHandler)
         setRecTimestampFocus(mapHandler);
     */
-    loadMarkdown(mdPath);
+}
+
+function setMarkdownDownload(mdPath)
+{
+    const el = document.getElementById('download-rec');
+    el.href = mdPath;
+    el.download = decodeURI(mdPath.split('/')[1]) + ".md";   // data/<name>/course.md
 }
 
 async function loadMarkdown(mdPath)
 {
-    document.getElementById('download-rec').href = mdPath;
-
     const recElem = document.getElementById("rec");
     try{
         //fetch
@@ -231,7 +207,7 @@ async function loadMarkdown(mdPath)
         //markdown -> html element
         const text = await resp.text();
         innerElement(recElem, markdownElement(text, {
-            host: `${window.location.protocol}//${window.location.host}`,
+            host: window.location.href.substring(0, window.location.href.lastIndexOf('/')),
             subpath: mdPath.substring(0, mdPath.lastIndexOf("/")),
         }));
     }

@@ -16,7 +16,7 @@ module.exports = {
   resolve: {
       extensions: [".ts", ".tsx", ".js", ".jsx", ".css"],
       fallback: {
-          util: require.resolve("util/")
+          util: require.resolve("util/"),
       },
   },
   plugins: [

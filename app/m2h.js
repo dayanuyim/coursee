@@ -59,8 +59,8 @@ export function markdownElement(markdown, opt)
 
     //amend html ====
     let html = md.render(markdown)
-    html = `<div>${html}</div>`;  //wrap to single element
     //html = renderRecord(html);
+    html = `<div>${html}</div>`;  //wrap to single element
 
     //amend element ========
     const  el = htmlToElement(html);
@@ -79,10 +79,6 @@ export function markdownElement(markdown, opt)
     extendVehicle(el.querySelector('section#transport'));
     //renderRecContent(el);
     return el;
-}
-
-function renderRecord(html){
-    return html.replace(/<pre><code>/g, "<article>").replace(/<\/code><\/pre>/g, "</article>")
 }
 
 function renderHeader(el){
@@ -148,44 +144,6 @@ function renderNavigation(el){
                         };
                     });
     */
-}
-
-function renderRecContent(el)
-{
-    //get start day
-    var start_date = (el.firstChild)? getStartDate(el.firstChild.innerHTML): null;
-    var base_date = start_date? start_date.addDays(-1): null;
-    //console.log("base_date: " + base_date);
-
-    for(let i = 0; i < el.children.length; ++i){
-        const curr = el.children[i];
-        const last = (i == 0)? null: el.children[i-1];
-
-        if(curr.tagName == "ARTICLE"){
-            //the rec per day, replace 'article' by 'content' elemnt
-            if (last && last.tagName == "H2"){
-                var content_elem = genRecContentElem(curr, last, base_date);
-                if(content_elem != null)
-                    elem.replaceChild(content_elem, curr);
-            }
-            //normal
-            else{
-                curr.innerHTML = curr.innerHTML.replace(/[\r\n]+/g, '<BR>');
-            }
-        }
-    }
-}
-
-function getStartDate(txt)
-{
-    var re = /\d\d\d\d[\/.-]\d{1,2}[\/.-]\d{1,2}/m;
-    var arr =  txt.match(re);
-    if(arr && arr.length >= 1){
-        var date = arr[0].replace(/\//g, '-');
-        return new Date(date);
-    }
-
-    return null;
 }
 
 function fixLocalPath(el)
@@ -289,6 +247,7 @@ function isTimeFormat(txt){
     if (txt.length == 4 && txt.match(/[0-2][0-9][0-5][0-9]/)) return true;
     if (txt.length == 7 && txt.match(/[0-2][0-9][0-5][0-9]~[0-5][0-9]/)) return true;
     if (txt.length == 9 && txt.match(/[0-2][0-9][0-5][0-9]~[0-2][0-9][0-5][0-9]/)) return true;
+    if (txt.match(/[0-9]+m/)) return true;
     return false;
 }
 
@@ -353,4 +312,77 @@ function extendVehicle(el){
             return `<span class="vehicle">${value}</span>`;
         });
     });
+}
+
+function renderRecord(html){
+    return html.replace(/<pre><code>/g, "<article>").replace(/<\/code><\/pre>/g, "</article>")
+}
+
+function renderRecContent(el)
+{
+    //get start day
+    var start_date = (el.firstChild)? getStartDate(el.firstChild.innerHTML): null;
+    var base_date = start_date? start_date.addDays(-1): null;
+    //console.log("base_date: " + base_date);
+
+    for(let i = 0; i < el.children.length; ++i){
+        const curr = el.children[i];
+        const last = (i == 0)? null: el.children[i-1];
+
+        if(curr.tagName == "ARTICLE"){
+            //the rec per day, replace 'article' by 'content' elemnt
+            if (last && last.tagName == "H3"){
+                var content_elem = genRecContentElem(curr, last, base_date);
+                if(content_elem != null)
+                    elem.replaceChild(content_elem, curr);
+            }
+            //normal
+            else{
+                curr.innerHTML = curr.innerHTML.replace(/[\r\n]+/g, '<BR>');
+            }
+        }
+    }
+}
+
+function getStartDate(txt)
+{
+    var re = /\d\d\d\d[\/.-]\d{1,2}[\/.-]\d{1,2}/m;
+    var arr =  txt.match(re);
+    if(arr && arr.length >= 1){
+        var date = arr[0].replace(/\//g, '-');
+        return new Date(date);
+    }
+
+    return null;
+}
+
+
+//gen <div class="rec-content">, from content and title elemnt
+function genRecContentElem(content, title, base_date)
+{
+    //parse date from title_elem
+    var day = getDay(title.innerHTML);
+    if(day != null){
+        //retag content_elem and as title_elem's child
+        var date = (base_date)? base_date.addDays(day): null;
+        var content_txt = formatRecTag(content.innerHTML, date);
+
+        var elem = document.createElement("DIV");
+        elem.className += "rec-content ";
+        elem.innerHTML = content_txt;
+        return elem;
+    }
+
+    return null;
+}
+
+function getDay(txt)
+{
+    var re = /D(\d+)\s/
+    var arr = txt.match(re);
+    if(arr && arr.length >= 2){
+        return parseInt(arr[1]);
+    }
+
+    return null;
 }
