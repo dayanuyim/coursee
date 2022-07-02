@@ -125,25 +125,28 @@ function renderSection(el, level=2){
     }
 }
 
+let _is_nav_dragging = false;
 function renderNavigation(el){
     if(!el) return;
 
+    //toc
     const toc = el.querySelector('ul');
     toc.classList.add('toc');
     toc.insertAdjacentHTML('afterbegin', '<li class="mainlink"><a href="#main">回上層目錄</a></li>');
-
+    //uteil
     el.insertAdjacentHTML('beforeend', templates.utils());
 
-    /*
-    const secs = Array.from(el.querySelectorAll('section'))
-                    .filter(sec => sec.id)
-                    .map(sec => {
-                        return {
-                            id: sec.id,
-                            name: sec.querySelector('h2').textContent,
-                        };
-                    });
-    */
+    //drag to move
+    el.addEventListener('mousedown', e => _is_nav_dragging = true, true);
+    document.addEventListener('mouseup', e => _is_nav_dragging = false, true);
+    document.addEventListener('mousemove', e => {
+        e.preventDefault();
+        if (_is_nav_dragging) {
+            const rect = el.getBoundingClientRect();
+            el.style.left = rect.x + e.movementX + 'px';
+            el.style.top = rect.y + e.movementY + 'px';
+        }
+    }, true);
 }
 
 function fixLocalPath(el)
