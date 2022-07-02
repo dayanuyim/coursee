@@ -1,6 +1,7 @@
 ### Application ###
 sessions/
 dist/
+app/data
 app/data.json
 
 # Created by https://www.gitignore.io/api/vim,node,linux,macos,windows,visualstudiocode
