@@ -1,6 +1,9 @@
 #!/bin/bash
 
-dir="$(dirname "$0")/data"
+dir="$1"
+if [[ -z $dir ]]; then
+    dir="$(dirname "$0")/data"
+fi
 
 function parse()
 {
@@ -32,20 +35,27 @@ function data(){
 
 echo "["
 
-line=
-IFS=$'\n'
+prev=
+curr=
 
-# print the prev line
+# print the prev line if curr ok
+IFS=$'\n'
 for path in $(data); do
-    if [[ -n $line ]]; then
-        echo "  $line,"
+
+    curr="$(parse "${path##*/}")"
+
+    if [[ -n $curr ]]; then
+        if [[ -n $prev ]]; then
+            echo "  $prev,"
+        fi
+        prev="$curr"
+        curr=
     fi
-    line="$(parse "${path##*/}")"
 done
 
 # print the last line
-if [[ -n $line ]]; then
-    echo "  $line"
+if [[ -n $prev ]]; then
+    echo "  $prev"
 fi
 
 echo "]"
