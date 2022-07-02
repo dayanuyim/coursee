@@ -247,7 +247,7 @@ function isTimeFormat(txt){
     if (txt.length == 4 && txt.match(/[0-2][0-9][0-5][0-9]/)) return true;
     if (txt.length == 7 && txt.match(/[0-2][0-9][0-5][0-9]~[0-5][0-9]/)) return true;
     if (txt.length == 9 && txt.match(/[0-2][0-9][0-5][0-9]~[0-2][0-9][0-5][0-9]/)) return true;
-    if (txt.match(/[0-9]+m/)) return true;
+    if (txt.match(/^[0-9]+m$/)) return true;
     return false;
 }
 
