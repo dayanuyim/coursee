@@ -194,7 +194,7 @@ nav,.nav {
   }
   */
   time {
-    color: #1372d0;
+    color: forestgreen;
     font-weight: bold;
   /*
     color: white;
@@ -309,10 +309,19 @@ header time {
 
 .vehicle{
     color: white;
-    background: cornflowerblue;
+    /*background: cornflowerblue;*/
+    background: darkblue;
     padding: 1px 4px 0px 4px;
     margin: 0px 4px 2px 0;
     border-radius: 4px;
     display: inline-block;
 }
-  
+
+.fa-sun{ color:darkorange; }
+.fa-wind{ color: green; }
+.fa-cloud{ color:gray; }
+.fa-cloud-bolt{ color:steelblue; }
+.fa-cloud-rain{ color:dimgray; }
+.fa-cloud-sun-rain{ color:brown; }
+.fa-smog{ color:lightgray; }
+.fa-snowflake{ color:skyblue; }

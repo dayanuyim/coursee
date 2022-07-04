@@ -47,8 +47,8 @@ nav + *{
 
 a {
     text-decoration: none;
-    /*color: #0366d6;*/
-    color:black;
+    color: #0366d6;
+    /*color:black;*/
 }
 a:hover {
     text-decoration: underline;
