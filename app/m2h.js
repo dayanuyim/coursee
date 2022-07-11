@@ -46,6 +46,7 @@ export function markdownElement(markdown, opt)
     const md = require('markdown-it')()
                 .use(require('markdown-it-task-checkbox'))
                 //.use(require("markdown-it-attrs"))
+                .use(require('markdown-it-imsize'))
                 .use(require("markdown-it-anchor").default, {
                     slugify: s => (Sec_name.getKey(s) || 'sec') + '-header',
                 })
@@ -69,7 +70,7 @@ export function markdownElement(markdown, opt)
     renderNavigation(el.querySelector('.nav'));
     fixLocalPath(el);
     renderAnchor(el);
-    renderImage(el);
+    renderSvg(el);
     el.querySelectorAll('section').forEach(sec => {
         if(['trk-plan', 'trk-backup', 'trk-facto'].includes(sec.id) || sec.querySelectorAll('li code').length > 5)
             renderRecBrief(sec.querySelector('h2+ul'));
@@ -180,48 +181,16 @@ function renderAnchor(el)
     })
 }
 
-function renderImage(el)
+function renderSvg(el)
 {
     if(!el) return;
 
     el.querySelectorAll('img').forEach(img => {
-
-        /*
-        //alt is used to specify the size 
-        if(img.alt.match(/[0-9]+x[0-9]+/)){
-            const [width, height] = img.alt.split('x');
-            img.removeAttribute('alt');
-            img.width = width;
-            img.height = height;
-        }
-
         //use <object> to load svg file
         if(img.src.toLowerCase().endsWith('.svg')){
             img.outerHTML = (img.width && img.height)?
                         templates.svgObject2({src: img.src, width: img.width, height: img.height}):
                         templates.svgObject({src: img.src});
-        }
-        */
-
-        //check if alt is specified size
-        let width, height;
-        if(img.alt.match(/[0-9]+.*x[0-9]+.*/)){
-            [width, height] = img.alt.split('x');
-            if(!isNaN(width)) width += 'px';
-            if(!isNaN(height)) height += 'px';
-            img.removeAttribute('alt');
-        }
-
-        //is svg image
-        if(img.src.toLowerCase().endsWith('.svg')){
-            img.outerHTML = (width && height)?
-                        templates.svgObject2({src: img.src, width, height}):
-                        templates.svgObject({src: img.src});
-        }
-        //normal iamge
-        else if(width && height){
-            img.style.width = width;
-            img.style.height = height;
         }
     });
 }

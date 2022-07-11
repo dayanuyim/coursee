@@ -123,7 +123,7 @@ export const svgObject = Handlebars.compile(`
 `);
 
 export const svgObject2 = Handlebars.compile(`
-    <object data="{{src}}" type="image/svg+xml" style="width:{{width}};height:{{height}}" >Failed to Load SVG</object>
+    <object data="{{src}}" type="image/svg+xml" width="{{width}}" height="{{height}}" >Failed to Load SVG</object>
 `);
 
 export const map_trekkr = Handlebars.compile(`
