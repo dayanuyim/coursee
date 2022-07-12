@@ -61,20 +61,20 @@ export function markdownElement(markdown, opt)
     //amend html ====
     let html = md.render(markdown)
     //html = renderRecord(html);
-    html = extendAltitude(html);
+    html = renderAltitude(html);
     html = `<div>${html}</div>`;  //wrap to single element
 
     //amend element ========
     const  el = htmlToElement(html);
-    renderHeader(el);
-    renderSection(el);
-    renderNavigation(el.querySelector('.nav'));
+    extendHeader(el);
+    extendSection(el);
+    extendNavigation(el.querySelector('.nav'));
     fixLocalPath(el);
-    renderAnchor(el);
-    renderSvg(el);
+    extendAnchor(el);
+    extendSvg(el);
     el.querySelectorAll('section').forEach(sec => {
         if(['trk-plan', 'trk-backup', 'trk-facto'].includes(sec.id) || sec.querySelectorAll('li code').length > 5)
-            renderRecBrief(sec.querySelector('h2+ul'));
+            extendRecBrief(sec.querySelector('h2+ul'));
     })
     extendTime(el);
     extendMap(el.querySelector('section#mapx'));
@@ -83,7 +83,7 @@ export function markdownElement(markdown, opt)
     return el;
 }
 
-function renderHeader(el){
+function extendHeader(el){
     if(!el) return;
     const header = el.querySelector('h1');
     if(!header) return;
@@ -92,7 +92,7 @@ function renderHeader(el){
 }
 
 
-function renderSection(el, level=2){
+function extendSection(el, level=2){
     if(!el) return;
     //workable but not accurate method:
     //return html.replace(/<h2>/g, "</section><section><h2>");
@@ -128,7 +128,7 @@ function renderSection(el, level=2){
 }
 
 let _is_nav_dragging = false;
-function renderNavigation(el){
+function extendNavigation(el){
     if(!el) return;
 
     //toc
@@ -160,7 +160,7 @@ function fixLocalPath(el)
 }
 
 function _fixLocalPath(url){
-    if(!_opt || !_opt.host || !_opt.subpath) return;
+    if(!_opt || !_opt.host || !_opt.subpath) return url;
 
     if(url.startsWith(_opt.host)){
         const path = url.substring(_opt.host.length);
@@ -169,7 +169,7 @@ function _fixLocalPath(url){
     return url;
 }
 
-function renderAnchor(el)
+function extendAnchor(el)
 {
     if(!el) return;
     if(!_opt || !_opt.host) return;
@@ -182,7 +182,7 @@ function renderAnchor(el)
     })
 }
 
-function renderSvg(el)
+function extendSvg(el)
 {
     if(!el) return;
 
@@ -252,15 +252,14 @@ function _indexOf(txt, ch, idx){
     return idx;
 }
 
-function renderRecBrief(el)
+function extendRecBrief(el)
 {
     if(!el) return;
 
     el.querySelectorAll('li').forEach(li => {
 
-        let html = li.innerHTML
-                    .replace(/{(.*?)}/g, extendWeather)
-                    .replace(/(D\d+ )/, extendTrkDay);
+        let html = renderWeather(li.innerHTML);
+        html = renderTrkDay(html);
 
         //trkseg-path =========
         let begin = html.indexOf('-&gt;');
@@ -281,12 +280,12 @@ function renderRecBrief(el)
         //re-format
         li.classList.add('trkseg');
         li.innerHTML = html;
-        //li.querySelectorAll('em').forEach(renderAltitude);
+        //li.querySelectorAll('em').forEach(extendAltitude);
     });
 }
 
 /*
-function renderAltitude(em)
+function extendAltitude(em)
 {
     if (!isNaN(em.textContent))
         em.classList.add('alt');
@@ -294,7 +293,7 @@ function renderAltitude(em)
 */
 
 // *NNNN* or <em>NNNN</em>
-function extendAltitude(html)
+function renderAltitude(html)
 {
     const to_altitue = (orig, alt) => {
         return `<em class="alt">${alt}</em>`;
@@ -305,15 +304,16 @@ function extendAltitude(html)
     return html;
 }
 
-function extendTrkDay(orig, day){
-    return `<span class="trkseg-day">${day}</span> `;
+function renderTrkDay(html){
+    return html.replace(/(D\d+ )/,
+        (orig, day) => `<span class="trkseg-day">${day}</span> `);
 }
 
-function extendWeather(orig, value){
-    const key = Weather_name.getKey(value);
-    if(!key)
-        return orig;
-    return `<i class="fa-solid fa-${key}" title="${value}"></i>`;
+function renderWeather(html){
+    return html.replace(/{(.*?)}/g, (orig, value) => {
+        const key = Weather_name.getKey(value);
+        return key? `<i class="fa-solid fa-${key}" title="${value}"></i>`: orig;
+    });
 }
 
 function extendVehicle(el){
