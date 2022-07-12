@@ -325,3 +325,8 @@ header time {
 .fa-cloud-sun-rain{ color:brown; }
 .fa-smog{ color:lightgray; }
 .fa-snowflake{ color:skyblue; }
+
+/* track record */
+pre code {
+    white-space: pre-wrap;
+}

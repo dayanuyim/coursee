@@ -61,6 +61,7 @@ export function markdownElement(markdown, opt)
     //amend html ====
     let html = md.render(markdown)
     //html = renderRecord(html);
+    html = extendAltitude(html);
     html = `<div>${html}</div>`;  //wrap to single element
 
     //amend element ========
@@ -223,6 +224,33 @@ function isTimeFormat(txt){
     return false;
 }
 
+//find last index of @ch out of @txt, but not in <tag>
+function _lastIndexOf(txt, ch, idx){
+    let level = 0;
+    for(; idx >= 0; idx--){
+        if(txt[idx] == '>')
+            level++;
+        else if(txt[idx] == '<')
+            level--;
+        else if(txt[idx] == ch && level == 0)
+            break;
+    }
+    return idx;
+}
+
+//find index of @ch out of @txt, but not in <tag>
+function _indexOf(txt, ch, idx){
+    let level = 0;
+    for(; idx < txt.length; idx++){
+        if(txt[idx] == '<')
+            level++;
+        else if(txt[idx] == '>')
+            level--;
+        else if(txt[idx] == ch && level == 0)
+            break;
+    }
+    return idx;
+}
 
 function renderRecBrief(el)
 {
@@ -238,9 +266,8 @@ function renderRecBrief(el)
         let begin = html.indexOf('-&gt;');
         if(begin > 0){
             //range
-            begin = html.lastIndexOf(' ', begin) + 1;  //if not found, set to index 0
-            let end = html.indexOf(' ', begin)
-            if(end < 0) end = html.length;
+            begin = _lastIndexOf(html, ' ', begin) + 1;  //if not found, set to index 0
+            const end = _indexOf(html, ' ', begin);      //if not found, set to html.length
 
             //split
             const path = html.substring(begin , end).split('-&gt;').map(loc => {
@@ -254,15 +281,28 @@ function renderRecBrief(el)
         //re-format
         li.classList.add('trkseg');
         li.innerHTML = html;
-        li.querySelectorAll('em').forEach(extendAltitude);
+        //li.querySelectorAll('em').forEach(renderAltitude);
     });
 }
 
-function extendAltitude(em)
+/*
+function renderAltitude(em)
 {
     if (!isNaN(em.textContent))
         em.classList.add('alt');
-        //em.outerHTML = `<span class="alt">${em.textContent}</span>`;
+}
+*/
+
+// *NNNN* or <em>NNNN</em>
+function extendAltitude(html)
+{
+    const to_altitue = (orig, alt) => {
+        return `<em class="alt">${alt}</em>`;
+    };
+
+    html = html.replace(/\*(\d+)\*/g, to_altitue);
+    html = html.replace(/<em>(\d+)<\/em>/g, to_altitue);
+    return html;
 }
 
 function extendTrkDay(orig, day){
