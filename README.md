@@ -6,16 +6,15 @@ Markdown Viewer for Hiking Context
 -  A viewer suitable for Hiking Context.
 -  Not to over-extend the syntax of markdown, but preffer to render properly from the get hints of the context
 
-## Document Extensions
+## Document Extension
 
 ### Document header
 
-  > The first H1 Header with the format: TITLE(YYYY-MM-DD)
+  > The first H1 Header is as the document title, possibly with the date 'YYYY-MM-DD'.
 
 ### Table of Contents
 
   > Include H2~H4
-
 
 ## Context Improvement
 
@@ -40,25 +39,26 @@ Markdown Viewer for Hiking Context
 
 > A number surrounding with `*`, for example, `*3884*`.
 
-### Timestamp Extensions
+### Time Extension
 
-> Timestamp string surronding with `` ` ``, for example, `` `0630` ``, acceptable formats:
-| Format    | Example   |
-| :-------- | --------- |
-| HHMM      | 0630      |
-| HHMM~MM   | 0630~40   |
-| HHMM~HHMM | 0630~0640 |
-| MMm       | 10m       |
+> Time string surronding with `` ` ``, for example, `` `0630` ``, acceptable formats:
+| Format     | Example    | Cond  |
+| :--------- | :--------- | :---: |
+| HHMM       | 0630       | &#96; |
+| HHMM~MM    | 0630~40    | &#96; |
+| HHMM~HHMM  | 0630~0640  | &#96; |
+| MMm        | 10m        | &#96; |
+| YYYY-MM-DD | 2022-07-10 |  No   |
 
 ### Weather Extension
 
 The weather name surronding with `()`, acceptable names are `晴`, `風`, `陰`, `雷`, `雨`, `變`, `霧`, `雪`.
 
-### Vehicle Extensions (in `交通資訊` section)
+### Vehicle Extension (in `交通資訊` section)
 
 Anything surronding with `{}` will be highlighted, for example, `{台灣好行6732(東埔-水里)}`.
 
-### Map Extensions (in `地圖` section)
+### Map Extension (in `地圖` section)
 
 Embedding the map page with the format `{map:<ID>}`, for example, `{map:trekkr}`.
 

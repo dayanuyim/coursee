@@ -36,36 +36,38 @@ const Weather_name = new BiMap({
     snowflake: "雪",
 });
 
-let _opt = null;
+//configured markdown render
+function mdRenderer(){
+    return require('markdown-it')()
+        .use(require('markdown-it-task-checkbox'))
+        //.use(require("markdown-it-attrs"))
+        .use(require('markdown-it-imsize'))
+        .use(require("markdown-it-anchor").default, {
+            slugify: s => (Sec_name.getKey(s) || 'sec') + '-header',
+        })
+        .use(require("markdown-it-table-of-contents"), {
+            containerClass: 'nav',
+            includeLevel: [2, 3, 4],
+        });
+}
 
+let _opt = null;
 export function markdownElement(markdown, opt)
 {
-    //set options
-    _opt = opt;
+    _opt = opt; //set options
 
-    const md = require('markdown-it')()
-                .use(require('markdown-it-task-checkbox'))
-                //.use(require("markdown-it-attrs"))
-                .use(require('markdown-it-imsize'))
-                .use(require("markdown-it-anchor").default, {
-                    slugify: s => (Sec_name.getKey(s) || 'sec') + '-header',
-                })
-                .use(require("markdown-it-table-of-contents"), {
-                    containerClass: 'nav',
-                    includeLevel: [2,3,4],
-                });
-
-    //amend markdown ====
+    //amend markdown text ====
     markdown = '[[toc]]\n' + markdown;
 
-    //amend html ====
-    let html = md.render(markdown)
+    //amend html text ====
+    let html = mdRenderer().render(markdown)
     //html = renderRecord(html);
     html = renderAltitude(html);
     html = renderWeather(html);
+    html = renderTime(html);
     html = `<div>${html}</div>`;  //wrap to single element
 
-    //amend element ========
+    //amend dom element ========
     const  el = htmlToElement(html);
     extendHeader(el);
     extendNavigation(el.querySelector('.nav'));
@@ -73,25 +75,43 @@ export function markdownElement(markdown, opt)
     extendAnchor(el);
     extendImage(el);
     extendSvg(el);
-
-    extendTime(el);
+    // section context -------------
     extendSection(el);
     el.querySelectorAll('section').forEach(sec => {
         if(['trk-plan', 'trk-backup', 'trk-facto'].includes(sec.id) || sec.querySelectorAll('li code').length > 5)
             extendRecBrief(sec.querySelector('h2+ul'));
-    })
+    });
     extendMap(el.querySelector('section#mapx'));
     extendVehicle(el.querySelector('section#transport'));
     //renderRecContent(el);
+    el.querySelectorAll('section').forEach(sec => {
+        if(['trk-rec', 'ref-rec'].includes(sec.id))
+            sec.querySelectorAll('h3+table').forEach(extendRecContent);
+    });
     return el;
 }
 
 function extendHeader(el){
     if(!el) return;
-    const header = el.querySelector('h1');
-    if(!header) return;
-    const [title, date] = header.textContent.split(/[()]/);
-    header.outerHTML = `<header><h1>${title}</h1><time>${date}</time></header>`;   // move to template
+    const h1 = el.querySelector('h1');
+    if(!h1) return;
+    //const [title, date] = h1.textContent.split(/[()]/);
+    //header.outerHTML = `<header><h1>${title}</h1><span>${date}</span></header>`;   // move to template
+
+
+    // create <header>
+    const header = document.createElement('header');
+    h1.insertAdjacentElement('beforebegin', header);
+
+    // move possible <time> into <header>
+    const time = h1.querySelector('time');
+    if(time){
+        header.insertAdjacentElement('afterbegin', time);
+        h1.textContent = h1.textContent.replace(/\(\)/, ''); //remove possible empty (), due to <time> moved 
+    }
+
+    // move <h1> into <header>
+    header.insertAdjacentElement('afterbegin', h1);
 }
 
 
@@ -224,20 +244,29 @@ function extendMap(el)
     });
 }
 
-function extendTime(el)
+function renderTime(html)
 {
-    if(!el) return;
-
-    el.querySelectorAll('code').forEach(code => {
-        if(isTimeFormat(code.textContent))
-            code.outerHTML = `<time>${code.textContent}</time>`;
-    });
+    return html.replace(/[12][90][0-9][0-9]-[01][0-9]-[0-3][0-9]/g, (orig) => {   // date format
+            console.log('yyyyy-mm-dd', orig);
+            return `<time>${orig}</time>`;
+        })
+        .replace(/<code>([0-9].*?)<\/code>/g, (orig, txt) => {   // normal time string
+            if (!isTimeFormat(txt)) return orig;
+            return `<time>${txt}</time>`;
+        })
+        /*
+        .replace(/<td>([0-9].*?)<\/td>/g, (orig, txt) => {    // record timestamps
+            if (!isTimeFormat(txt)) return orig;
+            return `<td><time>${txt}</time></td>`;
+        });
+        */
 }
 
 function isTimeFormat(txt){
     if (txt.length == 4 && txt.match(/[0-2][0-9][0-5][0-9]/)) return true;
     if (txt.length == 7 && txt.match(/[0-2][0-9][0-5][0-9]~[0-5][0-9]/)) return true;
     if (txt.length == 9 && txt.match(/[0-2][0-9][0-5][0-9]~[0-2][0-9][0-5][0-9]/)) return true;
+    if (txt.length == 10 && txt.match(/[12][90]\d\d-[01][0-9]-[0-3][0-9]/)) return true;
     if (txt.match(/^[0-9]+m$/)) return true;
     return false;
 }
@@ -300,14 +329,6 @@ function extendRecBrief(el)
         //li.querySelectorAll('em').forEach(extendAltitude);
     });
 }
-
-/*
-function extendAltitude(em)
-{
-    if (!isNaN(em.textContent))
-        em.classList.add('alt');
-}
-*/
 
 // *NNNN* or <em>NNNN</em>
 function renderAltitude(html)
