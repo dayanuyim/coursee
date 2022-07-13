@@ -62,21 +62,23 @@ export function markdownElement(markdown, opt)
     let html = md.render(markdown)
     //html = renderRecord(html);
     html = renderAltitude(html);
+    html = renderWeather(html);
     html = `<div>${html}</div>`;  //wrap to single element
 
     //amend element ========
     const  el = htmlToElement(html);
     extendHeader(el);
-    extendSection(el);
     extendNavigation(el.querySelector('.nav'));
     fixLocalPath(el);
     extendAnchor(el);
     extendSvg(el);
+
+    extendTime(el);
+    extendSection(el);
     el.querySelectorAll('section').forEach(sec => {
         if(['trk-plan', 'trk-backup', 'trk-facto'].includes(sec.id) || sec.querySelectorAll('li code').length > 5)
             extendRecBrief(sec.querySelector('h2+ul'));
     })
-    extendTime(el);
     extendMap(el.querySelector('section#mapx'));
     extendVehicle(el.querySelector('section#transport'));
     //renderRecContent(el);
@@ -258,8 +260,7 @@ function extendRecBrief(el)
 
     el.querySelectorAll('li').forEach(li => {
 
-        let html = renderWeather(li.innerHTML);
-        html = renderTrkDay(html);
+        let html = renderTrkDay(li.innerHTML);
 
         //trkseg-path =========
         let begin = html.indexOf('-&gt;');
@@ -304,16 +305,16 @@ function renderAltitude(html)
     return html;
 }
 
-function renderTrkDay(html){
-    return html.replace(/(D\d+ )/,
-        (orig, day) => `<span class="trkseg-day">${day}</span> `);
-}
-
 function renderWeather(html){
-    return html.replace(/{(.*?)}/g, (orig, value) => {
+    return html.replace(/\((.*?)\)/g, (orig, value) => {
         const key = Weather_name.getKey(value);
         return key? `<i class="fa-solid fa-${key}" title="${value}"></i>`: orig;
     });
+}
+
+function renderTrkDay(html){
+    return html.replace(/(D\d+ )/,
+        (orig, day) => `<span class="trkseg-day">${day}</span> `);
 }
 
 function extendVehicle(el){
