@@ -15,6 +15,17 @@ th, td{
     padding: 4px 8px;
 }
 
+figure {
+    margin: 2px;
+}
+figcaption {
+    /*font-size: larger;*/
+    font-style: italic;
+    color:dimgray;
+}
+figcaption::before { content: "<" }
+figcaption::after { content: ">" }
+
 div#download{
     position: fixed;
     top: 0;

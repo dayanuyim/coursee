@@ -71,6 +71,7 @@ export function markdownElement(markdown, opt)
     extendNavigation(el.querySelector('.nav'));
     fixLocalPath(el);
     extendAnchor(el);
+    extendImage(el);
     extendSvg(el);
 
     extendTime(el);
@@ -182,6 +183,21 @@ function extendAnchor(el)
         if(a.target) return;
         a.target = '_blank';
     })
+}
+
+function extendImage(el)
+{
+    if(!el) return;
+    el.querySelectorAll('img').forEach(img => {
+        // create <figure>
+        const fig = document.createElement('figure');
+        img.insertAdjacentElement('beforebegin', fig);
+
+        // move <img> and <figcaption> into <figure>
+        if(img.alt)
+            fig.insertAdjacentHTML('afterbegin', `<figcaption>${img.alt}</figcaption>`);
+        fig.insertAdjacentElement('afterbegin', img);
+    });
 }
 
 function extendSvg(el)

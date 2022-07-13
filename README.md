@@ -77,6 +77,8 @@ Open links in the new tabs.
 
 ### SVG extension
 
-Use <object> to load svg, instead of <img>, to get more interaction.
+Use `<object>` to load svg, instead of `<img>`, to get more interaction.
 
+### Image extension
 
+Wrapping with `<figure>` and add `<figcaption>` by 'alt' if provided.
