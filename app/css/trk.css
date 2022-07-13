@@ -67,10 +67,17 @@ div#map-content {
     height: calc(100vh - 20px);
 }
 
-.rec-content{
+table.rec-content{
     font-family: cwTeXFangSong, serif;
     font-size: large;
-    /*background-color: #101010;*/
+    border-width: 0;
+}
+table.rec-content thead {
+    display: none;
+}
+table.rec-content td {
+    border-width: 0;
+    padding: 2px;
 }
 
 .rec-timestamp:hover {

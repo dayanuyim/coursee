@@ -107,7 +107,7 @@ function extendHeader(el){
     const time = h1.querySelector('time');
     if(time){
         header.insertAdjacentElement('afterbegin', time);
-        h1.textContent = h1.textContent.replace(/\(\)/, ''); //remove possible empty (), due to <time> moved 
+        h1.textContent = h1.textContent.replace(/\(\)/, ''); //remove possible empty (), due to <time> moved
     }
 
     // move <h1> into <header>
@@ -364,6 +364,15 @@ function extendVehicle(el){
     });
 }
 
+function extendRecContent(el){
+    el.classList.add('rec-content');
+    el.querySelectorAll('td:first-child').forEach(td => {
+        if(td.textContent)
+            td.innerHTML = `<time>${td.textContent}</time>`;
+    });
+}
+
+///////// orignal rec conetent, itneraction with google map //////////////////////
 function renderRecord(html){
     return html.replace(/<pre><code>/g, "<article>").replace(/<\/code><\/pre>/g, "</article>")
 }
@@ -405,7 +414,6 @@ function getStartDate(txt)
 
     return null;
 }
-
 
 //gen <div class="rec-content">, from content and title elemnt
 function genRecContentElem(content, title, base_date)

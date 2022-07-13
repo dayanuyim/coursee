@@ -62,11 +62,17 @@ Anything surronding with `{}` will be highlighted, for example, `{台灣好行67
 
 Embedding the map page with the format `{map:<ID>}`, for example, `{map:trekkr}`.
 
-### Record Brief Extension (in `預計行程`, and `備案行程`, `實際行程` sections)
+### Record Brief Extension (in `預計行程`, `備案行程`, and `實際行程` sections)
 
 - **Expected format**: D1 XXX->YYY->ZZZ.
 - (optional) **Day Header**: `D` with a number.
 - (must) **Path**: locations concatenating with `->` without spaces around.
+
+### Record Content Extension (in `行程記錄`, and `參考記錄` sections)
+
+If the record content is rendered as a table:
+- Embellish the table
+- Column 1 should be timestamp, so tagged as `<time>`.
 
 Normal improvement
 ------------------
