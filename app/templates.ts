@@ -114,7 +114,14 @@ export const section = Handlebars.compile(`
 
 export const utils = Handlebars.compile(`
   <ul class="utils">
+    <!--
     <li><button type="button" onclick="saveMarkdown()">Save MD</button></li>
+    -->
+    <li><i class="fa-solid fa-image"></i>
+        <input type="radio" id="photo-display-line" name="photo-display" value="line" onchange="displayPhoto(this)" checked><label for="photo-display-line">逐行</label>
+        <input type="radio" id="photo-display-side" name="photo-display" value="side" onchange="displayPhoto(this)"        ><label for="photo-display-side">並排</label>
+        <input type="radio" id="photo-display-none" name="photo-display" value="none" onchange="displayPhoto(this)"        ><label for="photo-display-none">隱藏</label>
+    </li>
   </ul>
 `);
 

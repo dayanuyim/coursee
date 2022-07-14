@@ -31,6 +31,31 @@ function saveMarkdown(){
     //download(htmlToMarkdown(), filename, 'text/markdown');
 }
 
+function displayPhoto(el){
+    //const el = document.querySelector('input[name="photo-display"]:checked');
+    const disp = el.value;
+
+    const figures = document.body.querySelectorAll('figure');
+    figures.forEach(fig => {
+        if(disp == "none"){
+            fig.classList.add('hide');
+            return;
+        }
+
+        fig.classList.remove('hide');
+
+        const td = fig.closest('td');
+        const tr = td.closest('tr');
+        if(disp == "side" && td.cellIndex == 1){
+            tr.previousElementSibling.insertAdjacentElement('beforeend', td);
+        }
+        else if(disp == "line" && td.cellIndex == 2){
+            tr.nextElementSibling.insertAdjacentElement('beforeend', td);
+        }
+    });
+}
+
 window.toggleMap = toggleMap;
 window.toggleSec = toggleSec;
 window.toggleSecs = toggleSecs;
+window.displayPhoto = displayPhoto;

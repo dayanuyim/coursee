@@ -247,7 +247,6 @@ function extendMap(el)
 function renderTime(html)
 {
     return html.replace(/[12][90][0-9][0-9]-[01][0-9]-[0-3][0-9]/g, (orig) => {   // date format
-            console.log('yyyyy-mm-dd', orig);
             return `<time>${orig}</time>`;
         })
         .replace(/<code>([0-9].*?)<\/code>/g, (orig, txt) => {   // normal time string

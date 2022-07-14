@@ -76,8 +76,12 @@ table.rec-content thead {
     display: none;
 }
 table.rec-content td {
+    vertical-align: top;
     border-width: 0;
     padding: 2px;
+}
+table.rec-content td:nth-child(2) {
+    max-width: 600px;
 }
 
 .rec-timestamp:hover {
@@ -158,10 +162,12 @@ nav,.nav {
 /* ======= submenu =====*/
 
 .nav .utils{
-    list-style-type: none;
     grid-row: 2;
-    margin: 4px;
+    border-top: dimgray solid 1px;
+    list-style-type: none;
     padding-left:0;
+    margin: 4px;
+    padding: 4px;
 }
 
 .nav .toc .mainlink{
