@@ -35,7 +35,7 @@ function displayPhoto(el){
     //const el = document.querySelector('input[name="photo-display"]:checked');
     const disp = el.value;
 
-    const figures = document.body.querySelectorAll('figure');
+    const figures = document.body.querySelectorAll('table figure');
     figures.forEach(fig => {
         if(disp == "none"){
             fig.classList.add('hide');

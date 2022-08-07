@@ -57,7 +57,7 @@ export function markdownElement(markdown, opt)
     _opt = opt; //set options
 
     //amend markdown text ====
-    markdown = '[[toc]]\n' + markdown;
+    markdown = '[[toc]]\n\n' + markdown;
 
     //amend html text ====
     let html = mdRenderer().render(markdown)
@@ -198,7 +198,7 @@ function extendAnchor(el)
     if(!_opt || !_opt.host) return;
 
     const bookmark_prefix = `${_opt.host}/#`;
-    el.querySelectorAll('section a').forEach(a => {
+    el.querySelectorAll('a').forEach(a => {
         if(a.href.startsWith(bookmark_prefix)) return;
         if(a.target) return;
         a.target = '_blank';
@@ -349,7 +349,7 @@ function renderWeather(html){
 }
 
 function renderTrkDay(html){
-    return html.replace(/(D\d+ )/,
+    return html.replace(/(D\d+) /,
         (orig, day) => `<span class="trkseg-day">${day}</span> `);
 }
 

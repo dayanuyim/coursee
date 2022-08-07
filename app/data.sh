@@ -29,7 +29,7 @@ function parse()
 }
 
 function data(){
-    find "$dir" -maxdepth 1 -type d \( -iname 'YYYY-MM-DD-*' -or -name '20[0-9][0-9]-[01][0-9]-[0-3][0-9]*' \) | sort -r
+    find -L "$dir" -maxdepth 1 -type d \( -iname 'YYYY-MM-DD-*' -or -name '20[0-9][0-9]-[01][0-9]-[0-3][0-9]*' \) | sort -r
 }
 
 

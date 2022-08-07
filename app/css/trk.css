@@ -68,17 +68,17 @@ div#map-content {
 }
 
 table.rec-content{
-    font-family: cwTeXFangSong, serif;
-    font-size: large;
+    /*font-family: cwTeXFangSong, serif;*/
+    font-size: medium;
     border-width: 0;
 }
 table.rec-content thead {
     display: none;
 }
 table.rec-content td {
-    vertical-align: top;
+    /*vertical-align: top;*/
     border-width: 0;
-    padding: 2px;
+    padding: 1px 2px;
 }
 table.rec-content td:nth-child(2) {
     max-width: 600px;
@@ -111,13 +111,10 @@ ul {
     padding-left: 1em;
 }
 
-
 .hide {
     display: none;
 }
 
-
-  
 nav,.nav {
     display: inline-block;
     width: 20%;
@@ -268,13 +265,14 @@ nav,.nav {
   .trkseg-day {
     color: white;
     background: dimgray;
-    padding: 1px 4px 0px 4px;
+    padding: 1px 2px 0px 2px;
     border-radius: 4px;
     display: inline-block;
   }
 
   .trkseg time {
     font-size: .875em;
+    vertical-align: text-bottom;
   }
 
   /*
