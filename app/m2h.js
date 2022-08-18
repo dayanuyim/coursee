@@ -306,6 +306,8 @@ function extendRecBrief(el)
 
         let html = renderTrkDay(li.innerHTML);
 
+        html += templates.trksegUtils();
+
         //trkseg-path =========
         let begin = html.indexOf('-&gt;');
         if(begin > 0){
@@ -313,13 +315,9 @@ function extendRecBrief(el)
             begin = _lastIndexOf(html, ' ', begin) + 1;  //if not found, set to index 0
             const end = _indexOf(html, ' ', begin);      //if not found, set to html.length
 
-            //split
-            const path = html.substring(begin , end).split('-&gt;').map(loc => {
-                return `<span>${loc.trim()}</span>`
-            }).join('➤');
-
-            //replace
-            html = replaceRange(html, begin, end, `<span class="trkseg-path">${path}</span>`);
+            //re-format
+            const locs = html.substring(begin , end).split('-&gt;');
+            html = replaceRange(html, begin, end, templates.trksegPath({locs}));
         }
 
         //re-format
@@ -342,7 +340,7 @@ function renderAltitude(html)
 }
 
 function renderWeather(html){
-    return html.replace(/\((.*?)\)/g, (orig, value) => {
+    return html.replace(/{(.*?)}/g, (orig, value) => {
         const key = Weather_name.getKey(value);
         return key? `<i class="fa-solid fa-${key}" title="${value}"></i>`: orig;
     });

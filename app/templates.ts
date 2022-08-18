@@ -140,3 +140,19 @@ export const map_trekkr = Handlebars.compile(`
       不支援嵌入，請連至<a href="https://dayanuyim.github.io/maps/">Trekkr</a>
     </object>
 `);
+
+export const trksegUtils = Handlebars.compile(`
+    <div class="trkseg-utils">
+        <button class="trkseg-util-grid" onclick="toggleTrksegGrid(this)"><i class="fa-solid fa-layer-group"></i></button>
+    </div>
+`);
+
+// trkseg-path-arrow is a placeholder to insert arrow symbole from css
+export const trksegPath = Handlebars.compile(`
+    <span class="trkseg-path">
+    {{#each locs}}<!--
+     -->{{#unless @first}}<span class="trkseg-path-arrow"></span>{{/unless}}<!--
+     --><span class="trkseg-path-loc">{{{this}}}</span><!--
+ -->{{/each}}
+    </span>
+`);

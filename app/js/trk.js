@@ -55,7 +55,14 @@ function displayPhoto(el){
     });
 }
 
+function toggleTrksegGrid(target){
+    const trkseg = target.closest('.trkseg');
+    if(trkseg)
+        trkseg.classList.toggle('grid');
+}
+
 window.toggleMap = toggleMap;
 window.toggleSec = toggleSec;
 window.toggleSecs = toggleSecs;
 window.displayPhoto = displayPhoto;
+window.toggleTrksegGrid = toggleTrksegGrid;
