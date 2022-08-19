@@ -142,9 +142,10 @@ export const map_trekkr = Handlebars.compile(`
 `);
 
 export const trksegUtils = Handlebars.compile(`
-    <div class="trkseg-utils">
-        <button class="trkseg-util-grid" onclick="toggleTrksegGrid(this)"><i class="fa-solid fa-layer-group"></i></button>
-    </div>
+    <ul class="trkseg-utils hide">
+        <li><button title="堆疊" class="trkseg-util-grid" onclick="toggleTrksegGrid(this)"><i class="fa-solid fa-layer-group"></i></button></li>
+        <!-- other utils -->
+    </ul>
 `);
 
 // trkseg-path-arrow is a placeholder to insert arrow symbole from css

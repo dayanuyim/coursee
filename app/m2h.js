@@ -170,6 +170,8 @@ function extendNavigation(el){
             const rect = el.getBoundingClientRect();
             el.style.left = rect.x + e.movementX + 'px';
             el.style.top = rect.y + e.movementY + 'px';
+            el.style.bottom = 'unset';
+            el.style.right = 'unset';
         }
     }, true);
 }
@@ -306,8 +308,6 @@ function extendRecBrief(el)
 
         let html = renderTrkDay(li.innerHTML);
 
-        html += templates.trksegUtils();
-
         //trkseg-path =========
         let begin = html.indexOf('-&gt;');
         if(begin > 0){
@@ -318,6 +318,8 @@ function extendRecBrief(el)
             //re-format
             const locs = html.substring(begin , end).split('-&gt;');
             html = replaceRange(html, begin, end, templates.trksegPath({locs}));
+            //html = replaceRange(html, begin, begin, templates.trksegUtils());  //insert before trkseg-path
+            html += templates.trksegUtils();
         }
 
         //re-format
