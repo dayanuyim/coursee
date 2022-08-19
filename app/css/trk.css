@@ -145,16 +145,52 @@ nav,.nav {
     display: grid;
 }
 
-.nav .toc{
+.nav .nav-collapse{
     grid-row: 1;
+    text-align: right;
+    border: none;
+    color: #404040;
+    background-color: transparent;
+    width: 2em;
+    margin-left: 90%; /*align right*/
+}
+
+.nav .nav-collapse:hover {
+    color: #808080;
+    cursor: pointer;
+}
+
+.nav .nav-collapse::after {
+    content: "■";
+    display:inline-block;
+    transform: scale(1.5);
+}
+.nav.collapse .nav-collapse::after {
+    display:inline-block;
+    transform: scale(1);
+    content: "◥";
+}
+.nav.collapse .nav-collapse ~ * {
+    display: none;
+}
+
+.nav .nav-toc{
+    grid-row: 2;
     margin: 4px;
 }
-.nav .toc a{
+.nav .nav-toc a{
     color:black;
 }
 
+.nav .nav-toc .mainlink{
+    border-bottom: dimgray 1px dashed;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+    display: inline-block;
+}
+
 /* ======= submenu =====*/
-.nav .toc ul{
+.nav .nav-toc ul{
     list-style-type: none;
     margin: 0;
     padding-left:0;
@@ -162,33 +198,26 @@ nav,.nav {
     display:none;
     /*height: 0;*/
 }
-.nav .toc ul a{
+.nav .nav-toc ul a{
     font-size: smaller;
     color: dimgray;
 }
-.nav .toc>li:hover ul{
+.nav .nav-toc>li:hover ul{
     display: unset;
     /*height: unset;*/
 }
-.nav .toc>li:hover ul a{
+.nav .nav-toc>li:hover ul a{
     color: dimgray;
 }
 /* ======= submenu =====*/
 
-.nav .utils{
-    grid-row: 2;
+.nav .nav-utils{
+    grid-row: 3;
     border-top: dimgray solid 1px;
     list-style-type: none;
     padding-left:0;
     margin: 4px;
     padding: 4px;
-}
-
-.nav .toc .mainlink{
-    border-bottom: dimgray 1px dashed;
-    padding-bottom: 4px;
-    margin-bottom: 4px;
-    display: inline-block;
 }
   
   section{
@@ -331,14 +360,10 @@ nav,.nav {
     border: none;
     background-color: transparent;
 }
-.trkseg.grid .trkseg-util-grid:hover,
-.trkseg      .trkseg-util-grid{
-    color: gray;
-}
-.trkseg.grid .trkseg-util-grid,
-.trkseg      .trkseg-util-grid:hover{
-    color: black;
-}
+.trkseg      .trkseg-util-grid{ color: #808080; }
+.trkseg.grid .trkseg-util-grid{ color: #000000; }
+.trkseg      .trkseg-util-grid:hover{ color: #A0A0A0; cursor: pointer; }
+.trkseg.grid .trkseg-util-grid:hover{ color: #404040; cursor: pointer; }
 
 /****** trkseg path **********/
 .trkseg-path{

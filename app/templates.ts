@@ -112,8 +112,8 @@ export const section = Handlebars.compile(`
     </section>
 `);
 
-export const utils = Handlebars.compile(`
-  <ul class="utils">
+export const navUtils = Handlebars.compile(`
+  <ul class="nav-utils">
     <!--
     <li><button type="button" onclick="saveMarkdown()">Save MD</button></li>
     -->

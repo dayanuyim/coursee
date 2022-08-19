@@ -61,8 +61,23 @@ function toggleTrksegGrid(target){
         trkseg.classList.toggle('grid');
 }
 
+function toggleNavCollapse(target){
+    const nav = target.closest('.nav');
+    if(nav){
+        // reset the position by top and left
+        const rect = nav.getBoundingClientRect();
+        nav.style.left = `${rect.x}px`;
+        nav.style.top = `${rect.y}px`;
+        nav.style.bottom = 'unset';
+        nav.style.right = 'unset';
+
+        nav.classList.toggle('collapse');
+    }
+}
+
 window.toggleMap = toggleMap;
 window.toggleSec = toggleSec;
 window.toggleSecs = toggleSecs;
-window.displayPhoto = displayPhoto;
 window.toggleTrksegGrid = toggleTrksegGrid;
+window.toggleNavCollapse = toggleNavCollapse;
+window.displayPhoto = displayPhoto;

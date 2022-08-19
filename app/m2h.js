@@ -154,22 +154,25 @@ let _is_nav_dragging = false;
 function extendNavigation(el){
     if(!el) return;
 
+    //collapse button
+    el.insertAdjacentHTML('afterbegin', '<button class="nav-collapse" onclick="toggleNavCollapse(this)"></button>');
+
     //toc
     const toc = el.querySelector('ul');
-    toc.classList.add('toc');
+    toc.classList.add('nav-toc');
     toc.insertAdjacentHTML('afterbegin', '<li class="mainlink"><a href="#main">回上層目錄</a></li>');
-    //uteil
-    el.insertAdjacentHTML('beforeend', templates.utils());
+    //utils
+    el.insertAdjacentHTML('beforeend', templates.navUtils());
 
     //drag to move
     el.addEventListener('mousedown', e => _is_nav_dragging = true, true);
     document.addEventListener('mouseup', e => _is_nav_dragging = false, true);
     document.addEventListener('mousemove', e => {
         e.preventDefault();
-        if (_is_nav_dragging) {
+        if (_is_nav_dragging){
             const rect = el.getBoundingClientRect();
-            el.style.left = rect.x + e.movementX + 'px';
-            el.style.top = rect.y + e.movementY + 'px';
+            el.style.left = `${rect.x + e.movementX}px`;
+            el.style.top = `${rect.y + e.movementY}px`;
             el.style.bottom = 'unset';
             el.style.right = 'unset';
         }
