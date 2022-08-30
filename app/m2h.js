@@ -65,6 +65,7 @@ export function markdownElement(markdown, opt)
     html = renderAltitude(html);
     html = renderWeather(html);
     html = renderTime(html);
+    html = renderArrow(html);
     html = `<div>${html}</div>`;  //wrap to single element
 
     //amend dom element ========
@@ -274,6 +275,14 @@ function isTimeFormat(txt){
     if (txt.match(/^[0-9]+m$/)) return true;
     return false;
 }
+
+function renderArrow(html)
+{
+    return html.replace(/-\((.*?)\)-&gt;/g, (orig, txt) => {   // normal time string
+            return `<span class="arrow-legend">&nbsp;${txt}&nbsp;</span>&gt;`;
+        });
+}
+
 
 //find last index of @ch out of @txt, but not in <tag>
 function _lastIndexOf(txt, ch, idx){

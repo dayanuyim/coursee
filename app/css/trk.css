@@ -167,7 +167,7 @@ nav,.nav {
 }
 .nav.collapse .nav-collapse::after {
     display:inline-block;
-    transform: scale(1);
+    transform: scale(.75);
     content: "◥";
 }
 .nav.collapse .nav-collapse ~ * {
@@ -424,6 +424,10 @@ nav,.nav {
     display: inline-block;
 }
 
+.vehicle a {
+    color: white;
+}
+
 .fa-sun{ color:darkorange; }
 .fa-wind{ color: green; }
 .fa-cloud{ color:gray; }
@@ -436,4 +440,9 @@ nav,.nav {
 /* track record */
 pre code {
     white-space: pre-wrap;
+}
+
+.arrow-legend {
+    vertical-align: super;
+    text-decoration: underline;
 }
