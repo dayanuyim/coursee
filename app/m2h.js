@@ -440,8 +440,9 @@ function extendRecBriefChart(trkseg)
         if(alt) alt = parseInt(alt.textContent);
 
         const name = Array.from(loc.childNodes)
-                .filter(n => n.nodeType == 3)   //3=TextNode, which excluds other element nodes, like time or alt.
-                .map(n => n.nodeValue)
+                .filter(n => !(n.nodeType == Node.ELEMENT_NODE &&
+                              (n.tagName.toLowerCase() == 'time' || n.classList.contains('alt'))))   //not time or altitude
+                .map(n => n.textContent)
                 .join('');
 
         locations.push([timestr2min(time1), alt, name]);
