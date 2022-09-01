@@ -1,6 +1,6 @@
 import { fireOnlyIfSingleClick } from '../dom-utils';
 
-function toggleMap(){
+window.toggleMap = function(){
     const mapobj = document.getElementById('mapobj');
     mapobj.classList.toggle('hide');
     if(!mapobj.getAttribute('data')){
@@ -9,11 +9,11 @@ function toggleMap(){
     }
 }
 
-function toggleSec(target){
+window.toggleSec = function(target){
     fireOnlyIfSingleClick(()=>target.classList.toggle('collapse'));
 }
 
-function toggleSecs(target){
+window.toggleSecs = function(target){
     const cls = 'collapse';
 
     const toggle = target.classList.contains(cls)?
@@ -21,6 +21,7 @@ function toggleSecs(target){
             el => el.classList.add(cls);
     document.body.querySelectorAll('.sec-toggle').forEach(toggle);
 }
+
 function saveMarkdown(){
     const date = document.body.querySelector('header time').getAttribute('datetime');
     const hdr = document.body.querySelector('header h1').innerHTML;
@@ -31,7 +32,7 @@ function saveMarkdown(){
     //download(htmlToMarkdown(), filename, 'text/markdown');
 }
 
-function displayPhoto(el){
+window.displayPhoto = function(el){
     //const el = document.querySelector('input[name="photo-display"]:checked');
     const disp = el.value;
 
@@ -55,13 +56,19 @@ function displayPhoto(el){
     });
 }
 
-function toggleTrksegGrid(target){
+window.toggleTrksegGrid = function(target){
     const trkseg = target.closest('.trkseg');
     if(trkseg)
         trkseg.classList.toggle('grid');
 }
 
-function toggleNavCollapse(target){
+window.toggleTrksegChart = function (target){
+    const trkseg = target.closest('.trkseg');
+    if(trkseg)
+        trkseg.classList.toggle('chart');
+}
+
+window.toggleNavCollapse = function(target){
     const nav = target.closest('.nav');
     if(nav){
         // reset the position by top and left
@@ -74,10 +81,3 @@ function toggleNavCollapse(target){
         nav.classList.toggle('collapse');
     }
 }
-
-window.toggleMap = toggleMap;
-window.toggleSec = toggleSec;
-window.toggleSecs = toggleSecs;
-window.toggleTrksegGrid = toggleTrksegGrid;
-window.toggleNavCollapse = toggleNavCollapse;
-window.displayPhoto = displayPhoto;

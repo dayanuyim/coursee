@@ -54,6 +54,10 @@ Markdown Viewer for Hiking Context
 
 The weather name surronding with `()`, acceptable names are `晴`, `風`, `陰`, `雷`, `雨`, `變`, `霧`, `雪`.
 
+### Legend-Arrow Extension
+
+Show the legend-arrow `-(LEGEND)->` in proper way.
+
 ### Vehicle Extension (in `交通資訊` section)
 
 Anything surronding with `{}` will be highlighted, for example, `{台灣好行6732(東埔-水里)}`.

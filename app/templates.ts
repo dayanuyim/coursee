@@ -144,7 +144,7 @@ export const map_trekkr = Handlebars.compile(`
 export const trksegUtils = Handlebars.compile(`
     <ul class="trkseg-utils hide">
         <li><button title="堆疊" class="trkseg-util-grid" onclick="toggleTrksegGrid(this)"><i class="fa-solid fa-layer-group"></i></button></li>
-        <!-- other utils -->
+        <li><button title="行進圖" class="trkseg-util-chart" onclick="toggleTrksegChart(this)"><i class="fa-solid fa-chart-line"></i></button></li>
     </ul>
 `);
 

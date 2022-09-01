@@ -115,7 +115,7 @@ table.rec-content td:nth-child(2) {
 
 body {
     padding: 1em;
-    background: lightyellow;
+    background: #e0eae0;
     font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
 }
 
@@ -224,7 +224,7 @@ nav,.nav {
     margin: 1em 0;
     padding:1em;
     border-radius: 8px;
-    background: #fcf1ce;
+    background: #cbddcb;
     border-right: dimgray 1px solid;
     border-bottom: dimgray 1px solid;
     position: relative;  /*for .sec-toggle to positon absolutely*/
@@ -337,8 +337,8 @@ nav,.nav {
 
 .trkseg-utils{
     position: absolute;
-    top: 0;
-    left: -28px;
+    top: -1px;
+    left: -22px;
 
     list-style-type: none;
     margin: 0;
@@ -355,15 +355,38 @@ nav,.nav {
     display: block;
 }
 
-.trkseg-util-grid {
+.trkseg-utils button{
     padding: 0;
     border: none;
     background-color: transparent;
 }
-.trkseg      .trkseg-util-grid{ color: #808080; }
-.trkseg.grid .trkseg-util-grid{ color: #000000; }
-.trkseg      .trkseg-util-grid:hover{ color: #A0A0A0; cursor: pointer; }
-.trkseg.grid .trkseg-util-grid:hover{ color: #404040; cursor: pointer; }
+
+.trkseg      .trkseg-util-grid,
+.trkseg      .trkseg-util-chart {
+    color: #808080;
+}
+.trkseg.grid .trkseg-util-grid,
+.trkseg.chart .trkseg-util-chart {
+    color: #000000;
+}
+.trkseg      .trkseg-util-grid:hover,
+.trkseg      .trkseg-util-chart:hover{
+     color: #A0A0A0;
+     cursor: pointer;
+}
+.trkseg.grid .trkseg-util-grid:hover,
+.trkseg.chart .trkseg-util-chart:hover{
+    color: #404040;
+    cursor: pointer;
+}
+
+.trkseg.grid .trkseg-path-loc,
+.trkseg.grid .trkseg-path-arrow{
+    display: inline-grid;
+}
+
+.trkseg       .trkseg-chart{ display: none; }
+.trkseg.chart .trkseg-chart{ display: block; }
 
 /****** trkseg path **********/
 .trkseg-path{
@@ -404,9 +427,41 @@ nav,.nav {
     content: '➤';
 }
 
-.trkseg.grid .trkseg-path-loc,
-.trkseg.grid .trkseg-path-arrow{
-    display: inline-grid;
+/*================= Trkseg Chart =====================*/
+.trkseg-chart {
+    display: block;
+    /*height: 200px; */
+    background: rgba(255,255,255,.3);
+    max-height: 200px;
+}
+
+.trkseg-chart polygon{
+    fill: seagreen;
+}
+
+.trkseg-chart circle{
+    fill: green;
+}
+
+.trkseg-chart-alt-line{ stroke: lightgray; }
+.trkseg-chart-alt-legend{
+    transform: translate(-8px, 0);
+    font-size: 12px;
+    text-anchor: end;
+    dominant-baseline: middle;
+    fill: gray;
+}
+
+.trkseg-chart-loc-path{ stroke: gray; }
+.trkseg-chart-loc-name{
+    transform: translate(-3px, -3px);
+    font-size: 12px;
+    text-anchor: middle;
+    dominant-baseline: ideographic;
+    fill: black;
+}
+.trkseg-chart-loc-name.first{
+    text-anchor: start;
 }
 
 .alt {

@@ -2,8 +2,85 @@ import * as templates from './templates';
 import { htmlToElement} from './dom-utils';
 import BiMap from 'bidirectional-map';
 
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+function minMax(arr){
+    let min = null;
+    let max = null;
+    arr.forEach(v => {
+        if(v == null) return;
+        if(min == null || v < min) min = v;
+        if(max == null || v > max) max = v;
+    });
+    return [min, max];
+}
+
+function floor(num, step){
+    return Math.floor(num / step) * step;
+}
+
+function ceil(num, step){
+    return Math.ceil(num / step) * step;
+}
+
 function replaceRange(s, begin, end, s2){
     return s.substring(0, begin) + s2 + s.substring(end);
+}
+
+function splitTimePeriod(period){
+        if(!period)
+            return [null, null];
+
+        let [t1, t2] = period.split('~');
+        if(t2 && t2.length == 2)
+            t2 = t1.substring(0, 2) + t2;
+        return [t1, t2];
+}
+
+function timestr2min(str){
+    if(str == null) return null;
+    return str.substring(0, 2) * 60 + parseInt(str.substring(2, 4));
+}
+
+function fillLostData(data, valspan, maxstep)
+{
+    valspan = valspan || 0;
+    maxstep = maxstep || 0;
+
+    const idx_h = data.findIndex(v => v != null);
+
+    //no any time info
+    if(idx_h < 0){
+        const step = Math.floor(Math.min(valspan / data.length, maxstep));
+        for(let i = 0; i < data.length; i++)
+            data[i] = i * step;
+        return data;
+    }
+
+    //fill head / tail null
+    const idx_t = data.findLastIndex(v => v != null);
+    const step = Math.floor(Math.min(valspan/data.length, data[idx_h]/idx_h, maxstep));  // min(average, non-zero, maxstep)
+    for(let i = idx_h - 1; i >= 0; i--)
+        data[i] = data[i+1] - step;
+    for(let i = idx_t + 1; i < data.length; i++)
+        data[i] = data[i-1] + step;
+
+    //interpolate for null datum
+    for(let i = idx_h + 1; i < idx_t; i++){
+        if(data[i])
+            continue;
+
+        // next non-null datum
+        let j = i + 1;
+        while(data[j] == null) j++;
+
+        //interpolation
+        const step = Math.floor((data[j] - data[i-i]) / (j - i + 1));
+        for(; i < j; ++i)
+            data[i] = data[i-1] + step;
+    }
+
+    return data;
 }
 
 //predefined section names
@@ -81,6 +158,9 @@ export function markdownElement(markdown, opt)
     el.querySelectorAll('section').forEach(sec => {
         if(['trk-plan', 'trk-backup', 'trk-facto'].includes(sec.id) || sec.querySelectorAll('li code').length > 5)
             extendRecBrief(sec.querySelector('h2+ul'));
+    });
+    el.querySelectorAll('.trkseg').forEach(trkseg => {
+        extendRecBriefChart(trkseg);
     });
     extendMap(el.querySelector('section#mapx'));
     extendVehicle(el.querySelector('section#transport'));
@@ -316,11 +396,14 @@ function extendRecBrief(el)
 {
     if(!el) return;
 
-    el.querySelectorAll('li').forEach(li => {
+    el.querySelectorAll('li').forEach(trkseg => {
 
-        let html = renderTrkDay(li.innerHTML);
+        trkseg.classList.add('trkseg');
 
-        //trkseg-path =========
+        //trkseg day
+        let html = renderTrkDay(trkseg.innerHTML);
+
+        //trkseg path =========
         let begin = html.indexOf('-&gt;');
         if(begin > 0){
             //range
@@ -331,15 +414,173 @@ function extendRecBrief(el)
             const locs = html.substring(begin , end).split('-&gt;');
             html = replaceRange(html, begin, end, templates.trksegPath({locs}));
             //html = replaceRange(html, begin, begin, templates.trksegUtils());  //insert before trkseg-path
-            html += templates.trksegUtils();
         }
 
-        //re-format
-        li.classList.add('trkseg');
-        li.innerHTML = html;
-        //li.querySelectorAll('em').forEach(extendAltitude);
+        //trkseg util
+        html += templates.trksegUtils();
+
+        trkseg.innerHTML = html
+
+        // default flag
+        //if(trkseg.querySelector('time') || trkseg.querySelector('.alt'))
+            trkseg.classList.add('grid');
     });
 }
+
+function extendRecBriefChart(trkseg)
+{
+    //split loc to time, alt, name
+    const locations = [];
+    trkseg.querySelectorAll('.trkseg-path-loc').forEach(loc => {
+        let time = loc.querySelector('time');
+        if(time) time = time.textContent;
+        let [time1, time2] = splitTimePeriod(time);  //time may be a period
+
+        let alt = loc.querySelector('.alt');
+        if(alt) alt = parseInt(alt.textContent);
+
+        const name = Array.from(loc.childNodes)
+                .filter(n => n.nodeType == 3)   //3=TextNode, which excluds other element nodes, like time or alt.
+                .map(n => n.nodeValue)
+                .join('');
+
+        locations.push([timestr2min(time1), alt, name]);
+        if(time2)
+            locations.push([timestr2min(time2), alt, name]);
+    });
+
+    //gen chart
+    if(locations.length){
+        const chart = genLocChart(locations);
+        chart.classList.add('trkseg-chart');
+        trkseg.insertAdjacentElement('beforeend', chart);
+    }
+}
+
+function genLocChart(locations)
+{
+    //settings ------------
+    const PADDING = 20;
+    const X_SCALE = 1;
+    const Y_SCALE = .1;
+    const ALT_INTERVAL = 200;
+
+    const to_x = time => Math.round(2*PADDING + X_SCALE * (time- time_min));
+    const to_y = alt =>  Math.round(  PADDING + Y_SCALE * (alt_max - alt));   //flip
+
+    // data --------------------------
+    const times = fillLostData(locations.map(loc => loc[0]), 12*60, 90);
+    const alts = fillLostData(locations.map(loc => loc[1]));
+    const names = locations.map(loc => loc[2]);
+
+    const [time_min, time_max] = minMax(times);
+    const [alt_min, alt_max] = minMax(alts);
+
+    const width = to_x(time_max) + 2*PADDING;  //add right padding
+    const height = to_y(alt_min) + PADDING;    //add bottom padding
+
+    const xlist = times.map(t => to_x(t));
+    const ylist = alts.map(a => to_y(a));
+
+    // svg ===================
+    const svg = document.createElementNS(SVG_NS, "svg");
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    svg.setAttribute('width', width);
+    //svg.setAttribute('preserveAspectRatio', 'none');
+
+    // alt line shadow
+    const xlist_ext = xlist.concat([ xlist[xlist.length-1], xlist[0] ]);
+    const ylist_ext = ylist.concat([ height, height ]);
+    svg.insertAdjacentElement('beforeend', _locChartPolygon(xlist_ext, ylist_ext));
+
+    // alt lines
+    const left = to_x(time_min);
+    const right = to_x(time_max)
+    const top = ceil(alt_max, ALT_INTERVAL);
+    for(let alt = floor(alt_min, ALT_INTERVAL); alt <= top; alt += ALT_INTERVAL)
+    {
+        const y = to_y(alt);
+        svg.insertAdjacentElement('beforeend', _locChartLine(left, y, right, y, 'trkseg-chart-alt-line'));
+        svg.insertAdjacentElement('beforeend', _locChartText(left, y, alt, 'trkseg-chart-alt-legend'));
+    }
+
+    // locations
+    for(let i = 0; i < names.length; ++i){
+        const x = xlist[i];
+        const y = ylist[i];
+        const name = (i > 0 && names[i-1] == names[i])? '⌛︎': names[i];
+
+        if(i > 0)
+            svg.insertAdjacentElement('beforeend', _locChartLine(xlist[i-1], ylist[i-1], x, y, 'trkseg-chart-loc-path'));
+        svg.insertAdjacentElement('beforeend', _locChartDot(x, y));
+        svg.insertAdjacentElement('beforeend', _locChartText(x, y, name, (i > 0)? 'trkseg-chart-loc-name': 'trkseg-chart-loc-name first'));
+    }
+
+    return svg;
+}
+
+function _locChartPolygon(xlist, ylist, cls){
+
+    const coords = [];
+    for(let i = 0; i < xlist.length; i++)
+        coords.push(`${xlist[i]},${ylist[i]}`);
+
+    const opts = {
+        points: coords.join(' '),
+    };
+
+    const polygon = document.createElementNS(SVG_NS, "polygon");
+    if(polygon)
+        polygon.classList.add(cls);
+
+    for (const [key, value] of Object.entries(opts))
+        polygon.setAttribute(key, value);
+    return polygon;
+}
+
+function _locChartLine(x1, y1, x2, y2, cls){
+    const opts = { x1, y1, x2, y2, };
+
+    const line = document.createElementNS(SVG_NS, "line");
+    if(cls)
+        line.classList.add(cls);
+
+    for (const [key, value] of Object.entries(opts))
+        line.setAttribute(key, value);
+    return line;
+}
+//<line stroke="gray" x1="100" y1="500" x2="725" y2="500"/>
+
+function _locChartDot(x, y, cls){
+    const opts = {
+        cx: x,
+        cy: y,
+        r: 2,
+    };
+
+    const circle = document.createElementNS(SVG_NS, "circle");
+    if(cls)
+        circle.classList.add(cls);
+
+    for (const [key, value] of Object.entries(opts))
+        circle.setAttribute(key, value);
+    return circle;
+}
+
+function _locChartText(x, y, txt, cls){
+    const opts = {x, y};
+
+    const text = document.createElementNS(SVG_NS, "text");
+    if(cls)
+        text.classList.add(...cls.split(' '));
+
+    for (const [key, value] of Object.entries(opts))
+        text.setAttribute(key, value);
+    text.textContent = txt;
+
+    return text;
+}
+
 
 // *NNNN* or <em>NNNN</em>
 function renderAltitude(html)
