@@ -311,6 +311,9 @@ nav,.nav {
 .trkseg {
     position: relative;
 }
+.trkseg:hover {
+    background-color: #ddeedd;
+}
 
 .trkseg-day {
     color: white;
@@ -326,29 +329,34 @@ nav,.nav {
 }
 
 /****** trkseg utils **********/
+/*
 .trkseg-utils::before{
     content: "\A";
     border-style: solid;
     border-width: 8px 0px 8px 8px;
-    border-color: transparent transparent transparent aliceblue;
+    border-color: transparent transparent transparent #ddeedd;
     position: absolute;
     left: 21px;
 }
+*/
 
 .trkseg-utils{
     position: absolute;
-    top: -1px;
-    left: -22px;
+    top: 0px;
+    left: -21px;
+    z-index: 999;
 
     list-style-type: none;
     margin: 0;
     padding: 2px 4px;
 
+    /*
     border-width: 1px 0 1px 1px;
     border-color: whitesmoke;
     border-style: solid;
+    */
 
-    background: aliceblue;
+    background: #ddeedd;
 }
 
 .trkseg:hover .trkseg-utils{
@@ -407,7 +415,7 @@ nav,.nav {
 }
 
 .trkseg-path-loc:hover{
-    background-color:rgba(255,255,255);
+    background-color:rgba(255,255,255, .6);
 }
 
 .trkseg-path-arrow{
@@ -433,6 +441,7 @@ nav,.nav {
     /*height: 200px; */
     background: rgba(255,255,255,.3);
     max-height: 200px;
+    margin-bottom: 8px;
 }
 
 .trkseg-chart polygon{

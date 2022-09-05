@@ -4,6 +4,19 @@ import BiMap from 'bidirectional-map';
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
+function weekdayName(weekday){
+    switch(weekday % 7){
+        case 0: return '日';
+        case 1: return '一';
+        case 2: return '二';
+        case 3: return '三';
+        case 4: return '四';
+        case 5: return '五';
+        case 6: return '六';
+    }
+    return 'N/A';
+}
+
 function minMax(arr){
     let min = null;
     let max = null;
@@ -75,7 +88,7 @@ function fillLostData(data, valspan, maxstep)
         while(data[j] == null) j++;
 
         //interpolation
-        const step = Math.floor((data[j] - data[i-i]) / (j - i + 1));
+        const step = Math.floor((data[j] - data[i-1]) / (j - i + 1));
         for(; i < j; ++i)
             data[i] = data[i-1] + step;
     }
@@ -113,6 +126,19 @@ const Weather_name = new BiMap({
     snowflake: "雪",
 });
 
+// #####################################################
+
+let _opt = null;
+let _course_date;
+
+function toCouseDate(day){
+    if(!_course_date) return null;
+    //const date = new Date(_course_date);
+    //date.setDate(date.getDate() + (day-1));
+    //return date;
+    return new Date(_course_date + (day-1)*86400*1000);
+}
+
 //configured markdown render
 function mdRenderer(){
     return require('markdown-it')()
@@ -128,7 +154,8 @@ function mdRenderer(){
         });
 }
 
-let _opt = null;
+// #####################################################
+
 export function markdownElement(markdown, opt)
 {
     _opt = opt; //set options
@@ -193,6 +220,9 @@ function extendHeader(el){
 
     // move <h1> into <header>
     header.insertAdjacentElement('afterbegin', h1);
+
+    //set global date
+    _course_date = time? Date.parse(time.textContent): null;
 }
 
 
@@ -400,7 +430,7 @@ function extendRecBrief(el)
 
         trkseg.classList.add('trkseg');
 
-        //trkseg day
+        //trkseg day ========
         let html = renderTrkDay(trkseg.innerHTML);
 
         //trkseg path =========
@@ -416,13 +446,13 @@ function extendRecBrief(el)
             //html = replaceRange(html, begin, begin, templates.trksegUtils());  //insert before trkseg-path
         }
 
-        //trkseg util
+        //trkseg util ========
         html += templates.trksegUtils();
 
         trkseg.innerHTML = html
 
         // default flag
-        //if(trkseg.querySelector('time') || trkseg.querySelector('.alt'))
+        if(trkseg.querySelector('time')) // || trkseg.querySelector('.alt'))
             trkseg.classList.add('grid');
     });
 }
@@ -465,6 +495,7 @@ function genLocChart(locations)
     const X_SCALE = 1;
     const Y_SCALE = .1;
     const ALT_INTERVAL = 200;
+    const ALT_SCALE = 100;
 
     const to_x = time => Math.round(2*PADDING + X_SCALE * (time- time_min));
     const to_y = alt =>  Math.round(  PADDING + Y_SCALE * (alt_max - alt));   //flip
@@ -497,8 +528,8 @@ function genLocChart(locations)
     // alt lines
     const left = to_x(time_min);
     const right = to_x(time_max)
-    const top = ceil(alt_max, ALT_INTERVAL);
-    for(let alt = floor(alt_min, ALT_INTERVAL); alt <= top; alt += ALT_INTERVAL)
+    const top = alt_max + ALT_INTERVAL;
+    for(let alt = floor(alt_min, ALT_SCALE); alt < top; alt += ALT_INTERVAL)
     {
         const y = to_y(alt);
         svg.insertAdjacentElement('beforeend', _locChartLine(left, y, right, y, 'trkseg-chart-alt-line'));
@@ -603,8 +634,13 @@ function renderWeather(html){
 }
 
 function renderTrkDay(html){
-    return html.replace(/(D\d+) /,
-        (orig, day) => `<span class="trkseg-day">${day}</span> `);
+
+    return html.replace(/D(\d+) /, (orig, day) => {
+            const date = toCouseDate(day);
+            console.log('render day', day, date);
+            const day_desc = date? `D${day}(${weekdayName(date.getDay())})`: `D${day}`;
+            return `<span class="trkseg-day">${day_desc}</span> `;
+        });
 }
 
 function extendVehicle(el){
