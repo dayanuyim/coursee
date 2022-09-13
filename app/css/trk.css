@@ -444,8 +444,12 @@ nav,.nav {
     margin-bottom: 8px;
 }
 
-.trkseg-chart polygon{
+.trkseg-chart-shadow{
     fill: seagreen;
+}
+
+.trkseg-chart-shadow-stopover{
+    fill: #52ac79;
 }
 
 .trkseg-chart circle{
@@ -469,6 +473,13 @@ nav,.nav {
     dominant-baseline: ideographic;
     fill: black;
 }
+.trkseg-chart-loc-stopover{
+    font-size: 14px;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+/*.trkseg-chart-loc-name.last,*/
 .trkseg-chart-loc-name.first{
     text-anchor: start;
 }

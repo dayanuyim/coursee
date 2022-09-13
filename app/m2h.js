@@ -2,7 +2,77 @@ import * as templates from './templates';
 import { htmlToElement} from './dom-utils';
 import BiMap from 'bidirectional-map';
 
+function partition(array, filter) {
+    let pass = [], fail = [];
+    array.forEach((e, idx, arr) => (filter(e, idx, arr) ? pass : fail).push(e));
+    return [pass, fail];
+  }
+
+// svg utils ===================================
+// prefer to using cls with css to define style
 const SVG_NS = "http://www.w3.org/2000/svg";
+
+function svg_polygon(xlist, ylist, cls){
+
+    const coords = [];
+    for(let i = 0; i < xlist.length; i++)
+        coords.push(`${xlist[i]},${ylist[i]}`);
+
+    const opts = {
+        points: coords.join(' '),
+    };
+
+    const polygon = document.createElementNS(SVG_NS, "polygon");
+    if(polygon)
+        polygon.classList.add(cls);
+
+    for (const [key, value] of Object.entries(opts))
+        polygon.setAttribute(key, value);
+    return polygon;
+}
+
+function svg_line(x1, y1, x2, y2, cls){
+    const opts = { x1, y1, x2, y2, };
+
+    const line = document.createElementNS(SVG_NS, "line");
+    if(cls)
+        line.classList.add(cls);
+
+    for (const [key, value] of Object.entries(opts))
+        line.setAttribute(key, value);
+    return line;
+}
+//<line stroke="gray" x1="100" y1="500" x2="725" y2="500"/>
+
+function svg_circle(x, y, cls){
+    const opts = {
+        cx: x,
+        cy: y,
+        r: 2,
+    };
+
+    const circle = document.createElementNS(SVG_NS, "circle");
+    if(cls)
+        circle.classList.add(cls);
+
+    for (const [key, value] of Object.entries(opts))
+        circle.setAttribute(key, value);
+    return circle;
+}
+
+function svg_text(x, y, txt, cls){
+    const opts = {x, y};
+
+    const text = document.createElementNS(SVG_NS, "text");
+    if(cls)
+        text.classList.add(...cls.split(' '));
+
+    for (const [key, value] of Object.entries(opts))
+        text.setAttribute(key, value);
+    text.textContent = txt;
+
+    return text;
+}
 
 function weekdayName(weekday){
     switch(weekday % 7){
@@ -497,9 +567,6 @@ function genLocChart(locations)
     const ALT_INTERVAL = 200;
     const ALT_SCALE = 100;
 
-    const to_x = time => Math.round(2*PADDING + X_SCALE * (time- time_min));
-    const to_y = alt =>  Math.round(  PADDING + Y_SCALE * (alt_max - alt));   //flip
-
     // data --------------------------
     const times = fillLostData(locations.map(loc => loc[0]), 12*60, 90);
     const alts = fillLostData(locations.map(loc => loc[1]));
@@ -508,110 +575,87 @@ function genLocChart(locations)
     const [time_min, time_max] = minMax(times);
     const [alt_min, alt_max] = minMax(alts);
 
+    // coord --------------------------
+    const to_x = time => Math.round(2*PADDING + X_SCALE * (time- time_min));
+    const to_y = alt =>  Math.round(  PADDING + Y_SCALE * (alt_max - alt));   //flip
+
     const width = to_x(time_max) + 2*PADDING;  //add right padding
     const height = to_y(alt_min) + PADDING;    //add bottom padding
 
-    const xlist = times.map(t => to_x(t));
-    const ylist = alts.map(a => to_y(a));
+    //const xlist = times.map(t => to_x(t));
+    //const ylist = alts.map(a => to_y(a));
 
-    // svg ===================
+    const data = locations.map((loc, i) => ({
+        x: to_x(times[i]),
+        y: to_y(alts[i]),
+        legend: loc[2],
+    }));
+
+    const alt_ylist = [];
+    const top = alt_max + ALT_INTERVAL;
+    for(let alt = floor(alt_min, ALT_SCALE); alt < top; alt += ALT_INTERVAL)
+        alt_ylist.push({y: to_y(alt), legend: alt});
+
+    return genLineChart(width, height, data, alt_ylist);
+}
+
+function genLineChart(width, height, data, ycoords)
+{
+    // utils
+    //const is_stopover = idx => (idx > 0 && data[idx-1].legend == data[idx].legend);
+    const svg_shadow = function(start, stop, cls){
+        const subdata = data.slice(start, stop+1);
+        const xlist = subdata.map(d => d.x);
+        xlist.push(xlist[xlist.length-1]);
+        xlist.push(xlist[0]);
+        const ylist = subdata.map(d => d.y);
+        ylist.push(height);
+        ylist.push(height);
+        return svg_polygon(xlist, ylist, cls);
+    }
+
+    // svg
     const svg = document.createElementNS(SVG_NS, "svg");
     svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
     svg.setAttribute('width', width);
     //svg.setAttribute('preserveAspectRatio', 'none');
 
-    // alt line shadow
-    const xlist_ext = xlist.concat([ xlist[xlist.length-1], xlist[0] ]);
-    const ylist_ext = ylist.concat([ height, height ]);
-    svg.insertAdjacentElement('beforeend', _locChartPolygon(xlist_ext, ylist_ext));
+    const chart_inserts = elem => svg.insertAdjacentElement('afterbegin', elem);
+    const chart_appends = elem => svg.insertAdjacentElement('beforeend', elem);
 
-    // alt lines
-    const left = to_x(time_min);
-    const right = to_x(time_max)
-    const top = alt_max + ALT_INTERVAL;
-    for(let alt = floor(alt_min, ALT_SCALE); alt < top; alt += ALT_INTERVAL)
-    {
-        const y = to_y(alt);
-        svg.insertAdjacentElement('beforeend', _locChartLine(left, y, right, y, 'trkseg-chart-alt-line'));
-        svg.insertAdjacentElement('beforeend', _locChartText(left, y, alt, 'trkseg-chart-alt-legend'));
+    // draw y-coord lines
+    if(ycoords){
+        const xmin = data[0].x;
+        const xmax = data[data.length-1].x;
+        ycoords.forEach(({y, legend}) => {
+            chart_appends(svg_line(xmin, y, xmax, y, 'trkseg-chart-alt-line'));
+            chart_appends(svg_text(xmin, y, legend, 'trkseg-chart-alt-legend'));
+        });
     }
 
-    // locations
-    for(let i = 0; i < names.length; ++i){
-        const x = xlist[i];
-        const y = ylist[i];
-        const name = (i > 0 && names[i-1] == names[i])? '⌛︎': names[i];
+    // draw line
+    for(let i = 1; i < data.length; ++i)
+        chart_appends(svg_line(data[i-1].x, data[i-1].y, data[i].x, data[i].y, 'trkseg-chart-loc-path'));
 
-        if(i > 0)
-            svg.insertAdjacentElement('beforeend', _locChartLine(xlist[i-1], ylist[i-1], x, y, 'trkseg-chart-loc-path'));
-        svg.insertAdjacentElement('beforeend', _locChartDot(x, y));
-        svg.insertAdjacentElement('beforeend', _locChartText(x, y, name, (i > 0)? 'trkseg-chart-loc-name': 'trkseg-chart-loc-name first'));
-    }
+    // draw locations
+    data.forEach(({x, y, legend}, i) => {
+        if(i > 0 && data[i-1].legend == legend){   //stopover location
+            chart_inserts(svg_shadow(i-1, i, 'trkseg-chart-shadow-stopover'));
+            chart_appends(svg_text((data[i-1].x + x)/2, (y + height)/2, '⏳', 'trkseg-chart-loc-stopover'));
+        }
+        else{
+            const place = (i == 0)? ' first': (i == data.length - 1)? ' last': '';
+            chart_appends(svg_circle(x, y));
+            chart_appends(svg_text(x, y, legend, 'trkseg-chart-loc-name' + place));
+        }
+    });
+
+    // shadow for all
+    chart_inserts(svg_shadow(0, data.length-1, 'trkseg-chart-shadow'));
 
     return svg;
 }
 
-function _locChartPolygon(xlist, ylist, cls){
-
-    const coords = [];
-    for(let i = 0; i < xlist.length; i++)
-        coords.push(`${xlist[i]},${ylist[i]}`);
-
-    const opts = {
-        points: coords.join(' '),
-    };
-
-    const polygon = document.createElementNS(SVG_NS, "polygon");
-    if(polygon)
-        polygon.classList.add(cls);
-
-    for (const [key, value] of Object.entries(opts))
-        polygon.setAttribute(key, value);
-    return polygon;
-}
-
-function _locChartLine(x1, y1, x2, y2, cls){
-    const opts = { x1, y1, x2, y2, };
-
-    const line = document.createElementNS(SVG_NS, "line");
-    if(cls)
-        line.classList.add(cls);
-
-    for (const [key, value] of Object.entries(opts))
-        line.setAttribute(key, value);
-    return line;
-}
-//<line stroke="gray" x1="100" y1="500" x2="725" y2="500"/>
-
-function _locChartDot(x, y, cls){
-    const opts = {
-        cx: x,
-        cy: y,
-        r: 2,
-    };
-
-    const circle = document.createElementNS(SVG_NS, "circle");
-    if(cls)
-        circle.classList.add(cls);
-
-    for (const [key, value] of Object.entries(opts))
-        circle.setAttribute(key, value);
-    return circle;
-}
-
-function _locChartText(x, y, txt, cls){
-    const opts = {x, y};
-
-    const text = document.createElementNS(SVG_NS, "text");
-    if(cls)
-        text.classList.add(...cls.split(' '));
-
-    for (const [key, value] of Object.entries(opts))
-        text.setAttribute(key, value);
-    text.textContent = txt;
-
-    return text;
-}
 
 
 // *NNNN* or <em>NNNN</em>
@@ -637,9 +681,8 @@ function renderTrkDay(html){
 
     return html.replace(/D(\d+) /, (orig, day) => {
             const date = toCouseDate(day);
-            console.log('render day', day, date);
-            const day_desc = date? `D${day}(${weekdayName(date.getDay())})`: `D${day}`;
-            return `<span class="trkseg-day">${day_desc}</span> `;
+            const desc = date? `D${day}(${weekdayName(date.getDay())})`: `D${day}`;
+            return `<span class="trkseg-day">${desc}</span> `;
         });
 }
 
