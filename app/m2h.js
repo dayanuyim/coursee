@@ -12,65 +12,51 @@ function partition(array, filter) {
 // prefer to using cls with css to define style
 const SVG_NS = "http://www.w3.org/2000/svg";
 
+function _svg_element(name, cls, opts){
+    const elem = document.createElementNS(SVG_NS, name);
+    if(cls)
+        elem.classList.add(...cls.split(' '));
+    for (const [key, value] of Object.entries(opts))
+        elem.setAttribute(key, value);
+    return elem;
+}
+
+/*
 function svg_polygon(xlist, ylist, cls){
 
     const coords = [];
     for(let i = 0; i < xlist.length; i++)
         coords.push(`${xlist[i]},${ylist[i]}`);
 
-    const opts = {
+    return _svg_element("polygon", cls, {
         points: coords.join(' '),
-    };
+    });
+}
+*/
 
-    const polygon = document.createElementNS(SVG_NS, "polygon");
-    if(polygon)
-        polygon.classList.add(cls);
-
-    for (const [key, value] of Object.entries(opts))
-        polygon.setAttribute(key, value);
-    return polygon;
+function svg_polygon(xylist, cls){
+    const coords = xylist.map(({x, y}) => `${x},${y}`);
+    return _svg_element("polygon", cls, {
+        points: coords.join(' '),
+    });
 }
 
-function svg_line(x1, y1, x2, y2, cls){
-    const opts = { x1, y1, x2, y2, };
-
-    const line = document.createElementNS(SVG_NS, "line");
-    if(cls)
-        line.classList.add(cls);
-
-    for (const [key, value] of Object.entries(opts))
-        line.setAttribute(key, value);
-    return line;
-}
 //<line stroke="gray" x1="100" y1="500" x2="725" y2="500"/>
+function svg_line(x1, y1, x2, y2, cls){
+    return _svg_element("line", cls, { x1, y1, x2, y2, });
+}
 
 function svg_circle(x, y, cls){
-    const opts = {
+    return _svg_element("circle", cls, {
         cx: x,
         cy: y,
         r: 2,
-    };
-
-    const circle = document.createElementNS(SVG_NS, "circle");
-    if(cls)
-        circle.classList.add(cls);
-
-    for (const [key, value] of Object.entries(opts))
-        circle.setAttribute(key, value);
-    return circle;
+    });
 }
 
 function svg_text(x, y, txt, cls){
-    const opts = {x, y};
-
-    const text = document.createElementNS(SVG_NS, "text");
-    if(cls)
-        text.classList.add(...cls.split(' '));
-
-    for (const [key, value] of Object.entries(opts))
-        text.setAttribute(key, value);
+    const text = _svg_element("text", cls, {x, y});
     text.textContent = txt;
-
     return text;
 }
 
@@ -547,13 +533,12 @@ function extendRecBriefChart(trkseg)
 
         locations.push([timestr2min(time1), alt, name]);
         if(time2)
-            locations.push([timestr2min(time2), alt, name]);
+            locations.push([timestr2min(time2), alt, null]); //nowhere(null locaiton name) means a stopover
     });
 
     //gen chart
     if(locations.length){
         const chart = genLocChart(locations);
-        chart.classList.add('trkseg-chart');
         trkseg.insertAdjacentElement('beforeend', chart);
     }
 }
@@ -570,7 +555,6 @@ function genLocChart(locations)
     // data --------------------------
     const times = fillLostData(locations.map(loc => loc[0]), 12*60, 90);
     const alts = fillLostData(locations.map(loc => loc[1]));
-    const names = locations.map(loc => loc[2]);
 
     const [time_min, time_max] = minMax(times);
     const [alt_min, alt_max] = minMax(alts);
@@ -581,9 +565,6 @@ function genLocChart(locations)
 
     const width = to_x(time_max) + 2*PADDING;  //add right padding
     const height = to_y(alt_min) + PADDING;    //add bottom padding
-
-    //const xlist = times.map(t => to_x(t));
-    //const ylist = alts.map(a => to_y(a));
 
     const data = locations.map((loc, i) => ({
         x: to_x(times[i]),
@@ -602,23 +583,19 @@ function genLocChart(locations)
 function genLineChart(width, height, data, ycoords)
 {
     // utils
-    //const is_stopover = idx => (idx > 0 && data[idx-1].legend == data[idx].legend);
     const svg_shadow = function(start, stop, cls){
-        const subdata = data.slice(start, stop+1);
-        const xlist = subdata.map(d => d.x);
-        xlist.push(xlist[xlist.length-1]);
-        xlist.push(xlist[0]);
-        const ylist = subdata.map(d => d.y);
-        ylist.push(height);
-        ylist.push(height);
-        return svg_polygon(xlist, ylist, cls);
+        const xylist = data.slice(start, stop+1);
+        xylist.push({y: height, x: xylist[xylist.length-1].x});
+        xylist.push({y: height, x: xylist[0].x});
+        return svg_polygon(xylist, cls);
     }
 
     // svg
-    const svg = document.createElementNS(SVG_NS, "svg");
-    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-    svg.setAttribute('width', width);
-    //svg.setAttribute('preserveAspectRatio', 'none');
+    const svg = _svg_element('svg', 'trkseg-chart', {
+        viewBox: `0 0 ${width} ${height}`,
+        width,
+        //preserveAspectRatio: 'none',
+    });
 
     const chart_inserts = elem => svg.insertAdjacentElement('afterbegin', elem);
     const chart_appends = elem => svg.insertAdjacentElement('beforeend', elem);
@@ -637,9 +614,9 @@ function genLineChart(width, height, data, ycoords)
     for(let i = 1; i < data.length; ++i)
         chart_appends(svg_line(data[i-1].x, data[i-1].y, data[i].x, data[i].y, 'trkseg-chart-loc-path'));
 
-    // draw locations
+    // draw locations or stopover shadows
     data.forEach(({x, y, legend}, i) => {
-        if(i > 0 && data[i-1].legend == legend){   //stopover location
+        if(!legend){   //stopover location
             chart_inserts(svg_shadow(i-1, i, 'trkseg-chart-shadow-stopover'));
             chart_appends(svg_text((data[i-1].x + x)/2, (y + height)/2, '⏳', 'trkseg-chart-loc-stopover'));
         }
