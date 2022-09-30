@@ -7,21 +7,27 @@ fi
 
 function parse()
 {
-    # date prefix
-    date="${1:0:10}"
-
-    if [[ ${#date} != 10 || ${date:4:1} != '-' || ${date:7:1} != '-' ]]; then
+    # format: YYYYMMDD-Title-Days
+    y="${1:0:4}"
+    m="${1:4:2}"
+    d="${1:6:2}"
+    if [[ ${#y} != 4 || ( $y != "YYYY" && $y -lt 2000 ) || \
+          ${#m} != 2 || ( $m != "MM" && ${m#0} -gt 12 ) || \
+          ${#d} != 2 || ( $d != "DD" && ${d#0} -gt 31 ) ]];
+    then
         >&2 echo "Bad Date Format: $1, $date"
         return 1
     fi
 
+    date="$y-$m-$d"
+
     # strip suffix days
-    title="${1:11}"
+    title="${1:9}"
     title="${title%-[1-9]}"
     title="${title%-[1-9][0-9]}"
 
     # suffix days
-    pos=$((11+${#title}+1))
+    pos=$((9+${#title}+1))
     days="${1:$pos}"
     #days="${days:-1}"
 
@@ -29,7 +35,7 @@ function parse()
 }
 
 function data(){
-    find -L "$dir" -maxdepth 1 -type d \( -iname 'YYYY-MM-DD-*' -or -name '20[0-9][0-9]-[01][0-9]-[0-3][0-9]*' \) | sort -r
+    find -L "$dir" -maxdepth 1 -type d \( -iname 'YYYYMMDD-*' -or -name '20[0-9][0-9][01][0-9][0-3][0-9]-*' \) | sort -r
 }
 
 

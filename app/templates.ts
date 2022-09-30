@@ -6,8 +6,8 @@ Handlebars.registerHelper('defVal', function (value, defValue) {
     //return new Handlebars.SafeString(out);
 });
 
-Handlebars.registerHelper('name', function (date, days, title) {
-    let out = date;
+Handlebars.registerHelper('fmtTitle', function (date, days, title) {
+    let out = date.replaceAll('-', '');
     if(title) out += `-${title}`;
     if(days) out += `-${days}`;
     return out;
@@ -54,7 +54,7 @@ export const main = Handlebars.compile(`
         <li>
             <time class="trk-date">{{fmtDate date}}</time>
             <span class="trk-days trk-days-{{defVal days 1}}">{{defVal days 1}}</span>
-            <label class="trk-title"><a href="#trek-{{name date days title}}">{{title}}</a></label>
+            <label class="trk-title"><a href="#trek-{{fmtTitle date days title}}">{{title}}</a></label>
             <span class="trk-gpx"><a href="data/{{date}}-{{title}}/course.gpx"><i class="fa-solid fa-location-dot"></i></a></span>
             <span class="trk-rec"><a href="data/{{date}}-{{title}}/course.md"><i class="fa-regular fa-pen-to-square"></i></a></span>
         </li>
