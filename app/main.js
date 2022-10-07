@@ -1,13 +1,16 @@
 'use strict';
 
-import './css/trk.css';
-import './js/trk';
+import './css/coursee-md.css';
+import './css/editor.css';
+import './js/coursee';
 import {GPXParser} from './loadgpx';
 import * as googleMaps from 'google-maps-api';
 import * as templates from './templates';
 import * as moment from 'moment-timezone';
 import { innerElement } from './dom-utils';
 import { markdownElement } from './m2h';
+import * as monaco from 'monaco-editor';
+import { initVimMode } from 'monaco-vim';
 
 // utils ================================
 Date.prototype.addDays = function(days) {
@@ -197,23 +200,40 @@ function setMarkdownDownload(mdPath)
 
 async function loadMarkdown(mdPath)
 {
-    const recElem = document.getElementById("rec");
     try{
         //fetch
         const resp = await fetch(mdPath, {contentType: "text/markdown;charset=UTF-8;"});
         if(!resp.ok)
             throw new Error(`Markdown '${mdPath}' not found`);
+        const text = await resp.text();
+
+        //mardown editor
+        const editor = monaco.editor.create(document.getElementById('editor-content'), {
+            value: text,
+            language: 'markdown',
+            minimap: {
+              enabled: false,
+            },
+            theme: "vs-dark",
+            fontSize: 14,
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+          });
+        editor.focus();
+        const vimMode = initVimMode(editor, document.getElementById('editor-status'))
 
         //markdown -> html element
-        const text = await resp.text();
-        innerElement(recElem, markdownElement(text, {
+        innerElement(document.getElementById("rec"), markdownElement(text, {
             host: window.location.href.substring(0, window.location.href.lastIndexOf('/')),
             subpath: mdPath.substring(0, mdPath.lastIndexOf("/")),
         }));
+
+        //init status
+        document.getElementById('toolbar-view').click();
     }
     catch(err){
         console.error(err);
-        return setRecNotFound(recElem, `Load Rec Error: ${err}`);
+        return setRecNotFound(document.getElementById("rec"), `Load Rec Error: ${err}`);
     }
 }
 

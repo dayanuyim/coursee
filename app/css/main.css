@@ -134,3 +134,67 @@ time{
     left: calc(70% + 4.5em);
 }
 
+/********************* Coursee Layout ************************/
+#toolbar{
+    position: fixed;
+    z-index: 9;
+}
+#toolbar button{
+    border: 1px solid lightgrey;
+    padding: 4px 8px;
+    font-weight: bold;
+}
+#toolbar button:nth-child(n+2){
+    border-left-width: 0;
+}
+#toolbar button:not(:disabled):hover{
+    background-color:rgba(255,255,255,.8);
+    cursor: pointer;
+}
+
+#container{
+    position: relative;
+}
+
+#container #editor-content {
+    position: fixed;
+    top: 2em;
+    left: 4px;
+    width: calc(100vw - 8px);
+    height: calc(100vh - 3.5em);
+}
+
+#container #editor-status {
+    position: fixed;
+    top: calc(100vh - 3.5em + 2em);
+    left: 4px;
+    width: calc(100vw - 8px);
+}
+
+#container #rec {
+    padding: 2em;
+}
+
+/* ---------------------------------------------*/
+#container.edit #rec {
+    display: none;
+}
+
+/* ---------------------------------------------*/
+#container.view #editor {
+    display: none;
+}
+
+/* ---------------------------------------------*/
+#container.both #editor-content,
+#container.both #editor-status {
+    width: calc(50vw - 8px);
+}
+
+#container.both #rec{
+    padding-left: 0.5em;
+    padding-right: 1em;
+    position: absolute;
+    top: 0px;
+    left: calc(50vw);
+}

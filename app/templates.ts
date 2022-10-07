@@ -71,20 +71,34 @@ export const main = Handlebars.compile(`
 `);
 
 export const trek = Handlebars.compile(`
-    <div id="download">
+    <div id="download" style="display: none">
     下載:
     <a id="download-trk"><i class="fa-solid fa-location-dot"></i>航跡</a>&nbsp;
     <a id="download-rec"><i class="fa-regular fa-pen-to-square"></i>記錄</a>
     </div>
 
     <div id="container">
+
+        <div id="toolbar">
+            <button id="toolbar-edit" onclick="selectMode(this,'edit')">&larr;</button><!--
+         --><button id="toolbar-both" onclick="selectMode(this,'both')">&harr;</button><!--
+         --><button id="toolbar-view" onclick="selectMode(this,'view')">&rarr;</button>
+        </div>
+
+        <div id="editor">
+            <div id="editor-content"></div>
+            <div id="editor-status"></div>
+        </div>
+
         <div id="rec" class="">
-            <div class="rec-content">[Record Loading...]</div>
+            <div id="rec-content">[Record Loading...]</div>
         </div>
             
+        <!--
         <div id="map" class="">
             <div id="map-content">[The Map to Display]</div>
         </div>
+        -->
     </div>
 `);
 

@@ -81,3 +81,22 @@ window.toggleNavCollapse = function(target){
         nav.classList.toggle('collapse');
     }
 }
+
+window.toggleEdit = function(target){
+    const container = target.closest('#container');
+    if(container)
+        container.classList.toggle('edit');
+}
+
+window.selectMode = function(target, mode){
+    const container = target.closest('#container');
+    if(!container) return;
+    container.classList.remove('view');
+    container.classList.remove('edit');
+    container.classList.remove('both');
+    container.classList.add(mode);
+
+    document.getElementById('toolbar-view').disabled = (mode === 'view');
+    document.getElementById('toolbar-edit').disabled = (mode === 'edit');
+    document.getElementById('toolbar-both').disabled = (mode === 'both');
+}

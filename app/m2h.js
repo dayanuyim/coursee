@@ -252,6 +252,8 @@ export function markdownElement(markdown, opt)
         if(['trk-rec', 'ref-rec'].includes(sec.id))
             sec.querySelectorAll('h3+table').forEach(extendRecContent);
     });
+
+    //el.classList.add('coursee-md');
     return el;
 }
 
