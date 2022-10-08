@@ -278,6 +278,7 @@ function _upload_file(fpath, text, ms){
     });
 }
 
+let _editor_vim_plugin;
 function initEditor(fpath, text)
 {
     //editor
@@ -309,6 +310,24 @@ function initEditor(fpath, text)
         if(_editor_content_changed)
             _upload_file(fpath, editor.getValue(), 0);
     })
+
+    //vim plugin
+    VimMode.Vim.defineEx('write', 'w', function() {
+        _upload_file(fpath, editor.getValue(), 0);
+    });
+
+    window.setEditorVim = (target) => {
+        target.classList.toggle('vim');
+        const enabled = target.classList.contains('vim');
+
+        if(enabled){
+            _editor_vim_plugin = initVimMode(editor, document.getElementById('editor-status'))
+        }
+        else if(_editor_vim_plugin){
+            _editor_vim_plugin.dispose();
+            _editor_vim_plugin = null;
+        }
+    };
 }
 
 function setRecTimestampFocus(mapHandler)

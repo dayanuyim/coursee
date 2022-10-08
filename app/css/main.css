@@ -171,6 +171,27 @@ time{
     width: calc(100vw - 8px);
 }
 
+#container #editor-settings {
+    position: fixed;
+    top: calc(100vh - 3.5em + 2em);
+    left: calc(100vw - 4px - 1em);
+    width: 1em;
+}
+
+#container #editor-settings button{
+    padding: 0;
+    margin: 0;
+    border: 0;
+    width: 1em;
+    font-size: large;
+    background: transparent;
+}
+
+#editor-vim.vim{ color: lightseagreen; }
+#editor-vim.vim:hover{ color: lightgreen; }
+#editor-vim{ color: black; }
+#editor-vim:hover{ color: lightgray; }
+
 #container #rec {
     padding: 2em;
 }
@@ -189,6 +210,9 @@ time{
 #container.both #editor-content,
 #container.both #editor-status {
     width: calc(50vw - 8px);
+}
+#container.both #editor-settings {
+    left: calc(50vw - 4px - 1em);
 }
 
 #container.both #rec{

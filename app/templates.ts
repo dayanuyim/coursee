@@ -88,6 +88,9 @@ export const trek = Handlebars.compile(`
         <div id="editor">
             <div id="editor-content"></div>
             <div id="editor-status"></div>
+            <div id="editor-settings">
+                <button id="editor-vim" onclick="setEditorVim(this)"><i class="fa-brands fa-vimeo-v"></i></button>
+            </div>
         </div>
 
         <div id="rec" class="">
