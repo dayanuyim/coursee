@@ -80,6 +80,19 @@ if (isDev) {
 // import lib router
 //app.use('/api', require('./lib/theater.js')());
 
+//api to upload file
+app.put('/upload/*', express.json(), function(req, res, next){
+  const webroot = isDev? 'app': 'dist';
+  const fpath = path.join(__dirname, webroot, req.params[0]);
+  const text = req.body.text;
+  console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
+
+  fs.writeFile(fpath, text, function(error, data){
+    if(error) return res.status(500).json({error});
+    res.status(200).json({result: "ok"});
+  });
+});
+
 // Startup Server
 if(isHttps){
   const https = require('https');
@@ -88,10 +101,10 @@ if(isHttps){
     cert: fs.readFileSync(nconf.get('security:cert'))
   };
   https.createServer(httpsOptions, app)
-      .listen(servicePort, () => console.log(`Security Server on Port ${serviceUrl}`));
+      .listen(servicePort, () => console.log(`Security Server on ${serviceUrl}:${servicePort}`));
 }
 else{
-  app.listen(servicePort, () => console.log(`Server on Port ${serviceUrl}`));
+  app.listen(servicePort, () => console.log(`Server on ${serviceUrl}:${servicePort}`));
 }
 
 

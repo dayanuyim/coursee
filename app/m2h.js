@@ -357,11 +357,11 @@ function fixLocalPath(el)
 }
 
 function _fixLocalPath(url){
-    if(!_opt || !_opt.host || !_opt.subpath) return url;
+    if(!_opt || !_opt.host || !_opt.dir) return url;
 
     if(url.startsWith(_opt.host)){
         const path = url.substring(_opt.host.length);
-        return `${_opt.host}/${_opt.subpath}${path}`
+        return `${_opt.host}/${_opt.dir}${path}`
     }
     return url;
 }

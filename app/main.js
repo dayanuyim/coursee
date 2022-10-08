@@ -10,13 +10,58 @@ import * as moment from 'moment-timezone';
 import { innerElement } from './dom-utils';
 import { markdownElement } from './m2h';
 import * as monaco from 'monaco-editor';
-import { initVimMode } from 'monaco-vim';
+import { initVimMode, VimMode } from 'monaco-vim';
+import * as path from 'path';
+
+const AUTO_SAVE_DELAY = 5000;  //ms
 
 // utils ================================
 Date.prototype.addDays = function(days) {
     var result = new Date(this);
     result.setDate(result.getDate() + days);
     return result;
+}
+
+async function putJson(url, obj){
+    try{
+        const resp = await fetch(url, {
+            method: 'PUT',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+                //'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: JSON.stringify(obj),
+        });
+        return resp.json();
+    }
+    catch(error){
+        console.error(error);
+        return {error};
+    }
+}
+
+const _upload_file_timers = {};
+function uploadFileLazy(fpath, text, ms, callback) {
+    //clear old timer if any
+    const last = _upload_file_timers[fpath];
+    if(last){
+        clearTimeout(last);
+        delete _upload_file_timers[fpath];
+    }
+
+    const action = async() => {
+        console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
+        const resp = await putJson(`/upload/${fpath}`, { text });
+        console.log("save resp: ", resp);
+        delete _upload_file_timers[fpath];
+        callback();
+    };
+
+    //if(ms == 0)
+    //    action();   //do it right away, no timer cached
+    //else
+        _upload_file_timers[fpath] = setTimeout(action, ms);
 }
 
 // map ===============================
@@ -207,34 +252,63 @@ async function loadMarkdown(mdPath)
             throw new Error(`Markdown '${mdPath}' not found`);
         const text = await resp.text();
 
-        //mardown editor
-        const editor = monaco.editor.create(document.getElementById('editor-content'), {
-            value: text,
-            language: 'markdown',
-            minimap: {
-              enabled: false,
-            },
-            theme: "vs-dark",
-            fontSize: 14,
-            scrollBeyondLastLine: false,
-            automaticLayout: true,
-          });
-        editor.focus();
-        const vimMode = initVimMode(editor, document.getElementById('editor-status'))
+        //markdown editor
+        initEditor(mdPath, text);
 
         //markdown -> html element
         innerElement(document.getElementById("rec"), markdownElement(text, {
-            host: window.location.href.substring(0, window.location.href.lastIndexOf('/')),
-            subpath: mdPath.substring(0, mdPath.lastIndexOf("/")),
+            host: path.dirname(window.location.href),
+            dir: path.dirname(mdPath),
         }));
 
         //init status
-        document.getElementById('toolbar-view').click();
+        document.getElementById('toolbar-both').click();
     }
     catch(err){
         console.error(err);
         return setRecNotFound(document.getElementById("rec"), `Load Rec Error: ${err}`);
     }
+}
+
+let _editor_content_changed = false;
+
+function _upload_file(fpath, text, ms){
+    uploadFileLazy(fpath, text, ms, ()=>{
+        _editor_content_changed = false;
+    });
+}
+
+function initEditor(fpath, text)
+{
+    //editor
+    const editor = monaco.editor.create(document.getElementById('editor-content'), {
+        value: text,
+        language: 'markdown',
+        minimap: {
+            enabled: false,
+        },
+        theme: "vs-dark",
+        fontSize: 14,
+        scrollBeyondLastLine: false,
+        automaticLayout: true,
+        });
+    editor.focus();
+    editor.onDidChangeModelContent(e => {
+        _editor_content_changed = true;
+        _upload_file(fpath, editor.getValue(), AUTO_SAVE_DELAY);
+    });
+
+    //vim plugin
+    const vim = initVimMode(editor, document.getElementById('editor-status'))
+    VimMode.Vim.defineEx('write', 'w', function() {
+        _upload_file(fpath, editor.getValue(), 0);
+    });
+
+    //save on exit if changed
+    window.addEventListener('beforeunload', ()=>{
+        if(_editor_content_changed)
+            _upload_file(fpath, editor.getValue(), 0);
+    })
 }
 
 function setRecTimestampFocus(mapHandler)
