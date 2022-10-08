@@ -236,30 +236,34 @@ export async function loadRec(name)
     */
 }
 
-function setMarkdownDownload(mdPath)
+function setMarkdownDownload(fpath)
 {
     const el = document.getElementById('download-rec');
-    el.href = mdPath;
-    el.download = decodeURI(mdPath.split('/')[1]) + ".md";   // data/<name>/course.md
+    el.href = fpath;
+    el.download = decodeURI(fpath.split('/')[1]) + ".md";   // data/<name>/course.md
 }
 
-async function loadMarkdown(mdPath)
+let setViewer;
+async function loadMarkdown(fpath)
 {
     try{
         //fetch
-        const resp = await fetch(mdPath, {contentType: "text/markdown;charset=UTF-8;"});
+        const resp = await fetch(fpath, {contentType: "text/markdown;charset=UTF-8;"});
         if(!resp.ok)
-            throw new Error(`Markdown '${mdPath}' not found`);
+            throw new Error(`Markdown '${fpath}' not found`);
         const text = await resp.text();
 
         //markdown editor
-        initEditor(mdPath, text);
+        initEditor(fpath, text);
 
-        //markdown -> html element
-        innerElement(document.getElementById("rec"), markdownElement(text, {
+        //markdown viewer
+        const elem = document.getElementById("rec");
+        const opt = {
             host: path.dirname(window.location.href),
-            dir: path.dirname(mdPath),
-        }));
+            dir: path.dirname(fpath),
+        };
+        setViewer = txt => innerElement(elem, markdownElement(txt, opt));
+        setViewer(text);
 
         //init status
         document.getElementById('toolbar-both').click();
@@ -296,13 +300,9 @@ function initEditor(fpath, text)
     editor.focus();
     editor.onDidChangeModelContent(e => {
         _editor_content_changed = true;
-        _upload_file(fpath, editor.getValue(), AUTO_SAVE_DELAY);
-    });
-
-    //vim plugin
-    const vim = initVimMode(editor, document.getElementById('editor-status'))
-    VimMode.Vim.defineEx('write', 'w', function() {
-        _upload_file(fpath, editor.getValue(), 0);
+        const text = editor.getValue();
+        setViewer(text);   //refresh viewer
+        _upload_file(fpath, text, AUTO_SAVE_DELAY);
     });
 
     //save on exit if changed
