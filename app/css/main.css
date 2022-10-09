@@ -158,23 +158,28 @@ time{
 
 #container #editor-content {
     position: fixed;
-    top: 2em;
-    left: 4px;
-    width: calc(100vw - 8px);
-    height: calc(100vh - 3.5em);
+    top: 25px;
+    left: 0;
+    width: calc(100vw);
+    height: calc(100vh - 45px);
 }
 
 #container #editor-status {
     position: fixed;
-    top: calc(100vh - 3.5em + 2em);
-    left: 4px;
-    width: calc(100vw - 8px);
+    top: calc(100vh - 45px + 25px);
+    left: 0;
+    width: calc(100vw);
+
+    margin-top: 0em;
+    color: white;
+    background-color: dimgray;
+    border-top: 1px solid lightgrey;
 }
 
 #container #editor-settings {
     position: fixed;
-    top: calc(100vh - 3.5em + 2em);
-    left: calc(100vw - 4px - 1em);
+    top: calc(100vh - 45px + 25px);
+    left: calc(100vw - 1em);
     width: 1em;
 }
 
@@ -183,17 +188,20 @@ time{
     margin: 0;
     border: 0;
     width: 1em;
-    font-size: large;
+    font-size: 16px;
     background: transparent;
+}
+#container #editor-settings button:hover{
+    cursor: pointer;
 }
 
 #editor-vim.vim{ color: lightseagreen; }
-#editor-vim.vim:hover{ color: lightgreen; }
+#editor-vim.vim:hover{ color: lightgreen;}
 #editor-vim{ color: black; }
-#editor-vim:hover{ color: lightgray; }
+#editor-vim:hover{ color: lightgray;}
 
 #container #rec {
-    padding: 2em;
+    padding: 25px 1em 2em 2em;
 }
 
 /* ---------------------------------------------*/
@@ -209,15 +217,14 @@ time{
 /* ---------------------------------------------*/
 #container.both #editor-content,
 #container.both #editor-status {
-    width: calc(50vw - 8px);
+    width: calc(50vw);
 }
 #container.both #editor-settings {
-    left: calc(50vw - 4px - 1em);
+    left: calc(50vw - 1em);
 }
 
 #container.both #rec{
-    padding-left: 0.5em;
-    padding-right: 1em;
+    padding-left: 1em;
     position: absolute;
     top: 0px;
     left: calc(50vw);

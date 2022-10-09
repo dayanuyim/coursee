@@ -1,5 +1,12 @@
 import { fireOnlyIfSingleClick } from '../dom-utils';
 
+function setElemClass(el, cls, enabled){
+    if(enabled)
+        el.classList.add(cls);
+    else
+        el.classList.remove(cls);
+}
+
 window.toggleMap = function(){
     const mapobj = document.getElementById('mapobj');
     mapobj.classList.toggle('hide');
@@ -73,10 +80,16 @@ window.toggleNavCollapse = function(target){
     if(nav){
         // reset the position by top and left
         const rect = nav.getBoundingClientRect();
+        /*
         nav.style.left = `${rect.x}px`;
         nav.style.top = `${rect.y}px`;
         nav.style.bottom = 'unset';
         nav.style.right = 'unset';
+        */
+        nav.style.left = 'unset';
+        nav.style.top = 'unset';
+        nav.style.bottom = `${window.innerHeight - rect.bottom}px`;
+        nav.style.right = `${window.innerWidth - rect.right}px`;
 
         nav.classList.toggle('collapse');
     }
@@ -91,12 +104,18 @@ window.toggleEdit = function(target){
 window.selectMode = function(target, mode){
     const container = target.closest('#container');
     if(!container) return;
-    container.classList.remove('view');
-    container.classList.remove('edit');
-    container.classList.remove('both');
-    container.classList.add(mode);
 
-    document.getElementById('toolbar-view').disabled = (mode === 'view');
-    document.getElementById('toolbar-edit').disabled = (mode === 'edit');
-    document.getElementById('toolbar-both').disabled = (mode === 'both');
+    //check for each mode
+    for(const m of ['view', 'edit', 'both']){
+        const selected = (mode === m);
+        setElemClass(container, m, selected);
+        document.getElementById(`toolbar-${m}`).disabled = selected;
+    }
+}
+
+window.jumpToLine = function(target){
+    const lineno = target.value;
+    console.log(line);
+    const el = document.body.querySelector(`a[data-line-no=${lineno}`);
+    console.log(el);
 }
