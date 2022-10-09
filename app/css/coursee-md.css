@@ -139,9 +139,9 @@ nav,.nav {
     max-width: 15%;
     background: rgba(248,248,248,.7);
     position: fixed;
-    bottom: 2em;
-    right: 2em;
-    padding: 1em;
+    bottom: 0em;
+    right: 0em;
+    padding: 0 1em;
     z-index: 999;
     display: grid;
 }
@@ -162,14 +162,14 @@ nav,.nav {
 }
 
 .nav .nav-collapse::after {
-    content: "■";
     display:inline-block;
-    transform: scale(1.5);
+    content: "▼";
+    /* content: "■"; transform: scale(1.5); */
 }
 .nav.collapse .nav-collapse::after {
     display:inline-block;
-    transform: scale(.75);
-    content: "◥";
+    content: "▲"
+    /* content: "◥"; transform: scale(.75); */
 }
 .nav.collapse .nav-collapse ~ * {
     display: none;
@@ -217,8 +217,9 @@ nav,.nav {
     border-top: dimgray solid 1px;
     list-style-type: none;
     padding-left:0;
-    margin: 4px;
+    margin: 0px;
     padding: 4px;
+    font-size: 14px;
 }
   
   section{
@@ -521,4 +522,9 @@ pre code {
 .arrow-legend {
     vertical-align: super;
     text-decoration: underline;
+}
+
+a[data-line-no]{
+    /*display: none;*/
+    background-color: red;
 }
