@@ -51,7 +51,7 @@ function uploadFileLazy(fpath, text, ms, callback) {
     }
 
     const action = async() => {
-        console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
+        //console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
         const resp = await putJson(`/upload/${fpath}`, { text });
         console.log("save resp: ", resp);
         delete _upload_file_timers[fpath];

@@ -491,15 +491,17 @@ nav,.nav {
     font-size: smaller;
 }
 
+/*
 .vehicle{
     color: white;
-    /*background: cornflowerblue;*/
+    //background: cornflowerblue;
     background: darkblue;
     padding: 1px 4px 0px 4px;
     margin: 0px 4px 2px 0;
     border-radius: 4px;
     display: inline-block;
 }
+*/
 
 .vehicle a {
     color: white;
@@ -522,9 +524,4 @@ pre code {
 .arrow-legend {
     vertical-align: super;
     text-decoration: underline;
-}
-
-a[data-line-no]{
-    /*display: none;*/
-    background-color: red;
 }

@@ -112,10 +112,3 @@ window.selectMode = function(target, mode){
         document.getElementById(`toolbar-${m}`).disabled = selected;
     }
 }
-
-window.jumpToLine = function(target){
-    const lineno = target.value;
-    console.log(line);
-    const el = document.body.querySelector(`a[data-line-no=${lineno}`);
-    console.log(el);
-}

@@ -198,11 +198,18 @@ function toCouseDate(day){
 //configured markdown render
 function mdRenderer(){
     return require('markdown-it')()
+        .use(require('markdown-it-mark'))
+        .use(require('markdown-it-ins'))
         .use(require('markdown-it-task-checkbox'))
         //.use(require("markdown-it-attrs"))
         .use(require('markdown-it-imsize'))
         .use(require("markdown-it-anchor").default, {
             slugify: s => (Sec_name.getKey(s) || 'sec') + '-header',
+        })
+        .use(require("markdown-it-link-attributes"), {
+            attrs: {
+                target: '_blank',
+            }
         })
         .use(require("markdown-it-table-of-contents"), {
             containerClass: 'nav',
@@ -233,7 +240,7 @@ export function markdownElement(markdown, opt)
     extendHeader(el);
     extendNavigation(el.querySelector('.nav'));
     fixLocalPath(el);
-    extendAnchor(el);
+    //extendAnchor(el);
     extendImage(el);
     extendSvg(el);
     // section context -------------
@@ -366,6 +373,7 @@ function _fixLocalPath(url){
     return url;
 }
 
+/*
 function extendAnchor(el)
 {
     if(!el) return;
@@ -378,6 +386,7 @@ function extendAnchor(el)
         a.target = '_blank';
     })
 }
+*/
 
 function extendImage(el)
 {

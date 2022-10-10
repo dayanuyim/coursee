@@ -60,7 +60,8 @@ Show the legend-arrow `-(LEGEND)->` in proper way.
 
 ### Vehicle Extension (in `交通資訊` section)
 
-Anything surronding with `{}` will be highlighted, for example, `{台灣好行6732(東埔-水里)}`.
+~~Anything surronding with `{}` will be highlighted, for example, `{台灣好行6732(東埔-水里)}`.~~
+Deprecated. Replaced by Mark tag.
 
 ### Map Extension (in `地圖` section)
 
