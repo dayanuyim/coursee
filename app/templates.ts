@@ -80,9 +80,12 @@ export const trek = Handlebars.compile(`
     <div id="container">
 
         <div id="toolbar">
-            <button id="toolbar-edit" onclick="selectMode(this,'edit')">&larr;</button><!--
-         --><button id="toolbar-both" onclick="selectMode(this,'both')">&harr;</button><!--
-         --><button id="toolbar-view" onclick="selectMode(this,'view')">&rarr;</button>
+            <span class="group">
+                <button id="toolbar-edit" onclick="selectMode(this,'edit')">&larr;</button><!--
+            --><button id="toolbar-both" onclick="selectMode(this,'both')">&harr;</button><!--
+            --><button id="toolbar-view" onclick="selectMode(this,'view')">&rarr;</button>
+            </span>
+            <button id="toolbar-sync" onclick="setSyncScroll(this)"><span></span></button>
         </div>
 
         <div id="editor">

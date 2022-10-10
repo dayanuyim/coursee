@@ -198,8 +198,11 @@ function toCouseDate(day){
 //configured markdown render
 function mdRenderer(){
     return require('markdown-it')()
+        .use(require('./markdown-it-inject-linenumbers'))
         .use(require('markdown-it-mark'))
         .use(require('markdown-it-ins'))
+        .use(require('markdown-it-sup'))
+        .use(require('markdown-it-sub'))
         .use(require('markdown-it-task-checkbox'))
         //.use(require("markdown-it-attrs"))
         .use(require('markdown-it-imsize'))
@@ -224,7 +227,7 @@ export function markdownElement(markdown, opt)
     _opt = opt; //set options
 
     //amend markdown text ====
-    markdown = '[[toc]]\n\n' + markdown;
+    markdown += '\n\n[[toc]]\n';
 
     //amend html text ====
     let html = mdRenderer().render(markdown)

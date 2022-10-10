@@ -257,7 +257,7 @@ async function loadMarkdown(fpath)
         initEditor(fpath, text);
 
         //markdown viewer
-        const elem = document.getElementById("rec");
+        const elem = document.getElementById("rec-content");
         const opt = {
             host: path.dirname(window.location.href),
             dir: path.dirname(fpath),
@@ -266,11 +266,13 @@ async function loadMarkdown(fpath)
         setViewer(text);
 
         //init status
+        //TODO: set by coockie
         document.getElementById('toolbar-both').click();
+        document.getElementById('toolbar-sync').click();
     }
     catch(err){
         console.error(err);
-        return setRecNotFound(document.getElementById("rec"), `Load Rec Error: ${err}`);
+        return setRecNotFound(document.getElementById("rec-content"), `Load Rec Error: ${err}`);
     }
 }
 
@@ -283,6 +285,8 @@ function _upload_file(fpath, text, ms){
 }
 
 let _editor_vim_plugin;
+let _editor_top_line_num;
+let _editor_sync_scroll = false;;
 function initEditor(fpath, text)
 {
     //editor
@@ -305,6 +309,16 @@ function initEditor(fpath, text)
         _upload_file(fpath, text, AUTO_SAVE_DELAY);
     });
 
+    editor.onDidScrollChange(function (e) {
+        const num = editor.getVisibleRanges()[0].startLineNumber;
+        if(num == _editor_top_line_num) return;
+
+        // do if line changed
+        _editor_top_line_num = num;
+        if(_editor_sync_scroll)
+            scrollViewerToLine(_editor_top_line_num);
+      });
+
     //save on exit if changed
     window.addEventListener('beforeunload', ()=>{
         if(_editor_content_changed)
@@ -316,10 +330,7 @@ function initEditor(fpath, text)
         _upload_file(fpath, editor.getValue(), 0);
     });
 
-    window.setEditorVim = (target) => {
-        target.classList.toggle('vim');
-        const enabled = target.classList.contains('vim');
-
+    window._setEditorVim = (enabled) => {
         if(enabled){
             _editor_vim_plugin = initVimMode(editor, document.getElementById('editor-status'))
         }
@@ -328,6 +339,24 @@ function initEditor(fpath, text)
             _editor_vim_plugin = null;
         }
     };
+}
+
+window._setSyncScroll = (enabled)=>{
+    _editor_sync_scroll = enabled;
+    if(_editor_sync_scroll)
+        scrollViewerToLine(_editor_top_line_num);
+}
+
+function scrollViewerToLine(num){
+    const el = document.body.querySelector(`[data-source-line='${num}'`);
+    //console.log(el, el.scrollTop, el.scrollLeft, el.scrollWidth);
+    if(el){
+        el.scrollIntoView({
+            behavior: "auto",
+            block: "start",
+            inline: "nearest",
+        });
+    }
 }
 
 function setRecTimestampFocus(mapHandler)

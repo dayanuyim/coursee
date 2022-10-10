@@ -112,3 +112,15 @@ window.selectMode = function(target, mode){
         document.getElementById(`toolbar-${m}`).disabled = selected;
     }
 }
+
+window.setEditorVim = (target) => {
+    target.classList.toggle('vim');
+    const enabled = target.classList.contains('vim');
+    _setEditorVim(enabled);
+}
+
+window.setSyncScroll = function(target){
+    target.classList.toggle('sync');
+    const enabled = target.classList.contains('sync');
+    _setSyncScroll(enabled);
+}
