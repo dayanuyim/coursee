@@ -19,10 +19,13 @@ module.exports = function inject_linenumbers_plugin(md) {
     return slf.renderToken(tokens, idx, options, env, slf);
   }
 
-  md.renderer.rules.paragraph_open = injectLineNumbers;
-  md.renderer.rules.heading_open   = injectLineNumbers;
-  md.renderer.rules.list_item_open = injectLineNumbers;
-  md.renderer.rules.table_open     = injectLineNumbers;
+  md.renderer.rules.paragraph_open  = injectLineNumbers;
+  md.renderer.rules.heading_open    = injectLineNumbers;
+  md.renderer.rules.list_item_open  = injectLineNumbers;
+  md.renderer.rules.table_open      = injectLineNumbers;
+  md.renderer.rules.tr_open         = injectLineNumbers;
+  md.renderer.rules.blockquote_open = injectLineNumbers;
+  //md.renderer.rules.code_block      = injectLineNumbers;
 };
 
 },{}]},{},[1])(1)
