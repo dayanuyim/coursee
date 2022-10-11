@@ -416,21 +416,20 @@ function updateScrollStatus(owner, lineno){
     _top_line_num[owner] = lineno;
 
     // sync the editor
-    if(!_is_sync_scroll) return;
     if(owner != _focus_elem) return;  // scroll not control by myself
     syncTargetScroll();
 }
 
 function syncTargetScroll(){
+    if(!_is_sync_scroll) return;
     const lineno = _top_line_num[_focus_elem];
     const target = (_focus_elem == 'viewer')? 'editor': 'viewer';
-    console.log(`${_focus_elem}: scroll ${target} to line: ${lineno}`);
+    //console.log(`${_focus_elem}: scroll ${target} to line: ${lineno}`);
     _scrollToLine[target](lineno);
 }
 
 window._setSyncScroll = (enabled)=>{
     _is_sync_scroll = enabled;
-    if(!enabled) return;
     syncTargetScroll();
 }
 

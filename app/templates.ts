@@ -80,12 +80,12 @@ export const trek = Handlebars.compile(`
     <div id="container">
 
         <div id="toolbar">
-            <span class="layout-mode">
-               <button id="toolbar-edit" onclick="selectMode(this,'edit')" title="編輯模式"><i class="fa-solid fa-pen-to-square"></i></button><!--
-            --><button id="toolbar-both" onclick="selectMode(this,'both')" title="並排模式"><i class="fa-solid fa-table-columns"></i></button><!--
-            --><button id="toolbar-view" onclick="selectMode(this,'view')" title="瀏覽模式"><i class="fa-solid fa-eye"></i></button>
+            <span class="btn-group">
+               <button class="switch" id="toolbar-edit" onclick="selectMode(this,'edit')" title="編輯模式"><i class="fa-solid fa-pen-to-square"></i></button><!--
+            --><button class="switch" id="toolbar-both" onclick="selectMode(this,'both')" title="並排模式"><i class="fa-solid fa-table-columns"></i></button><!--
+            --><button class="switch" id="toolbar-view" onclick="selectMode(this,'view')" title="瀏覽模式"><i class="fa-solid fa-eye"></i></button>
             </span>
-            <button id="toolbar-sync" onclick="setSyncScroll(this)" title="同步捲動"><i class="fa-solid fa-link-slash"></i></span></button>
+            <button class="switch" id="toolbar-sync" onclick="setSyncScroll(this)" title="同步捲動"><i class="fa-solid fa-link-slash"></i></span></button>
         </div>
 
         <div id="editor">
@@ -171,8 +171,8 @@ export const map_trekkr = Handlebars.compile(`
 
 export const trksegUtils = Handlebars.compile(`
     <ul class="trkseg-utils hide">
-        <li><button title="堆疊" class="trkseg-util-grid" onclick="toggleTrksegGrid(this)"><i class="fa-solid fa-layer-group"></i></button></li>
-        <li><button title="行進圖" class="trkseg-util-chart" onclick="toggleTrksegChart(this)"><i class="fa-solid fa-chart-line"></i></button></li>
+        <li><button class="trkseg-util-grid" title="堆疊" onclick="toggleTrksegGrid(this)"><i class="fa-solid fa-layer-group"></i></button></li>
+        <li><button class="trkseg-util-chart" title="行進圖" onclick="toggleTrksegChart(this)"><i class="fa-solid fa-chart-line"></i></button></li>
     </ul>
 `);
 

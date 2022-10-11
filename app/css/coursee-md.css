@@ -1,3 +1,26 @@
+button.switch { color: #808080; }
+button.switch:hover{ color: #A0A0A0;}
+button.switch.switch-on{ color: #000000; }
+button.switch.switch-on:hover{ color: #404040; }
+button.switch:not(:disabled):hover{ cursor: pointer;}
+
+.btn-group button{
+    border-style: solid;
+    border-color: lightgrey;
+    border-width: 2px 0 2px 1px;
+    background-color: #EFEFEF;
+}
+.btn-group button:first-child{
+    border-width: 2px 0 2px 2px;
+    border-radius: 4px 0 0 4px;
+}
+.btn-group button:last-child{
+    border-width: 2px 2px 2px 1px;
+    border-radius: 0 4px 4px 0;
+}
+
+/******************************************/
+
 header {
     position: relative;
     border: black 1px dashed;
@@ -371,24 +394,15 @@ nav,.nav {
     background-color: transparent;
 }
 
-.trkseg      .trkseg-util-grid,
-.trkseg      .trkseg-util-chart {
-    color: #808080;
-}
-.trkseg.grid .trkseg-util-grid,
-.trkseg.chart .trkseg-util-chart {
-    color: #000000;
-}
-.trkseg      .trkseg-util-grid:hover,
-.trkseg      .trkseg-util-chart:hover{
-     color: #A0A0A0;
-     cursor: pointer;
-}
-.trkseg.grid .trkseg-util-grid:hover,
-.trkseg.chart .trkseg-util-chart:hover{
-    color: #404040;
-    cursor: pointer;
-}
+.trkseg      .trkseg-util-grid{ color: #808080; }
+.trkseg      .trkseg-util-grid:hover{ color: #A0A0A0; cursor: pointer; }
+.trkseg.grid .trkseg-util-grid{ color: #000000; }
+.trkseg.grid .trkseg-util-grid:hover{ color: #404040; cursor: pointer; }
+
+.trkseg       .trkseg-util-chart { color: #808080; }
+.trkseg       .trkseg-util-chart:hover{ color: #A0A0A0; cursor: pointer; }
+.trkseg.chart .trkseg-util-chart { color: #000000; }
+.trkseg.chart .trkseg-util-chart:hover{ color: #404040; cursor: pointer; }
 
 .trkseg.grid .trkseg-path-loc,
 .trkseg.grid .trkseg-path-arrow{
@@ -532,35 +546,18 @@ pre code {
     z-index: 9;
 }
 
-#toolbar button:not(:disabled):hover{
-    background-color:rgba(255,255,255,.8);
-    cursor: pointer;
-}
-
 #toolbar button{
-    border: 1px solid lightgrey;
-    padding: 0 4px;
+    padding: 4 4px;
     font-weight: bold;
-    font-size: 20px;
-}
-
-#toolbar .layout-mode button{
-    color:gray;
-}
-#toolbar .layout-mode button:disabled{
-    color:black;
-}
-#toolbar .layout-mode button:nth-child(n+2){
-    border-left-width: 0;
+    font-size: 16px;
 }
 
 #toolbar-sync {
-    margin-left: calc(50vw - 30px - 29px - 29px - 15px);
-    color: gray;
+    background: transparent;
+    border-width: 0;
+    margin-left: calc(50vw - 90px - 15px);
 }
-#toolbar-sync.sync {
-    color: black;
-}
+
 /*
 #toolbar-sync.sync {
     color: black;
@@ -597,7 +594,8 @@ pre code {
     position: fixed;
     top: calc(100vh - 45px + 25px);
     left: 0;
-    width: calc(100vw);
+    width: calc(100vw - 1em);
+    padding-left: 1em;
 
     margin-top: 0em;
     color: white;
@@ -608,7 +606,7 @@ pre code {
 #container #editor-settings {
     position: fixed;
     top: calc(100vh - 45px + 25px);
-    left: calc(100vw - 1em);
+    left: 0;
     width: 1em;
 }
 
@@ -624,10 +622,10 @@ pre code {
     cursor: pointer;
 }
 
-#editor-vim.vim{ color: lightseagreen; }
-#editor-vim.vim:hover{ color: lightgreen;}
-#editor-vim{ color: black; }
-#editor-vim:hover{ color: lightgray;}
+#editor-vim{ color: #808080; }
+#editor-vim:hover{ color: #A0A0A0;}
+#editor-vim.switch-on{ color: lightseagreen; }
+#editor-vim.switch-on:hover{ color: lightgreen;}
 
 #container #viewer{
     position: fixed;
@@ -656,12 +654,14 @@ pre code {
 }
 
 /* ---------------------------------------------*/
-#container.both #editor-content,
-#container.both #editor-status {
+#container.both #editor-content{
     width: calc(50vw);
 }
+#container.both #editor-status {
+    width: calc(50vw - 1em);
+}
 #container.both #editor-settings {
-    left: calc(50vw - 1em);
+    /*left: calc(50vw - 1em);*/
 }
 
 #container.both #viewer{

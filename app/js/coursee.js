@@ -109,17 +109,19 @@ window.selectMode = function(target, mode){
 
     //check for each mode
     for(const m of ['view', 'edit', 'both']){
-        const selected = (mode === m);
+        const selected = (m === mode);
+        const button = document.getElementById(`toolbar-${m}`);
+        button.disabled = selected;  //disable if selected
+        setElemClass(button, 'switch-on', selected);
         setElemClass(container, m, selected);
-        document.getElementById(`toolbar-${m}`).disabled = selected;
     }
 
     Cookies.set("coursee-layout-mode", mode, {sameSite: 'strict'});
 }
 
 window.setEditorVim = (target) => {
-    target.classList.toggle('vim');
-    const enabled = target.classList.contains('vim');
+    target.classList.toggle('switch-on');
+    const enabled = target.classList.contains('switch-on');
     _setEditorVim(enabled);
 
     Cookies.set("coursee-editor-vim", enabled, {sameSite: 'strict'});
@@ -127,8 +129,8 @@ window.setEditorVim = (target) => {
 
 window.setSyncScroll = function(target){
     //data
-    target.classList.toggle('sync');
-    const enabled = target.classList.contains('sync');
+    target.classList.toggle('switch-on');
+    const enabled = target.classList.contains('switch-on');
     //ui
     target.innerHTML = enabled ? '<i class="fa-solid fa-link"></i>':
                                  '<i class="fa-solid fa-link-slash"></i>';

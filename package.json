@@ -1,8 +1,8 @@
 {
-  "name": "Dayanuyim's",
+  "name": "coursee",
   "version": "1.0.0",
   "privte": true,
-  "description": "dayanuyim's web",
+  "description": "Markdown Playground for Hiking Courses",
   "scripts": {
     "build": "webpack",
     "start": "nodemon --ignore './sessions' server.js",
