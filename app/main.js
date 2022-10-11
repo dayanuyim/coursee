@@ -287,7 +287,16 @@ async function loadMarkdown(fpath)
 let _focus_elem = 'viewer';  // sync from viewer for the first place
 let _is_sync_scroll = false;;
 
-let _viewer_top_line_num = 1;
+const _top_line_num = {
+    viewer: 1,
+    editor: 1,
+};
+
+const _scrollToLine = {
+    viewer: undefined,
+    editor: undefined,
+}
+
 let _viewer_line_elems = [];
 function initViewer(fpath, text)
 {
@@ -298,7 +307,7 @@ function initViewer(fpath, text)
     };
 
     viewer.addEventListener("scroll", function(e){
-        syncEditorScroll(getTopVisibleLine(_viewer_line_elems));
+        updateScrollStatus('viewer', getTopVisibleLine(_viewer_line_elems));
     });
 
     setViewer = (txt) => {
@@ -310,14 +319,18 @@ function initViewer(fpath, text)
 
     setViewer(text);
 
-    viewer.addEventListener('focus', () => {
-        //console.log('focus viewer');
-        _focus_elem = 'viewer';
-    });
-    viewer.addEventListener('mouseover', () => {
-        //console.log('focus viewer');
-        _focus_elem = 'viewer';
-    });
+    viewer.addEventListener('focus', () => { _focus_elem = 'viewer'; });
+    viewer.addEventListener('mouseover', () => { _focus_elem = 'viewer'; });
+
+    _scrollToLine.viewer = (num) => {
+        const el = _viewer_line_elems.find(e => e.dataset.sourceLine == num)
+        if(!el) return;
+        el.scrollIntoView({
+            behavior: "auto",
+            block: "start",
+            inline: "nearest",
+        });
+    };
 
     viewer.focus();
 }
@@ -332,8 +345,6 @@ function getTopVisibleLine(line_elems) {
 
 let _editor_content_changed = false;
 let _editor_vim_plugin = null;
-let _editor_top_line_num = 1;
-let scrollEditorToLine;
 
 function _upload_file(fpath, text, ms){
     uploadFileLazy(fpath, text, ms, ()=>{
@@ -363,19 +374,13 @@ function initEditor(fpath, text)
     });
 
     editor.onDidScrollChange(function (e) {
-        syncViewerScroll(editor.getVisibleRanges()[0].startLineNumber);
+        updateScrollStatus('editor', editor.getVisibleRanges()[0].startLineNumber);
       });
 
-    editor.onDidFocusEditorWidget((e) => {
-        //console.log('focus editor');
-        _focus_elem = 'editor';
-    });
-    editor.onMouseMove((e)=>{
-        //console.log('focus editor');
-        _focus_elem = 'editor';
-    })
+    editor.onDidFocusEditorWidget((e) => { _focus_elem = 'editor'; });
+    editor.onMouseMove((e)=>{ _focus_elem = 'editor'; })
 
-    scrollEditorToLine = function(num){
+    _scrollToLine.editor = function(num){
         const line_height = editor.getOption(monaco.editor.EditorOption.lineHeight);
         editor.setScrollTop((num-1) * line_height);
     }
@@ -404,52 +409,29 @@ function initEditor(fpath, text)
     //editor.focus();
 }
 
-function syncViewerScroll(lineno){
+function updateScrollStatus(owner, lineno){
     // check if line changed
     if(!lineno) return;
-    if(_editor_top_line_num == lineno) return;
-    _editor_top_line_num = lineno;   //line is changed
-    if(!_is_sync_scroll) return;
-
-    // sync the viewer
-    if(_focus_elem != 'editor') return;  // scroll not control by editor
-     //console.log('editor: scroll viewer to line: ' + lineno);
-     scrollViewerToLine(lineno);
-}
-
-function syncEditorScroll(lineno){
-    // check if line changed
-    if(!lineno) return;
-    if(_viewer_top_line_num == lineno) return;
-    _viewer_top_line_num = lineno;
-    if(!_is_sync_scroll) return;
+    if(_top_line_num[owner] == lineno) return;
+    _top_line_num[owner] = lineno;
 
     // sync the editor
-    if(_focus_elem != 'viewer') return;  // scroll not control by viewer
-    //console.log('viewer: scroll editor to line: ' + lineno);
-    scrollEditorToLine(lineno);
+    if(!_is_sync_scroll) return;
+    if(owner != _focus_elem) return;  // scroll not control by myself
+    syncTargetScroll();
+}
+
+function syncTargetScroll(){
+    const lineno = _top_line_num[_focus_elem];
+    const target = (_focus_elem == 'viewer')? 'editor': 'viewer';
+    console.log(`${_focus_elem}: scroll ${target} to line: ${lineno}`);
+    _scrollToLine[target](lineno);
 }
 
 window._setSyncScroll = (enabled)=>{
     _is_sync_scroll = enabled;
     if(!enabled) return;
-
-    if(_focus_elem == 'viewer')
-        scrollEditorToLine(_viewer_top_line_num);
-    else
-        scrollViewerToLine(_editor_top_line_num);
-}
-
-function scrollViewerToLine(num){
-    const el = document.body.querySelector(`[data-source-line='${num}'`);
-    //console.log(el, el.scrollTop, el.scrollLeft, el.scrollWidth);
-    if(el){
-        el.scrollIntoView({
-            behavior: "auto",
-            block: "start",
-            inline: "nearest",
-        });
-    }
+    syncTargetScroll();
 }
 
 function setRecTimestampFocus(mapHandler)
