@@ -7,7 +7,7 @@ import '@fortawesome/fontawesome-free/js/regular'
 import '@fortawesome/fontawesome-free/js/brands'
 import * as templates from './templates';
 import * as utils from './utils'
-import { loadRec } from './main';
+import { loadCourse } from './main';
 
 async function showView()
 {
@@ -16,7 +16,7 @@ async function showView()
     if(view === '#main')
         return showIndex();
     if(view.startsWith("#trek"))
-        return showTrek(getParam(view));
+        return showCourse(getParam(view));
     if(document.getElementById(view.substring(1)))  // normal anchor
         return;
 
@@ -49,9 +49,9 @@ async function showIndex()
     }
 }
 
-function showTrek(name){
+function showCourse(name){
     document.body.innerHTML = templates.trek();
-    loadRec(name);
+    loadCourse(name);
 }
          
 (async () => {

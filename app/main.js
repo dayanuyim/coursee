@@ -12,10 +12,17 @@ import { markdownElement } from './m2h';
 import * as monaco from 'monaco-editor';
 import { initVimMode, VimMode } from 'monaco-vim';
 import * as path from 'path';
+import Cookies from 'js-cookie';
 
 const AUTO_SAVE_DELAY = 5000;  //ms
 
 // utils ================================
+function str2bool(value, defval) {
+    if(value === undefined)
+        return defval;
+    return value.toLowerCase() === "true";
+}
+
 Date.prototype.addDays = function(days) {
     var result = new Date(this);
     result.setDate(result.getDate() + days);
@@ -199,7 +206,7 @@ function setRecNotFound(recElem, msg)
     //adjust rec section
     document.getElementById("container").style.display = "flex";
     document.getElementById("container").style["flex-flow"] = "column";
-    document.getElementById("rec").style.flex = "none";
+    document.getElementById("viewer").style.flex = "none";
 
     //adjust map section
     const mapElem = document.getElementById("map");
@@ -213,12 +220,10 @@ function setRecNotFound(recElem, msg)
 }
 
 // TODO @name -> @mdUrl
-export async function loadRec(name)
+export async function loadCourse(name)
 {
-    if(!name){
-        rec.innerHTML = "No such record.";
-        return;
-    }
+    if(!name)
+        return alert("No such record.");
 
     const gpxPath = `data/${name}/course.gpx`;
     const mdPath = `data/${name}/course.md`;
@@ -260,40 +265,52 @@ async function loadMarkdown(fpath)
         initViewer(fpath, text);
 
         //init status
-        //TODO: set by coockie
-        document.getElementById('toolbar-both').click();
-        document.getElementById('toolbar-sync').click();
+        const nav_collapse = str2bool(Cookies.get('coursee-nav-collapse'), false);
+        const editor_vim = str2bool(Cookies.get('coursee-editor-vim'), false);
+        const sync_scroll = str2bool(Cookies.get('coursee-sync-scroll'), true);
+        let layout_mode = Cookies.get('coursee-layout-mode');
+        if(!['view', 'edit', 'both'].includes(layout_mode))
+            layout_mode = 'both';  //default
+
+        if(sync_scroll)   document.getElementById('toolbar-sync').click();
+        if(nav_collapse) document.getElementById('nav-collapse').click();
+        if(editor_vim)   document.getElementById('editor-vim').click();
+        document.getElementById(`toolbar-${layout_mode}`).click();
     }
     catch(err){
         console.error(err);
-        return setRecNotFound(document.getElementById("rec-content"), `Load Rec Error: ${err}`);
+        return setRecNotFound(document.getElementById("viewer-content"), `Load Rec Error: ${err}`);
     }
 }
 
+
 let _sync_scroll_from;
-let _focus_elem;
+let _focus_elem = 'viewer';  // sync from viewer for the first place
 let _is_sync_scroll = false;;
 
-let _viewer_top_line_num;
+let _viewer_top_line_num = 1;
+let _viewer_line_elems = [];
 function initViewer(fpath, text)
 {
-    const viewer = document.getElementById("rec-content");
+    const viewer = document.getElementById("viewer-content");
     const opt = {
         host: path.dirname(window.location.href),
         dir: path.dirname(fpath),
     };
-    setViewer = txt => innerElement(viewer, markdownElement(txt, opt));
-
-    setViewer(text);
-
-    const line_elems = Array.from(document.querySelectorAll('[data-source-line]'))
-                            .sort((e1, e2) => e1.dataset.sourceLine - e2.dataset.sourceLine)
-                            .filter((e, idx, arr) => !(idx > 0 && e.dataset.sourceLine == arr[idx-1].dataset.sourceLine));
 
     viewer.addEventListener("scroll", function(){
         _focus_elem = 'viewer';
-        syncEditorScroll(getTopVisibleLine(line_elems));
+        syncEditorScroll(getTopVisibleLine(_viewer_line_elems));
     });
+
+    setViewer = (txt) => {
+        innerElement(viewer, markdownElement(txt, opt));
+        _viewer_line_elems = Array.from(document.querySelectorAll('[data-source-line]'))
+                                .sort((e1, e2) => e1.dataset.sourceLine - e2.dataset.sourceLine)
+                                .filter((e, idx, arr) => !(idx > 0 && e.dataset.sourceLine == arr[idx-1].dataset.sourceLine));
+    }
+
+    setViewer(text);
 
     /*
     viewer.addEventListener('focus', () => {
@@ -311,8 +328,8 @@ function getTopVisibleLine(line_elems) {
 }
 
 let _editor_content_changed = false;
-let _editor_vim_plugin;
-let _editor_top_line_num;
+let _editor_vim_plugin = null;
+let _editor_top_line_num = 1;
 let scrollEditorToLine;
 
 function _upload_file(fpath, text, ms){

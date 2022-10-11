@@ -67,7 +67,7 @@ section#container{
     */
 }
 
-section#rec {
+section#viewer {
     /*flex: 1; */
     width: 50%;
 }
@@ -146,7 +146,7 @@ nav,.nav {
     display: grid;
 }
 
-.nav .nav-collapse{
+.nav #nav-collapse{
     grid-row: 1;
     text-align: right;
     border: none;
@@ -156,22 +156,22 @@ nav,.nav {
     margin-left: 90%; /*align right*/
 }
 
-.nav .nav-collapse:hover {
+.nav #nav-collapse:hover {
     color: #808080;
     cursor: pointer;
 }
 
-.nav .nav-collapse::after {
+.nav #nav-collapse::after {
     display:inline-block;
     content: "▼";
     /* content: "■"; transform: scale(1.5); */
 }
-.nav.collapse .nav-collapse::after {
+.nav.collapse #nav-collapse::after {
     display:inline-block;
     content: "▲"
     /* content: "◥"; transform: scale(.75); */
 }
-.nav.collapse .nav-collapse ~ * {
+.nav.collapse #nav-collapse ~ * {
     display: none;
 }
 
@@ -541,25 +541,27 @@ pre code {
     border: 1px solid lightgrey;
     padding: 0 4px;
     font-weight: bold;
+    font-size: 20px;
 }
 
-#toolbar.group button:nth-child(n+2){
+#toolbar .layout-mode button{
+    color:gray;
+}
+#toolbar .layout-mode button:disabled{
+    color:black;
+}
+#toolbar .layout-mode button:nth-child(n+2){
     border-left-width: 0;
 }
 
-#toolbar-view{
-    font-size: 20px;
-}
-#toolbar-edit{
-    font-size: 20px;
-}
-#toolbar-both{
-    font-size: 20px;
-}
-#toolbar-sync{
-    font-size: 14px;
-}
 
+#toolbar-sync.sync {
+    color: black;
+}
+#toolbar-sync {
+    color: gray;
+}
+/*
 #toolbar-sync.sync {
     color: black;
     font-weight: normal;
@@ -577,6 +579,7 @@ pre code {
 #toolbar-sync span::after{
     content: "⇎";
 }
+*/
 
 #container{
     position: relative;
@@ -626,19 +629,19 @@ pre code {
 #editor-vim{ color: black; }
 #editor-vim:hover{ color: lightgray;}
 
-#container #rec{
+#container #viewer{
     position: fixed;
     margin-top: 25px;
     height: 100%;
 }
-#container #rec-content {
+#container #viewer-content {
     padding: 0 1em 2em 2em;
     height: 100%;
     overflow-y: auto;
 }
 
 /* ---------------------------------------------*/
-#container.edit #rec {
+#container.edit #viewer {
     display: none;
 }
 
@@ -656,9 +659,9 @@ pre code {
     left: calc(50vw - 1em);
 }
 
-#container.both #rec{
+#container.both #viewer{
     left: calc(50vw);
 }
-#container.both #rec-content{
+#container.both #viewer-content{
     padding-left: 1em;
 }

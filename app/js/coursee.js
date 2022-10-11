@@ -1,4 +1,5 @@
 import { fireOnlyIfSingleClick } from '../dom-utils';
+import Cookies from 'js-cookie';
 
 function setElemClass(el, cls, enabled){
     if(enabled)
@@ -77,22 +78,23 @@ window.toggleTrksegChart = function (target){
 
 window.toggleNavCollapse = function(target){
     const nav = target.closest('.nav');
-    if(nav){
-        // reset the position by top and left
-        const rect = nav.getBoundingClientRect();
-        /*
-        nav.style.left = `${rect.x}px`;
-        nav.style.top = `${rect.y}px`;
-        nav.style.bottom = 'unset';
-        nav.style.right = 'unset';
-        */
-        nav.style.left = 'unset';
-        nav.style.top = 'unset';
-        nav.style.bottom = `${window.innerHeight - rect.bottom}px`;
-        nav.style.right = `${window.innerWidth - rect.right}px`;
+    if(!nav) return;
+    // reset the position by top and left
+    const rect = nav.getBoundingClientRect();
+    /*
+    nav.style.left = `${rect.x}px`;
+    nav.style.top = `${rect.y}px`;
+    nav.style.bottom = 'unset';
+    nav.style.right = 'unset';
+    */
+    nav.style.left = 'unset';
+    nav.style.top = 'unset';
+    nav.style.bottom = `${window.innerHeight - rect.bottom}px`;
+    nav.style.right = `${window.innerWidth - rect.right}px`;
 
-        nav.classList.toggle('collapse');
-    }
+    nav.classList.toggle('collapse');
+
+    Cookies.set("coursee-nav-collapse", nav.classList.contains('collapse'), {sameSite: 'strict'});
 }
 
 window.toggleEdit = function(target){
@@ -111,16 +113,27 @@ window.selectMode = function(target, mode){
         setElemClass(container, m, selected);
         document.getElementById(`toolbar-${m}`).disabled = selected;
     }
+
+    Cookies.set("coursee-layout-mode", mode, {sameSite: 'strict'});
 }
 
 window.setEditorVim = (target) => {
     target.classList.toggle('vim');
     const enabled = target.classList.contains('vim');
     _setEditorVim(enabled);
+
+    Cookies.set("coursee-editor-vim", enabled, {sameSite: 'strict'});
 }
 
 window.setSyncScroll = function(target){
+    //data
     target.classList.toggle('sync');
     const enabled = target.classList.contains('sync');
+    //ui
+    target.innerHTML = enabled ? '<i class="fa-solid fa-link"></i>':
+                                 '<i class="fa-solid fa-link-slash"></i>';
+    //action
     _setSyncScroll(enabled);
+    //cookie
+    Cookies.set("coursee-sync-scroll", enabled, {sameSite: 'strict'});
 }

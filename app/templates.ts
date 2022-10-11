@@ -80,24 +80,24 @@ export const trek = Handlebars.compile(`
     <div id="container">
 
         <div id="toolbar">
-            <span class="group">
-                <button id="toolbar-edit" onclick="selectMode(this,'edit')">&larr;</button><!--
-            --><button id="toolbar-both" onclick="selectMode(this,'both')">&harr;</button><!--
-            --><button id="toolbar-view" onclick="selectMode(this,'view')">&rarr;</button>
+            <span class="layout-mode">
+               <button id="toolbar-edit" onclick="selectMode(this,'edit')" title="編輯模式"><i class="fa-solid fa-pen-to-square"></i></button><!--
+            --><button id="toolbar-both" onclick="selectMode(this,'both')" title="並排模式"><i class="fa-solid fa-table-columns"></i></button><!--
+            --><button id="toolbar-view" onclick="selectMode(this,'view')" title="瀏覽模式"><i class="fa-solid fa-eye"></i></button>
             </span>
-            <button id="toolbar-sync" onclick="setSyncScroll(this)"><span></span></button>
+            <button id="toolbar-sync" onclick="setSyncScroll(this)" title="同步捲動"><i class="fa-solid fa-link-slash"></i></span></button>
         </div>
 
         <div id="editor">
             <div id="editor-content"></div>
             <div id="editor-status"></div>
             <div id="editor-settings">
-                <button id="editor-vim" onclick="setEditorVim(this)"><i class="fa-brands fa-vimeo-v"></i></button>
+                <button id="editor-vim" onclick="setEditorVim(this)" title="VI模式"><i class="fa-brands fa-vimeo-v"></i></button>
             </div>
         </div>
 
-        <div id="rec" class="">
-            <div id="rec-content">[Record Loading...]</div>
+        <div id="viewer" class="">
+            <div id="viewer-content">[Record Loading...]</div>
         </div>
             
         <!--
@@ -130,6 +130,14 @@ export const section = Handlebars.compile(`
     <section id="{{id}}">
       <button class="sec-toggle" onclick="toggleSec(this)" ondblclick="toggleSecs(this)"></button>
     </section>
+`);
+
+export const navCollapse = Handlebars.compile(`
+    <button id="nav-collapse" onclick="toggleNavCollapse(this)"></button>
+`);
+
+export const navPageBack = Handlebars.compile(`
+    <li class="mainlink"><a href="#main">回上層目錄</a></li>
 `);
 
 export const navUtils = Handlebars.compile(`

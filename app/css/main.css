@@ -68,6 +68,10 @@ li:hover {
 }
 */
 
+section#index {
+    margin: 1.5em;
+}
+
 section{
     box-sizing: border-box;
     padding: 10px;

@@ -334,12 +334,12 @@ function extendNavigation(el){
     if(!el) return;
 
     //collapse button
-    el.insertAdjacentHTML('afterbegin', '<button class="nav-collapse" onclick="toggleNavCollapse(this)"></button>');
+    el.insertAdjacentHTML('afterbegin', templates.navCollapse());
 
     //toc
     const toc = el.querySelector('ul');
     toc.classList.add('nav-toc');
-    toc.insertAdjacentHTML('afterbegin', '<li class="mainlink"><a href="#main">回上層目錄</a></li>');
+    toc.insertAdjacentHTML('afterbegin', templates.navPageBack());
     //utils
     el.insertAdjacentHTML('beforeend', templates.navUtils());
 
