@@ -554,12 +554,12 @@ pre code {
     border-left-width: 0;
 }
 
-
+#toolbar-sync {
+    margin-left: calc(50vw - 30px - 29px - 29px - 15px);
+    color: gray;
+}
 #toolbar-sync.sync {
     color: black;
-}
-#toolbar-sync {
-    color: gray;
 }
 /*
 #toolbar-sync.sync {
@@ -638,6 +638,11 @@ pre code {
     padding: 0 1em 2em 2em;
     height: 100%;
     overflow-y: auto;
+}
+
+#container #viewer:focus,
+#container #viewer-content:focus{
+    outline: none;
 }
 
 /* ---------------------------------------------*/

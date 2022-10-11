@@ -284,7 +284,6 @@ async function loadMarkdown(fpath)
 }
 
 
-let _sync_scroll_from;
 let _focus_elem = 'viewer';  // sync from viewer for the first place
 let _is_sync_scroll = false;;
 
@@ -298,8 +297,7 @@ function initViewer(fpath, text)
         dir: path.dirname(fpath),
     };
 
-    viewer.addEventListener("scroll", function(){
-        _focus_elem = 'viewer';
+    viewer.addEventListener("scroll", function(e){
         syncEditorScroll(getTopVisibleLine(_viewer_line_elems));
     });
 
@@ -312,11 +310,16 @@ function initViewer(fpath, text)
 
     setViewer(text);
 
-    /*
     viewer.addEventListener('focus', () => {
-        console.log('focus viewer');
+        //console.log('focus viewer');
+        _focus_elem = 'viewer';
     });
-    */
+    viewer.addEventListener('mouseover', () => {
+        //console.log('focus viewer');
+        _focus_elem = 'viewer';
+    });
+
+    viewer.focus();
 }
 
 function getTopVisibleLine(line_elems) {
@@ -352,7 +355,6 @@ function initEditor(fpath, text)
         scrollBeyondLastLine: false,
         automaticLayout: true,
         });
-    editor.focus();
     editor.onDidChangeModelContent(e => {
         _editor_content_changed = true;
         const text = editor.getValue();
@@ -361,15 +363,17 @@ function initEditor(fpath, text)
     });
 
     editor.onDidScrollChange(function (e) {
-        _focus_elem = 'editor';
         syncViewerScroll(editor.getVisibleRanges()[0].startLineNumber);
       });
 
-    /*
     editor.onDidFocusEditorWidget((e) => {
-        console.log('focus editor');
+        //console.log('focus editor');
+        _focus_elem = 'editor';
     });
-    */
+    editor.onMouseMove((e)=>{
+        //console.log('focus editor');
+        _focus_elem = 'editor';
+    })
 
     scrollEditorToLine = function(num){
         const line_height = editor.getOption(monaco.editor.EditorOption.lineHeight);
@@ -396,34 +400,24 @@ function initEditor(fpath, text)
             _editor_vim_plugin = null;
         }
     };
+
+    //editor.focus();
 }
 
 function syncViewerScroll(lineno){
-    // check if fired by human or program
-    if(_sync_scroll_from){
-        //console.log(`editor: ignore fired from ${_sync_scroll_from}`);
-        return _sync_scroll_from = undefined;
-    }
-
     // check if line changed
     if(!lineno) return;
     if(_editor_top_line_num == lineno) return;
     _editor_top_line_num = lineno;   //line is changed
     if(!_is_sync_scroll) return;
 
-    // sync the editor
-    //console.log('editor: scroll viewer to line: ' + lineno);
-    _sync_scroll_from = 'editor';
-    scrollViewerToLine(lineno);
+    // sync the viewer
+    if(_focus_elem != 'editor') return;  // scroll not control by editor
+     //console.log('editor: scroll viewer to line: ' + lineno);
+     scrollViewerToLine(lineno);
 }
 
 function syncEditorScroll(lineno){
-    // check if fired by human or program
-    if(_sync_scroll_from){
-        //console.log(`viewer: ignore fired from ${_sync_scroll_from}`);
-        return _sync_scroll_from = undefined;
-    }
-
     // check if line changed
     if(!lineno) return;
     if(_viewer_top_line_num == lineno) return;
@@ -431,8 +425,8 @@ function syncEditorScroll(lineno){
     if(!_is_sync_scroll) return;
 
     // sync the editor
+    if(_focus_elem != 'viewer') return;  // scroll not control by viewer
     //console.log('viewer: scroll editor to line: ' + lineno);
-    _sync_scroll_from = 'viewer';
     scrollEditorToLine(lineno);
 }
 
@@ -440,14 +434,10 @@ window._setSyncScroll = (enabled)=>{
     _is_sync_scroll = enabled;
     if(!enabled) return;
 
-    if(_focus_elem == 'viewer'){
-        _sync_scroll_from = 'viewer';
+    if(_focus_elem == 'viewer')
         scrollEditorToLine(_viewer_top_line_num);
-    }
-    else{
-        _sync_scroll_from = 'editor';
+    else
         scrollViewerToLine(_editor_top_line_num);
-    }
 }
 
 function scrollViewerToLine(num){
