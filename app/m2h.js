@@ -362,6 +362,9 @@ function extendNavigation(el){
             el.style.bottom = `${window.innerHeight - rect.bottom - e.movementY}px`;
         }
     }, true);
+
+    //init status
+    el.classList.toggle('collapse', _opt.nav_collapse);
 }
 
 function fixLocalPath(el)

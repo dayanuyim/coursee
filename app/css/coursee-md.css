@@ -343,7 +343,8 @@ nav,.nav {
 .trkseg-day {
     color: white;
     background: dimgray;
-    padding: 1px 2px 0px 2px;
+    padding: 0px 2px 0px 2px;
+    margin-top: 1px;
     border-radius: 4px;
     display: inline-block;
 }

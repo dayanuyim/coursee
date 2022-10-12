@@ -265,14 +265,12 @@ async function loadMarkdown(fpath)
         initViewer(fpath, text);
 
         //init status
-        const nav_collapse = str2bool(Cookies.get('coursee-nav-collapse'), false);
         const editor_vim = str2bool(Cookies.get('coursee-editor-vim'), false);
         const sync_scroll = str2bool(Cookies.get('coursee-sync-scroll'), true);
         let layout_mode = Cookies.get('coursee-layout-mode');
         if(!['view', 'edit', 'both'].includes(layout_mode))
             layout_mode = 'both';  //default
 
-        if(nav_collapse) document.getElementById('nav-collapse').click();
         if(sync_scroll)  document.getElementById('toolbar-sync').click();
         if(editor_vim)   document.getElementById('editor-vim').click();
         selectMode(layout_mode);
@@ -302,8 +300,6 @@ function initViewer(fpath, text)
 {
     const viewer = document.getElementById("viewer-content");
     const opt = {
-        host: path.dirname(window.location.href),
-        dir: path.dirname(fpath),
     };
 
     viewer.addEventListener("scroll", function(e){
@@ -311,7 +307,11 @@ function initViewer(fpath, text)
     });
 
     setViewer = (txt) => {
-        innerElement(viewer, markdownElement(txt, opt));
+        innerElement(viewer, markdownElement(txt, {
+            host: path.dirname(window.location.href),
+            dir: path.dirname(fpath),
+            nav_collapse: str2bool(Cookies.get('coursee-nav-collapse'), false),
+        }));
         _viewer_line_elems = Array.from(document.querySelectorAll('[data-source-line]'))
                                 .sort((e1, e2) => e1.dataset.sourceLine - e2.dataset.sourceLine)
                                 .filter((e, idx, arr) => !(idx > 0 && e.dataset.sourceLine == arr[idx-1].dataset.sourceLine));
