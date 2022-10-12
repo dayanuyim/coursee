@@ -8,7 +8,7 @@ button.switch:not(:disabled):hover{ cursor: pointer;}
     border-style: solid;
     border-color: lightgrey;
     border-width: 2px 0 2px 1px;
-    background-color: #EFEFEF;
+    background-color: rgba(255, 255, 255, .2);
 }
 .btn-group button:first-child{
     border-width: 2px 0 2px 2px;
@@ -547,15 +547,17 @@ pre code {
 }
 
 #toolbar button{
-    padding: 4 4px;
+    padding: 4px;
     font-weight: bold;
     font-size: 16px;
+    background: transparent;
+    border-width: 0;
 }
 
 #toolbar-sync {
-    background: transparent;
-    border-width: 0;
-    margin-left: calc(50vw - 90px - 15px);
+    position: absolute;
+    top: 0;
+    left: calc(50vw - 4px);
 }
 
 /*
@@ -630,11 +632,11 @@ pre code {
 #container #viewer{
     position: fixed;
     margin-top: 25px;
-    height: 100%;
+    height: 100vh;
 }
 #container #viewer-content {
     padding: 0 1em 2em 2em;
-    height: 100%;
+    height: calc(100vh - 2em);
     overflow-y: auto;
 }
 
@@ -644,29 +646,29 @@ pre code {
 }
 
 /* ---------------------------------------------*/
-#container.edit #viewer {
+#container:not(.view) #viewer {
     display: none;
 }
 
 /* ---------------------------------------------*/
-#container.view #editor {
+#container:not(.edit) #editor {
     display: none;
 }
 
 /* ---------------------------------------------*/
-#container.both #editor-content{
+#container.view.edit #editor-content{
     width: calc(50vw);
 }
-#container.both #editor-status {
+#container.view.edit #editor-status {
     width: calc(50vw - 1em);
 }
-#container.both #editor-settings {
+#container.view.edit #editor-settings {
     /*left: calc(50vw - 1em);*/
 }
 
-#container.both #viewer{
+#container.view.edit #viewer{
     left: calc(50vw);
 }
-#container.both #viewer-content{
+#container.view.edit #viewer-content{
     padding-left: 1em;
 }

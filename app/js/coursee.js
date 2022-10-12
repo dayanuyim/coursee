@@ -1,13 +1,6 @@
 import { fireOnlyIfSingleClick } from '../dom-utils';
 import Cookies from 'js-cookie';
 
-function setElemClass(el, cls, enabled){
-    if(enabled)
-        el.classList.add(cls);
-    else
-        el.classList.remove(cls);
-}
-
 window.toggleMap = function(){
     const mapobj = document.getElementById('mapobj');
     mapobj.classList.toggle('hide');
@@ -23,11 +16,8 @@ window.toggleSec = function(target){
 
 window.toggleSecs = function(target){
     const cls = 'collapse';
-
-    const toggle = target.classList.contains(cls)?
-            el => el.classList.remove(cls):
-            el => el.classList.add(cls);
-    document.body.querySelectorAll('.sec-toggle').forEach(toggle);
+    const enabled = target.classList.toggle(cls);
+    document.body.querySelectorAll('.sec-toggle').forEach(el => el.classList.toggle(cls, enabled));
 }
 
 function saveMarkdown(){
@@ -78,60 +68,39 @@ window.toggleTrksegChart = function (target){
 
 window.toggleNavCollapse = function(target){
     const nav = target.closest('.nav');
-    if(!nav) return;
-    // reset the position by top and left
-    const rect = nav.getBoundingClientRect();
-    /*
-    nav.style.left = `${rect.x}px`;
-    nav.style.top = `${rect.y}px`;
-    nav.style.bottom = 'unset';
-    nav.style.right = 'unset';
-    */
-    nav.style.left = 'unset';
-    nav.style.top = 'unset';
-    nav.style.bottom = `${window.innerHeight - rect.bottom}px`;
-    nav.style.right = `${window.innerWidth - rect.right}px`;
-
-    nav.classList.toggle('collapse');
-
-    Cookies.set("coursee-nav-collapse", nav.classList.contains('collapse'), {sameSite: 'strict'});
+    if(nav){
+        const enabled = nav.classList.toggle('collapse');
+        Cookies.set("coursee-nav-collapse", enabled, {sameSite: 'strict'});
+    }
 }
 
-window.toggleEdit = function(target){
-    const container = target.closest('#container');
-    if(container)
-        container.classList.toggle('edit');
-}
-
-window.selectMode = function(target, mode){
-    const container = target.closest('#container');
-    if(!container) return;
-
-    //check for each mode
+window.selectMode = function(mode){
+    //buttons status
     for(const m of ['view', 'edit', 'both']){
         const selected = (m === mode);
         const button = document.getElementById(`toolbar-${m}`);
         button.disabled = selected;  //disable if selected
-        setElemClass(button, 'switch-on', selected);
-        setElemClass(container, m, selected);
+        button.classList.toggle('switch-on', selected);
     }
 
+    //contianer status
+    const container = document.getElementById('container');
+    container.classList.toggle('edit', mode != 'view');
+    container.classList.toggle('view', mode != 'edit');
+
+    //cookie
     Cookies.set("coursee-layout-mode", mode, {sameSite: 'strict'});
 }
 
 window.setEditorVim = (target) => {
-    target.classList.toggle('switch-on');
-    const enabled = target.classList.contains('switch-on');
+    const enabled = target.classList.toggle('switch-on');
     _setEditorVim(enabled);
-
     Cookies.set("coursee-editor-vim", enabled, {sameSite: 'strict'});
 }
 
 window.setSyncScroll = function(target){
-    //data
-    target.classList.toggle('switch-on');
-    const enabled = target.classList.contains('switch-on');
     //ui
+    const enabled = target.classList.toggle('switch-on');
     target.innerHTML = enabled ? '<i class="fa-solid fa-link"></i>':
                                  '<i class="fa-solid fa-link-slash"></i>';
     //action

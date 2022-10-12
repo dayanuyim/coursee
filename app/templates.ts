@@ -81,9 +81,9 @@ export const trek = Handlebars.compile(`
 
         <div id="toolbar">
             <span class="btn-group">
-               <button class="switch" id="toolbar-edit" onclick="selectMode(this,'edit')" title="編輯模式"><i class="fa-solid fa-pen-to-square"></i></button><!--
-            --><button class="switch" id="toolbar-both" onclick="selectMode(this,'both')" title="並排模式"><i class="fa-solid fa-table-columns"></i></button><!--
-            --><button class="switch" id="toolbar-view" onclick="selectMode(this,'view')" title="瀏覽模式"><i class="fa-solid fa-eye"></i></button>
+               <button class="switch" id="toolbar-edit" onclick="selectMode('edit')" title="編輯模式"><i class="fa-solid fa-pen-to-square"></i></button><!--
+            --><button class="switch" id="toolbar-both" onclick="selectMode('both')" title="並排模式"><i class="fa-solid fa-table-columns"></i></button><!--
+            --><button class="switch" id="toolbar-view" onclick="selectMode('view')" title="瀏覽模式"><i class="fa-solid fa-eye"></i></button>
             </span>
             <button class="switch" id="toolbar-sync" onclick="setSyncScroll(this)" title="同步捲動"><i class="fa-solid fa-link-slash"></i></span></button>
         </div>

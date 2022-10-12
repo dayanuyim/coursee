@@ -272,10 +272,10 @@ async function loadMarkdown(fpath)
         if(!['view', 'edit', 'both'].includes(layout_mode))
             layout_mode = 'both';  //default
 
-        if(sync_scroll)   document.getElementById('toolbar-sync').click();
         if(nav_collapse) document.getElementById('nav-collapse').click();
+        if(sync_scroll)  document.getElementById('toolbar-sync').click();
         if(editor_vim)   document.getElementById('editor-vim').click();
-        document.getElementById(`toolbar-${layout_mode}`).click();
+        selectMode(layout_mode);
     }
     catch(err){
         console.error(err);

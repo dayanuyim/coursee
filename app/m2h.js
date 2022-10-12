@@ -350,10 +350,16 @@ function extendNavigation(el){
         e.preventDefault();
         if (_is_nav_dragging){
             const rect = el.getBoundingClientRect();
+            /*
             el.style.left = `${rect.x + e.movementX}px`;
             el.style.top = `${rect.y + e.movementY}px`;
             el.style.bottom = 'unset';
             el.style.right = 'unset';
+            */
+            el.style.left = 'unset';
+            el.style.top = 'unset';
+            el.style.right = `${window.innerWidth - rect.right - e.movementX}px`;
+            el.style.bottom = `${window.innerHeight - rect.bottom - e.movementY}px`;
         }
     }, true);
 }
