@@ -134,7 +134,7 @@ export const section = Handlebars.compile(`
 `);
 
 export const navCollapse = Handlebars.compile(`
-    <button id="nav-collapse" onclick="toggleNavCollapse(this)"></button>
+    <button id="nav-collapse" onclick="toggleNavCollapse(this)"><i class="fa-solid fa-angles-{{#if collapsed}}up{{else}}down{{/if}}"></i></button>
 `);
 
 export const navPageBack = Handlebars.compile(`

@@ -334,7 +334,8 @@ function extendNavigation(el){
     if(!el) return;
 
     //collapse button
-    el.insertAdjacentHTML('afterbegin', templates.navCollapse());
+    el.insertAdjacentHTML('afterbegin', templates.navCollapse({collapsed: _opt.nav_collapse}));
+    el.classList.toggle('collapse', _opt.nav_collapse);
 
     //toc
     const toc = el.querySelector('ul');
@@ -362,9 +363,6 @@ function extendNavigation(el){
             el.style.bottom = `${window.innerHeight - rect.bottom - e.movementY}px`;
         }
     }, true);
-
-    //init status
-    el.classList.toggle('collapse', _opt.nav_collapse);
 }
 
 function fixLocalPath(el)

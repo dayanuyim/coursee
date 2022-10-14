@@ -70,6 +70,8 @@ window.toggleNavCollapse = function(target){
     const nav = target.closest('.nav');
     if(nav){
         const enabled = nav.classList.toggle('collapse');
+        target.innerHTML = enabled ? '<i class="fa-solid fa-angles-up"></i>':
+                                     '<i class="fa-solid fa-angles-down"></i>';
         Cookies.set("coursee-nav-collapse", enabled, {sameSite: 'strict'});
     }
 }

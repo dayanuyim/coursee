@@ -178,6 +178,8 @@ nav,.nav {
 }
 
 .nav #nav-collapse{
+    /*visibility: hidden;*/
+
     grid-row: 1;
     text-align: right;
     border: none;
@@ -185,23 +187,26 @@ nav,.nav {
     background-color: transparent;
     width: 2em;
     margin-left: 90%; /*align right*/
-}
-
-.nav #nav-collapse:hover {
-    color: #808080;
+    padding-right: 5em;  /*padding right*/
     cursor: pointer;
 }
 
+/*
+.nav:hover #nav-collapse{
+    visibility: visible;
+}
+*/
+
+/*
 .nav #nav-collapse::after {
     display:inline-block;
     content: "▼";
-    /* content: "■"; transform: scale(1.5); */
 }
 .nav.collapse #nav-collapse::after {
     display:inline-block;
     content: "▲"
-    /* content: "◥"; transform: scale(.75); */
 }
+*/
 .nav.collapse #nav-collapse ~ * {
     display: none;
 }
@@ -645,8 +650,9 @@ pre code {
     height: 100vh;
 }
 #container #viewer-content {
+    box-sizing: border-box;
     padding: 0 1em 2em 2em;
-    height: calc(100vh - 2em);
+    height: 100vh;
     overflow-y: auto;
 }
 
@@ -656,10 +662,10 @@ pre code {
 }
 
 #viewer-boundary{
+    display: none;
     position: absolute;
     transition: all 0.25s;
     margin-left: 1px;
-
     top: 0;
     left: 0;
     bottom: 0;
@@ -692,4 +698,7 @@ pre code {
 }
 #container.viewable.editable #viewer-content{
     padding-left: 1em;
+}
+#container.viewable.editable #viewer-boundary{
+    display: block;
 }
