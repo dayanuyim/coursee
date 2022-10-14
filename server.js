@@ -88,8 +88,8 @@ app.put('/upload/*', express.json(), function(req, res, next){
   console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
 
   fs.writeFile(fpath, text, function(error, data){
-    if(error) return res.status(500).json({error});
-    res.status(200).json({result: "ok"});
+    if(error) return res.status(500).json({done: false, error});
+    res.status(200).json({done: true});
   });
 });
 

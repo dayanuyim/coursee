@@ -75,7 +75,7 @@ window.toggleNavCollapse = function(target){
 }
 
 window.selectMode = function(mode){
-    //buttons status
+    //buttons status, 'radio buttons' behavior
     for(const m of ['view', 'edit', 'both']){
         const selected = (m === mode);
         const button = document.getElementById(`toolbar-${m}`);
@@ -85,12 +85,27 @@ window.selectMode = function(mode){
 
     //contianer status
     const container = document.getElementById('container');
-    container.classList.toggle('edit', mode != 'view');
-    container.classList.toggle('view', mode != 'edit');
+    container.classList.toggle('editable', mode != 'view');
+    container.classList.toggle('viewable', mode != 'edit');
+
+    resetBoundary();
 
     //cookie
     Cookies.set("coursee-layout-mode", mode, {sameSite: 'strict'});
 }
+
+//ref: tuneBoundary()
+function resetBoundary()
+{
+    const resetLeft = el => el.style.removeProperty('left');
+    const resetWidth = el => el.style.removeProperty('width');
+
+    resetLeft(document.getElementById('viewer'));
+    resetLeft(document.getElementById('toolbar-sync'));
+    resetWidth(document.getElementById('editor-content'));
+    resetWidth(document.getElementById('editor-status'));
+}
+
 
 window.setEditorVim = (target) => {
     const enabled = target.classList.toggle('switch-on');

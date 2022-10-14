@@ -96,7 +96,8 @@ export const trek = Handlebars.compile(`
             </div>
         </div>
 
-        <div id="viewer" tabindex="0">
+        <div id="viewer" tabindex="0""edge">
+            <div id="viewer-boundary"></div>
             <div id="viewer-content" tabindex="1">[Record Loading...]</div>
         </div>
             

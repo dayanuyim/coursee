@@ -60,9 +60,8 @@ function uploadFileLazy(fpath, text, ms, callback) {
     const action = async() => {
         //console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
         const resp = await putJson(`/upload/${fpath}`, { text });
-        console.log("save resp: ", resp);
         delete _upload_file_timers[fpath];
-        callback();
+        callback(resp);
     };
 
     //if(ms == 0)
@@ -248,6 +247,13 @@ function setMarkdownDownload(fpath)
     el.download = decodeURI(fpath.split('/')[1]) + ".md";   // data/<name>/course.md
 }
 
+function addPx(px, val){
+    if(!val)
+        return px;
+    px = px? parseInt(px.replace(/px$/, '')): 0;
+    return `${px+val}px`;
+}
+
 let setViewer;
 async function loadMarkdown(fpath)
 {
@@ -258,11 +264,10 @@ async function loadMarkdown(fpath)
             throw new Error(`Markdown '${fpath}' not found`);
         const text = await resp.text();
 
-        //markdown editor
-        initEditor(fpath, text);
-
-        //markdown viewer
-        initViewer(fpath, text);
+        //init layout
+        const editor = initEditor(fpath, text);
+        const viewer = initViewer(fpath, text);
+        viewer.focus(); //or, editor.focus();
 
         //init status
         const editor_vim = str2bool(Cookies.get('coursee-editor-vim'), false);
@@ -283,16 +288,19 @@ async function loadMarkdown(fpath)
 
 
 let _focus_elem = 'viewer';  // sync from viewer for the first place
-let _is_sync_scroll = false;;
 
-const _top_line_num = {
-    viewer: 1,
-    editor: 1,
-};
-
-const _scrollToLine = {
-    viewer: undefined,
-    editor: undefined,
+const _sync_scroll_context = {
+    is_enabled: false,
+    viewer: {
+        top_line: 1,
+        curr_line: 1,
+        scrollToLine: undefined,
+    },
+    editor: {
+        top_line: 1,
+        curr_line: 1,
+        scrollToLine: undefined,
+    },
 }
 
 let _viewer_line_elems = [];
@@ -302,10 +310,6 @@ function initViewer(fpath, text)
     const opt = {
     };
 
-    viewer.addEventListener("scroll", function(e){
-        updateScrollStatus('viewer', getTopVisibleLine(_viewer_line_elems));
-    });
-
     setViewer = (txt) => {
         innerElement(viewer, markdownElement(txt, {
             host: path.dirname(window.location.href),
@@ -313,16 +317,21 @@ function initViewer(fpath, text)
             nav_collapse: str2bool(Cookies.get('coursee-nav-collapse'), false),
         }));
         _viewer_line_elems = Array.from(document.querySelectorAll('[data-source-line]'))
-                                .sort((e1, e2) => e1.dataset.sourceLine - e2.dataset.sourceLine)
-                                .filter((e, idx, arr) => !(idx > 0 && e.dataset.sourceLine == arr[idx-1].dataset.sourceLine));
+                                .sort((e1, e2) => e1.dataset.sourceLine - e2.dataset.sourceLine);
+                                //.filter((e, idx, arr) => !(idx > 0 && e.dataset.sourceLine == arr[idx-1].dataset.sourceLine));  // to unique
+                                // ^filter^ is not mandatory; also, more elements with source-line info, even the same line number, improves scroll granularity
     }
 
     setViewer(text);
 
+    //sync croll =======
+    viewer.addEventListener("scroll", function(e){
+        updateScrollStatus('viewer', getTopVisibleLine(_viewer_line_elems));
+    });
     viewer.addEventListener('focus', () => { _focus_elem = 'viewer'; });
     viewer.addEventListener('mouseover', () => { _focus_elem = 'viewer'; });
 
-    _scrollToLine.viewer = (num) => {
+    _sync_scroll_context.viewer.scrollToLine = (num) => {
         const el = _viewer_line_elems.find(e => e.dataset.sourceLine == num)
         if(!el) return;
         el.scrollIntoView({
@@ -332,7 +341,21 @@ function initViewer(fpath, text)
         });
     };
 
-    viewer.focus();
+    // boundary bar =========
+    let boundary_x;
+    const boundary = document.getElementById('viewer-boundary');
+    boundary.addEventListener('mousedown', e => { boundary_x = e.clientX; }, true);
+    document.addEventListener('mouseup', e => boundary_x = undefined, true);
+    document.addEventListener('mousemove', e => {
+        e.preventDefault();
+        if (boundary_x){
+            const diff = e.clientX - boundary_x;
+            boundary_x = e.clientX;
+            tuneBoundary(diff);
+        }
+    }, true);
+
+    return viewer;
 }
 
 function getTopVisibleLine(line_elems) {
@@ -343,12 +366,26 @@ function getTopVisibleLine(line_elems) {
     return 0;
 }
 
+function tuneBoundary(diff)
+{
+    const tuneLeft = el => el.style.left = `${el.offsetLeft + diff}px`;
+    const tuneWidth = el => el.style.width = `${el.offsetWidth + diff}px`;
+
+    tuneLeft(document.getElementById('viewer'));
+    tuneLeft(document.getElementById('toolbar-sync'));
+    tuneWidth(document.getElementById('editor-content'));
+    tuneWidth(document.getElementById('editor-status'));
+    //document.getElementById('editor-status').style.width = document.getElementById('editor-content').style.width;
+}
+
 let _editor_content_changed = false;
 let _editor_vim_plugin = null;
 
-function _upload_file(fpath, text, ms){
-    uploadFileLazy(fpath, text, ms, ()=>{
-        _editor_content_changed = false;
+function uploadFile(fpath, text, ms){
+    uploadFileLazy(fpath, text, ms, (resp)=>{
+        _editor_content_changed = !resp.done;
+        if(!resp.done)
+            console.error(`save resp error: ${resp.error}`);
     });
 }
 
@@ -365,12 +402,15 @@ function initEditor(fpath, text)
         fontSize: 14,
         scrollBeyondLastLine: false,
         automaticLayout: true,
-        });
+        //wordWrap: 'wordWrapColumn',
+        //wordWrapColumn: 60,
+        //wrappingIndent: 'indent',
+    });
     editor.onDidChangeModelContent(e => {
         _editor_content_changed = true;
         const text = editor.getValue();
         setViewer(text);   //refresh viewer
-        _upload_file(fpath, text, AUTO_SAVE_DELAY);
+        uploadFile(fpath, text, AUTO_SAVE_DELAY);
     });
 
     editor.onDidScrollChange(function (e) {
@@ -380,7 +420,7 @@ function initEditor(fpath, text)
     editor.onDidFocusEditorWidget((e) => { _focus_elem = 'editor'; });
     editor.onMouseMove((e)=>{ _focus_elem = 'editor'; })
 
-    _scrollToLine.editor = function(num){
+    _sync_scroll_context.editor.scrollToLine = (num) => {
         const line_height = editor.getOption(monaco.editor.EditorOption.lineHeight);
         editor.setScrollTop((num-1) * line_height);
     }
@@ -388,12 +428,12 @@ function initEditor(fpath, text)
     //save on exit if changed
     window.addEventListener('beforeunload', ()=>{
         if(_editor_content_changed)
-            _upload_file(fpath, editor.getValue(), 0);
+            uploadFile(fpath, editor.getValue(), 0);
     })
 
     //vim plugin
     VimMode.Vim.defineEx('write', 'w', function() {
-        _upload_file(fpath, editor.getValue(), 0);
+        uploadFile(fpath, editor.getValue(), 0);
     });
 
     window._setEditorVim = (enabled) => {
@@ -406,14 +446,14 @@ function initEditor(fpath, text)
         }
     };
 
-    //editor.focus();
+    return editor;
 }
 
 function updateScrollStatus(owner, lineno){
     // check if line changed
     if(!lineno) return;
-    if(_top_line_num[owner] == lineno) return;
-    _top_line_num[owner] = lineno;
+    if(_sync_scroll_context[owner].top_line == lineno) return;
+    _sync_scroll_context[owner].top_line = lineno;
 
     // sync the editor
     if(owner != _focus_elem) return;  // scroll not control by myself
@@ -421,15 +461,15 @@ function updateScrollStatus(owner, lineno){
 }
 
 function syncTargetScroll(){
-    if(!_is_sync_scroll) return;
-    const lineno = _top_line_num[_focus_elem];
+    if(!_sync_scroll_context.is_enabled) return;
+    const lineno = _sync_scroll_context[_focus_elem].top_line;
     const target = (_focus_elem == 'viewer')? 'editor': 'viewer';
     //console.log(`${_focus_elem}: scroll ${target} to line: ${lineno}`);
-    _scrollToLine[target](lineno);
+    _sync_scroll_context[target].scrollToLine(lineno);
 }
 
 window._setSyncScroll = (enabled)=>{
-    _is_sync_scroll = enabled;
+    _sync_scroll_context.is_enabled = enabled;
     syncTargetScroll();
 }
 
