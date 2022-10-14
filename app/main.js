@@ -17,6 +17,22 @@ import Cookies from 'js-cookie';
 const AUTO_SAVE_DELAY = 5000;  //ms
 
 // utils ================================
+
+function indexOfMin(arr, eq){
+    if(!arr || arr.length <= 0) return -1;
+
+    let idx = 0;
+    for(let i = 1; i < arr.length; ++i){
+        if(eq){
+            if(arr[i] <= arr[idx]) idx = i;
+        }
+        else{
+            if(arr[i] <  arr[idx]) idx = i;
+        }
+    }
+    return idx;
+}
+
 function str2bool(value, defval) {
     if(value === undefined)
         return defval;
@@ -303,12 +319,10 @@ const _sync_scroll_context = {
     },
 }
 
-let _viewer_line_elems = [];
 function initViewer(fpath, text)
 {
+    let line_elems = [];
     const viewer = document.getElementById("viewer-content");
-    const opt = {
-    };
 
     setViewer = (txt) => {
         innerElement(viewer, markdownElement(txt, {
@@ -316,7 +330,7 @@ function initViewer(fpath, text)
             dir: path.dirname(fpath),
             nav_collapse: str2bool(Cookies.get('coursee-nav-collapse'), false),
         }));
-        _viewer_line_elems = Array.from(document.querySelectorAll('[data-source-line]'))
+        line_elems = Array.from(document.querySelectorAll('[data-source-line]'))
                                 .sort((e1, e2) => e1.dataset.sourceLine - e2.dataset.sourceLine);
                                 //.filter((e, idx, arr) => !(idx > 0 && e.dataset.sourceLine == arr[idx-1].dataset.sourceLine));  // to unique
                                 // ^filter^ is not mandatory; also, more elements with source-line info, even the same line number, improves scroll granularity
@@ -325,14 +339,14 @@ function initViewer(fpath, text)
     setViewer(text);
 
     //sync croll =======
-    viewer.addEventListener("scroll", function(e){
-        updateScrollStatus('viewer', getTopVisibleLine(_viewer_line_elems));
+    viewer.addEventListener("scroll", () => {
+        updateScrollStatus('viewer', getTopVisibleLine(viewer, line_elems));
     });
     viewer.addEventListener('focus', () => { _focus_elem = 'viewer'; });
     viewer.addEventListener('mouseover', () => { _focus_elem = 'viewer'; });
 
     _sync_scroll_context.viewer.scrollToLine = (num) => {
-        const el = _viewer_line_elems.find(e => e.dataset.sourceLine == num)
+        const el = line_elems.find(e => e.dataset.sourceLine == num)
         if(!el) return;
         el.scrollIntoView({
             behavior: "auto",
@@ -358,13 +372,30 @@ function initViewer(fpath, text)
     return viewer;
 }
 
-function getTopVisibleLine(line_elems) {
-    for(const el of line_elems) {
-        if(isInViewport(el))
+//TODO: more efficient way to do this?
+//  e.g. search from the last top line elment, instead from begining.
+function getTopVisibleLine(viewer, line_elems) {
+    /*
+    const is_overlay = (rect, rect2) => rect2.bottom > rect.top && rect2.top < rect.bottom;
+    const rect_v = viewer.getBoundingClientRect();
+    for(const el of line_elems)
+        if(is_overlay(rect_v, el.getBoundingClientRect())) //visible in the viewer
             return el.dataset.sourceLine;
-    }
     return 0;
+    */
+    const rect_v = viewer.getBoundingClientRect();
+
+    const distance = (el) =>{
+        const rect = el.getBoundingClientRect();
+        if(rect.bottom > rect_v.top && rect.top < rect_v.bottom)   //visible?
+            return Math.min(Math.abs(rect.top - rect_v.top), Math.abs(rect.bottom - rect_v.top));
+        return Infinity;
+    }
+
+    const idx = indexOfMin(line_elems.map(distance), true); //the last elements which has smallest distance
+    return idx < 0? 0: line_elems[idx].dataset.sourceLine;
 }
+
 
 function tuneBoundary(diff)
 {

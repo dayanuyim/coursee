@@ -332,10 +332,21 @@ export function fireClicksAsSingleClick(fn) {
 
 export function isInViewport(element) {
     const rect = element.getBoundingClientRect();
+    //part in the viewport
+    return !(
+        rect.right <= 0 ||
+        rect.bottom <= 0 ||
+        rect.left >= (window.innerWidth || document.documentElement.clientWidth) ||
+        rect.top >= (window.innerHeight || document.documentElement.clientHeight)
+    );
+
+    /*
+    //all in the viewport
     return (
         rect.top >= 0 &&
         rect.left >= 0 &&
         rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
         rect.right <= (window.innerWidth || document.documentElement.clientWidth)
     );
+    */
 }
