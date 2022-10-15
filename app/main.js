@@ -18,17 +18,18 @@ const AUTO_SAVE_DELAY = 5000;  //ms
 
 // utils ================================
 
-function indexOfMin(arr, eq){
+// Get the index of the element with minimum value
+//   @peak_last: true: if there are multiple elements with the minimum value, return the index of the last element.
+//               false: otherwise, return the index of the first element;
+function indexOfMin(arr, peak_last){
     if(!arr || arr.length <= 0) return -1;
+    const less_than = peak_last? (v1, v2) => v1 <= v2:
+                                 (v1, v2) => v1 <  v2;
 
     let idx = 0;
     for(let i = 1; i < arr.length; ++i){
-        if(eq){
-            if(arr[i] <= arr[idx]) idx = i;
-        }
-        else{
-            if(arr[i] <  arr[idx]) idx = i;
-        }
+        if(less_than(arr[i], arr[idx]))
+            idx = i;
     }
     return idx;
 }
