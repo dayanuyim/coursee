@@ -7,7 +7,7 @@ import {GPXParser} from './loadgpx';
 import * as googleMaps from 'google-maps-api';
 import * as templates from './templates';
 import * as moment from 'moment-timezone';
-import { innerElement, isInViewport } from './dom-utils';
+import { innerElement } from './dom-utils';
 import { markdownElement } from './m2h';
 import * as monaco from 'monaco-editor';
 import { initVimMode, VimMode } from 'monaco-vim';
@@ -76,7 +76,7 @@ function uploadFileLazy(fpath, text, ms, callback) {
 
     const action = async() => {
         //console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
-        const resp = await putJson(`/upload/${fpath}`, { text });
+        const resp = await putJson(fpath, { text });
         delete _upload_file_timers[fpath];
         callback(resp);
     };
@@ -241,8 +241,8 @@ export async function loadCourse(name)
     if(!name)
         return alert("No such record.");
 
-    const gpxPath = `data/${name}/course.gpx`;
-    const mdPath = `data/${name}/course.md`;
+    const gpxPath = `/data/${name}/course.gpx`;
+    const mdPath = `/data/${name}/course.md`;
 
     setMarkdownDownload(mdPath);
     loadMarkdown(mdPath);
@@ -417,7 +417,7 @@ function uploadFile(fpath, text, ms){
     uploadFileLazy(fpath, text, ms, (resp)=>{
         _editor_content_changed = !resp.done;
         if(!resp.done)
-            console.error(`save resp error: ${resp.error}`);
+            console.error('save resp error', resp.error);
     });
 }
 

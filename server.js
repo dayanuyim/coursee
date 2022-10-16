@@ -77,13 +77,12 @@ if (isDev) {
   app.use(express.static('dist'));
 }
 
-// import lib router
-//app.use('/api', require('./lib/theater.js')());
+// get file
+app.use('/data', express.static(nconf.get('data-path')));
 
-//api to upload file
-app.put('/upload/*', express.json(), function(req, res, next){
-  const webroot = isDev? 'app': 'dist';
-  const fpath = path.join(__dirname, webroot, req.params[0]);
+// upload file
+app.put('/data/*', express.json(), function(req, res, next){
+  const fpath = path.join(nconf.get('data-path'), req.params[0]);
   const text = req.body.text;
   console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
 
@@ -92,6 +91,9 @@ app.put('/upload/*', express.json(), function(req, res, next){
     res.status(200).json({done: true});
   });
 });
+
+// import lib router
+//app.use('/api', require('./lib/theater.js')());
 
 // Startup Server
 if(isHttps){

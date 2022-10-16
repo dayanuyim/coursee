@@ -7,5 +7,6 @@
   "security": {
     "key": "./server.key",
     "cert": "./server.pem"
-  }
+  },
+  "data-path": "app/data"
 }

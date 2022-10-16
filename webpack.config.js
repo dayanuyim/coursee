@@ -39,7 +39,7 @@ module.exports = {
       }),
       new CopyPlugin({
           patterns: [
-              {from: 'app/data', to: 'data'},
+              //{from: 'app/data', to: 'data'},  //set in server.js via nconf *.conf.json
               {from: 'app/data.sh', to: 'data.sh'},
               {from: 'app/data.json', to: 'data.json'},
               {from: 'app/images', to: 'images'},
