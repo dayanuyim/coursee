@@ -2,7 +2,9 @@
 
 dir="$1"
 if [[ -z $dir ]]; then
-    dir="$(dirname "$0")/data"
+    #dir="$(dirname "$0")/data"
+    conf="$(dirname "$0")/../development.config.json"
+    dir="$(jq -r '."data-path"' "$conf")"
 fi
 
 function parse()

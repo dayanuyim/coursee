@@ -39,6 +39,7 @@ const logFormatter = () => {
 
 const app = express();
 app.use(logFormatter());
+app.set('json spaces', 2);
 app.get('/api/version', (req, res) => res.status(200).json(pkg.version));
 
 if(nconf.get('redis')){
@@ -77,6 +78,45 @@ if (isDev) {
   app.use(express.static('dist'));
 }
 
+// import lib router
+//app.use('/api', require('./lib/theater.js')());
+
+//@name should be the format of 'YYYYMMDD-title[-days]'
+function parseDataName(name){
+  //date
+  const date = `${name.substring(0, 4)}-${name.substring(4, 6)}-${name.substring(6, 8)}`.toUpperCase();
+  if(date.length != 10 || (date != 'YYYY-MM-DD' && !Date.parse(date)))
+    return null;
+
+  if(name.charAt(8) !== '-')
+    return null;
+
+  //days
+  const has_days = /-\d+$/.exec(name);
+  const days = (has_days && has_days.index > 8)? name.substring(has_days.index+1): '';
+
+  //title
+  const title = name.substring(9, has_days? has_days.index: name.length);
+  if(!title)  //not allow empty
+    return null;
+
+  return { date, days, title };
+}
+
+function getDataList(dir){
+  return fs.readdirSync(dir)
+    .map(file => {
+      if(!fs.lstatSync(path.join(dir, file)).isDirectory())
+        return null;
+      return parseDataName(file);
+    })
+    .filter(v => v);
+}
+
+app.get('/api/list', function(req, res){
+  res.status(200).json(getDataList(nconf.get('data-path')));
+});
+
 // get file
 app.use('/data', express.static(nconf.get('data-path')));
 
@@ -91,9 +131,6 @@ app.put('/data/*', express.json(), function(req, res, next){
     res.status(200).json({done: true});
   });
 });
-
-// import lib router
-//app.use('/api', require('./lib/theater.js')());
 
 // Startup Server
 if(isHttps){

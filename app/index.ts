@@ -36,13 +36,14 @@ async function showIndex()
 
     try{
         //fetch
-        const resp = await fetch('./data.json');
+        //const resp = await fetch('./data.json');
+        const resp = await fetch('/api/list');
         if(!resp.ok)
             throw new Error(`data.json not found`);
 
         const json = await resp.json();
-        const treks = utils.groupItems(json, trek => trek.date.slice(0, 4)); //group by years
-        document.body.innerHTML = templates.main({treks});
+        const data = utils.groupItems(json, course => course.date.slice(0, 4)); //group by years
+        document.body.innerHTML = templates.main(data);
     }
     catch(err){
         console.error(err);
