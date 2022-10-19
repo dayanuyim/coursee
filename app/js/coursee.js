@@ -102,10 +102,11 @@ function resetBoundary()
     const resetLeft = el => el.style.removeProperty('left');
     const resetWidth = el => el.style.removeProperty('width');
 
-    resetLeft(document.getElementById('viewer'));
-    resetLeft(document.getElementById('toolbar-sync'));
     resetWidth(document.getElementById('editor-content'));
     resetWidth(document.getElementById('editor-status'));
+    resetLeft(document.getElementById('toolbar-sync'));
+    resetLeft(document.getElementById('viewer'));
+    resetWidth(document.getElementById('viewer-content'));
 }
 
 

@@ -401,12 +401,14 @@ function getTopVisibleLine(viewer, line_elems) {
 function tuneBoundary(diff)
 {
     const tuneLeft = el => el.style.left = `${el.offsetLeft + diff}px`;
-    const tuneWidth = el => el.style.width = `${el.offsetWidth + diff}px`;
+    const tuneWidthL = el => el.style.width = `${el.offsetWidth + diff}px`;
+    const tuneWidthR = el => el.style.width = `${el.offsetWidth - diff}px`;
 
-    tuneLeft(document.getElementById('viewer'));
+    tuneWidthL(document.getElementById('editor-content'));
+    tuneWidthL(document.getElementById('editor-status'));
     tuneLeft(document.getElementById('toolbar-sync'));
-    tuneWidth(document.getElementById('editor-content'));
-    tuneWidth(document.getElementById('editor-status'));
+    tuneLeft(document.getElementById('viewer'));
+    tuneWidthR(document.getElementById('viewer-content'));
     //document.getElementById('editor-status').style.width = document.getElementById('editor-content').style.width;
 }
 
