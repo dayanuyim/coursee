@@ -21,6 +21,14 @@ button.switch:not(:disabled):hover{ cursor: pointer;}
     border-radius: 0 4px 4px 0;
 }
 
+[data-weekday="0"]::after{ content: "(日)"; }
+[data-weekday="1"]::after{ content: "(一)"; }
+[data-weekday="2"]::after{ content: "(二)"; }
+[data-weekday="3"]::after{ content: "(三)"; }
+[data-weekday="4"]::after{ content: "(四)"; }
+[data-weekday="5"]::after{ content: "(五)"; }
+[data-weekday="6"]::after{ content: "(六)"; }
+
 /******************************************/
 
 header {

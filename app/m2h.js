@@ -60,19 +60,6 @@ function svg_text(x, y, txt, cls){
     return text;
 }
 
-function weekdayName(weekday){
-    switch(weekday % 7){
-        case 0: return '日';
-        case 1: return '一';
-        case 2: return '二';
-        case 3: return '三';
-        case 4: return '四';
-        case 5: return '五';
-        case 6: return '六';
-    }
-    return 'N/A';
-}
-
 function minMax(arr){
     let min = null;
     let max = null;
@@ -109,6 +96,23 @@ function splitTimePeriod(period){
 function timestr2min(str){
     if(str == null) return null;
     return str.substring(0, 2) * 60 + parseInt(str.substring(2, 4));
+}
+
+//return: 2: not adjacent
+//       -1: adjacent to the previous year, e.g. base=1, other=12
+//        0: adjacent the same year
+//        1: adjacent to the next year, e.g. base=12, other=1
+function cmpAdjacentMonth(base, other, diff){
+    if(base < 1 || base > 12) return 2;
+    if(other < 1 || other > 12) return 2;
+    const diff1 = Math.abs(base - other);
+    if(diff1 <= diff) return 0;
+
+    //wrap
+    const diff2 = 12 - diff1;
+    if(diff2 <= diff) return other > base? -1: 1
+
+    return 2;
 }
 
 function fillLostData(data, valspan, maxstep)
@@ -187,12 +191,17 @@ const Weather_name = new BiMap({
 let _opt = null;
 let _course_date;
 
-function toCouseDate(day){
+function toCourseDate(day){
     if(!_course_date) return null;
     //const date = new Date(_course_date);
     //date.setDate(date.getDate() + (day-1));
     //return date;
-    return new Date(_course_date + (day-1)*86400*1000);
+    return new Date(_course_date.getTime() + (day-1)*86400*1000);
+}
+
+//wrapper
+function getDay(date){
+    return date? date.getDay(): '';
 }
 
 //configured markdown render
@@ -290,7 +299,7 @@ function extendHeader(el){
     header.insertAdjacentElement('afterbegin', h1);
 
     //set global date
-    _course_date = time? Date.parse(time.textContent): null;
+    //_course_date = time? new Date(time.textContent): null;
 }
 
 
@@ -439,8 +448,31 @@ function extendMap(el)
 
 function renderTime(html)
 {
-    return html.replace(/[12][90][0-9][0-9]-[01][0-9]-[0-3][0-9]/g, (orig) => {   // date format
-            return `<time>${orig}</time>`;
+    //try to get course date from header
+    const matches = html.match(/<h1.*([12][90][0-9][0-9])-([01][0-9])-([0-3][0-9]).*<\/h1>/);
+    if(matches){
+        const [_, y, m, d] = matches;
+        if(y > 2000 && m >= 1 && m <= 12 && d >= 1 && d <= 31)
+            _course_date = new Date(y, m-1, d);  //m is index
+    }
+
+    return html.replace(/([12][90][0-9][0-9])-([01][0-9])-([0-3][0-9])/g, (orig, y, m, d) => {   // full date format
+            if(y > 2000 && m >= 1 && m <= 12 && d >= 1 && d <= 31){
+                const date = new Date(y, m-1, d);  //m is index
+                return `<time data-weekday=${getDay(date)}>${orig}</time>`;
+            }
+            return orig;
+        })
+        .replace(/([01][0-9])\/([0-3][0-9])\(W\)/g, (orig, m, d) => {   // short date format
+            if(_course_date && d >= 1 && d <= 31){
+                const cmp = cmpAdjacentMonth(_course_date.getMonth(), m, 1);
+                if(cmp <= 1){
+                    const y = _course_date.getFullYear() + cmp;
+                    const date = new Date(y, m-1, d);  //m is index
+                    return `<time data-weekday=${getDay(date)}>${m}/${d}</time>`;
+                }
+            }
+            return orig;
         })
         .replace(/<code>([0-9].*?)<\/code>/g, (orig, txt) => {   // normal time string
             if (!isTimeFormat(txt)) return orig;
@@ -455,10 +487,9 @@ function renderTime(html)
 }
 
 function isTimeFormat(txt){
-    if (txt.length == 4 && txt.match(/[0-2][0-9][0-5][0-9]/)) return true;
-    if (txt.length == 7 && txt.match(/[0-2][0-9][0-5][0-9]~[0-5][0-9]/)) return true;
-    if (txt.length == 9 && txt.match(/[0-2][0-9][0-5][0-9]~[0-2][0-9][0-5][0-9]/)) return true;
-    if (txt.length == 10 && txt.match(/[12][90]\d\d-[01][0-9]-[0-3][0-9]/)) return true;
+    if (txt.length == 4 && txt.match(/[0-2][0-9][0-5][0-9]/)) return true;                         //hhmm
+    if (txt.length == 7 && txt.match(/[0-2][0-9][0-5][0-9]~[0-5][0-9]/)) return true;              //hhmm~mm
+    if (txt.length == 9 && txt.match(/[0-2][0-9][0-5][0-9]~[0-2][0-9][0-5][0-9]/)) return true;    //hhmm~hhmm
     if (txt.match(/^[0-9]+m$/)) return true;
     return false;
 }
@@ -678,9 +709,8 @@ function renderWeather(html){
 function renderTrkDay(html){
 
     return html.replace(/D(\d+) /, (orig, day) => {
-            const date = toCouseDate(day);
-            const desc = date? `D${day}(${weekdayName(date.getDay())})`: `D${day}`;
-            return `<span class="trkseg-day">${desc}</span> `;
+            const date = toCourseDate(day);
+            return `<span class="trkseg-day" data-weekday="${getDay(date)}">D${day}</span> `;
         });
 }
 
@@ -749,7 +779,7 @@ function getStartDate(txt)
 function genRecContentElem(content, title, base_date)
 {
     //parse date from title_elem
-    var day = getDay(title.innerHTML);
+    var day = getTrkDay(title.innerHTML);
     if(day != null){
         //retag content_elem and as title_elem's child
         var date = (base_date)? base_date.addDays(day): null;
@@ -764,7 +794,7 @@ function genRecContentElem(content, title, base_date)
     return null;
 }
 
-function getDay(txt)
+function getTrkDay(txt)
 {
     var re = /D(\d+)\s/
     var arr = txt.match(re);

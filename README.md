@@ -39,6 +39,13 @@ Markdown Viewer for Hiking Context
 
 > A number surrounding with `*`, for example, `*3884*`.
 
+### Date Extension
+
+| Format     | Example    | Cond  |
+| :--------- | :--------- | :---: |
+| YYYY-MM-DD | 2022-07-10 | No   |
+| MM/DD(W)   | 07/09(W)   | Course Date Specified |
+
 ### Time Extension
 
 > Time string surronding with `` ` ``, for example, `` `0630` ``, acceptable formats:
@@ -48,7 +55,6 @@ Markdown Viewer for Hiking Context
 | HHMM~MM    | 0630~40    | &#96; |
 | HHMM~HHMM  | 0630~0640  | &#96; |
 | MMm        | 10m        | &#96; |
-| YYYY-MM-DD | 2022-07-10 |  No   |
 
 ### Weather Extension
 
