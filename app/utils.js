@@ -10,3 +10,16 @@ export function groupItems(arr, getKeyFun)
     });
     return group;
 }
+
+export function joinpath(...paths){
+    const sp = '/';
+
+    let sum = paths.shift();
+    for(const p of paths){
+        if(sum.endsWith(sp))
+            sum += p.startsWith(sp)? p.substring(sp.length): p;
+        else
+            sum += p.startsWith(sp)? p: sp+p;
+    }
+    return sum;
+}

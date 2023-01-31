@@ -1,5 +1,6 @@
 import * as templates from './templates';
 import { htmlToElement} from './dom-utils';
+import { joinpath} from './utils';
 import BiMap from 'bidirectional-map';
 
 function partition(array, filter) {
@@ -383,13 +384,14 @@ function fixLocalPath(el)
 }
 
 function _fixLocalPath(url){
-    if(!_opt || !_opt.host || !_opt.dir) return url;
+    if(!_opt || !_opt.host || !_opt.dir)
+        return url;
 
-    if(url.startsWith(_opt.host)){
-        const path = url.substring(_opt.host.length);
-        return `${_opt.host}/${_opt.dir}${path}`
-    }
-    return url;
+    if(!url.startsWith(_opt.host))
+        return url;
+
+    const relpath = url.substring(_opt.host.length);
+    return joinpath(_opt.host, _opt.dir, relpath);
 }
 
 /*
