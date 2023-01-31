@@ -66,15 +66,17 @@ th, td{
 }
 
 figure {
-    margin: 2px;
+    display: inline-block;
+    margin: 8px;
 }
-figcaption {
+figure figcaption {
     /*font-size: larger;*/
     font-style: italic;
     color:dimgray;
+    text-align: center;
 }
-figcaption::before { content: "<" }
-figcaption::after { content: ">" }
+figure figcaption::before { content: "<" }
+figure figcaption::after { content: ">" }
 
 mark {
     padding: 3px 2px 1px 2px;
