@@ -84,6 +84,15 @@ mark {
     background-color:#ffff84;
 }
 
+code {
+    padding: 2px;
+    margin: 0;
+    font-size: 85%;
+    background-color: rgba(255,255,255,.4);
+    border-radius: 4px;
+}
+
+/******************************************/
 div#download{
     position: fixed;
     top: 0;
