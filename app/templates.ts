@@ -275,11 +275,13 @@ export const svgObject2 = Handlebars.compile(`
 `);
 
 export const map_trekkr = Handlebars.compile(`
-    <button onclick="toggleMap()">線上地圖</button>
-    <!--<embed class="hide" id="mapobj" src="" width="100%" height="600" ></embed>-->
-    <object class="hide" id="mapobj" type="text/html" data="" width="100%" height="600">
-      不支援嵌入，請連至<a href="https://dayanuyim.github.io/maps/">Trekkr</a>
-    </object>
+    <div>
+        <button onclick="toggleMap(this)">線上地圖</button>
+        <!--<embed class="mapobj hide" src="" width="100%" height="600" ></embed>-->
+        <object class="mapobj hide" type="text/html" data="" width="100%" height="600">
+        不支援嵌入，請連至<a href="https://dayanuyim.github.io/maps/">Trekkr</a>
+        </object>
+    </div>
 `);
 
 export const trksegUtils = Handlebars.compile(`

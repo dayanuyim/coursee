@@ -1,13 +1,14 @@
 import { fireOnlyIfSingleClick } from '../dom-utils';
 import Cookies from 'js-cookie';
 
-window.toggleMap = function(){
-    const mapobj = document.getElementById('mapobj');
+window.toggleMap = function(target){
+    const url = "https://dayanuyim.github.io/maps/";  //TODO: get url by mapid
+
+    const mapobj = target.parentNode.querySelector('.mapobj');  //nextElementSibling
     mapobj.classList.toggle('hide');
-    if(!mapobj.getAttribute('data')){
-      mapobj.setAttribute('data', "https://dayanuyim.github.io/maps/");
-      mapobj.focus();
-    }
+    if(mapobj.getAttribute('data') !== url)
+        mapobj.setAttribute('data', url);
+    mapobj.focus();
 }
 
 window.toggleSec = function(target){
