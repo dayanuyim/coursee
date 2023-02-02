@@ -58,7 +58,7 @@ Markdown Viewer for Hiking Context
 
 ### Weather Extension
 
-The weather name surronding with `()`, acceptable names are `晴`, `風`, `陰`, `雷`, `雨`, `變`, `霧`, `雪`.
+The weather name surronding with `{}`, acceptable names are `晴`, `風`, `陰`, `雷`, `雨`, `變`, `霧`, `雪`.
 
 ### Legend-Arrow Extension
 

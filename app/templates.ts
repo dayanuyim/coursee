@@ -1,4 +1,12 @@
 import * as Handlebars from '../node_modules/handlebars/dist/handlebars.js';
+import { markdownHtml } from './m2h';
+
+
+Handlebars.registerHelper('breaklines', function(text) {
+    text = Handlebars.Utils.escapeExpression(text);
+    text = text.replace(/(\r\n|\n|\r)/gm, '<br>');
+    return new Handlebars.SafeString(text);
+});
 
 Handlebars.registerHelper('defVal', function (value, defValue) {
     let out = value || defValue;
@@ -67,9 +75,105 @@ export const main = Handlebars.compile(`
 
     <hr>
     <footer>
-        <p>&copy; 2022</p>
+        <p>&copy; 2023</p>
     </footer>
 `);
+
+Handlebars.registerHelper('dialect', function(kinds) {
+
+    let html = '';
+    for(const kind of kinds){
+        const cls = (kind == "b")? "basic":
+                    (kind == "e")? "ext":
+                    (kind == "c")? "custom": "na";
+        html += `<i class="dialect dialect-${cls}"></i>`;
+    }
+
+    return new Handlebars.SafeString(html);
+});
+
+Handlebars.registerHelper('mdhtml', function(md) {
+    return new Handlebars.SafeString(markdownHtml(md));
+});
+
+export const tip = Handlebars.compile(`
+    {{#each this}}
+    <table class="tip-tbl">
+        <thead>
+            <tr>
+                <th></th>
+                <th>MARKDOWN</th>
+                <th>HTML</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each this}}
+            <tr>
+                <td>{{dialect dialect}}</td>
+                <td>{{breaklines text}}</td>
+                <td>{{mdhtml text}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    {{/each}}
+
+    <div class="tip-legend">
+        <span>{{dialect "b"}} Basic</span>
+        <span>{{dialect "e"}} Extension</span>
+        <span>{{dialect "c"}} Customed Extension</span>
+    </div>
+`);
+
+function arraySplit(arr, grp_size)
+{
+    const grps = [];
+    for(let i = 0; i < arr.length; i += grp_size)
+        grps.push(arr.slice(i, i + grp_size));
+    return grps;
+}
+
+Handlebars.registerHelper('tip', function() {
+    const host = `${window.location.protocol}//${window.location.host}`
+    const ctx = [
+        [
+            { dialect: "b", text: "標題1\n=====" },
+            { dialect: "b", text: "標題2\n-----" },
+            { dialect: "b", text: "# 標題1" },
+            { dialect: "b", text: "## 標題2" },
+            { dialect: "b", text: "###### 標題6" },
+            { dialect: "b", text: "1. 有序清單" },
+            { dialect: "b", text: "- 無序清單" },
+            { dialect: "e", text: "- [x] 待辦事項" },
+        ], [
+            { dialect: "b", text: "> 引用" },
+            { dialect: "b", text: "*斜體*" },
+            { dialect: "b", text: "**粗體**" },
+            { dialect: "b", text: "***斜粗體***" },
+            { dialect: "b", text: "~~刪除線~~" },
+            { dialect: "b", text: "`# 程式碼`" },
+            { dialect: "e", text: "上標 1^st^" },
+            { dialect: "e", text: "下標 H~2~O" },
+            { dialect: "e", text: "++底線/插入++" },
+            { dialect: "e", text: "==標記==" },
+        ], [
+            { dialect: "c", text: 'A-(5min)->B'},
+            { dialect: "c", text: "日期 2023-01-01" },
+            { dialect: "c", text: "時間 `0630`" },
+            { dialect: "c", text: "時間 `0630~0700`" },
+            { dialect: "c", text: "時間 `5m`" },
+            { dialect: "c", text: "高度 *3952*" },
+            { dialect: "c", text: "{晴} {霧} {變}" },
+            { dialect: "c", text: "{map:trekkr}" },
+        ], [
+            { dialect: "b", text: `[連結](${host}/favicon.png "title")` },
+            { dialect: "be", text: `![圖片](${host}/favicon.png "title" =16x)` },
+        ],
+    ];
+
+    //ctx = arraySplit(ctx, 12);
+    return new Handlebars.SafeString(tip(ctx));
+});
 
 export const trek = Handlebars.compile(`
     <div id="download" style="display: none">
@@ -86,7 +190,14 @@ export const trek = Handlebars.compile(`
             --><button class="switch" id="toolbar-both" onclick="selectMode('both')" title="並排模式"><i class="fa-solid fa-table-columns"></i></button><!--
             --><button class="switch" id="toolbar-view" onclick="selectMode('view')" title="瀏覽模式"><i class="fa-solid fa-eye"></i></button>
             </span>
+            <button class="push" id="toolbar-tip" onclick="showModal('tip')"><i class="fa fa-regular fa-circle-question"></i></button>
             <button class="switch" id="toolbar-sync" onclick="setSyncScroll(this)" title="同步捲動"><i class="fa-solid fa-link-slash"></i></span></button>
+        </div>
+
+        <div id="tip" class="modal hide">
+            <div class="modal-container">
+                <div class="modal-body">{{tip}}</div>
+            </div>
         </div>
 
         <div id="editor">

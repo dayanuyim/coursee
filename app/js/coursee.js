@@ -126,3 +126,17 @@ window.setSyncScroll = function(target){
     //cookie
     Cookies.set("coursee-sync-scroll", enabled, {sameSite: 'strict'});
 }
+
+window.showModal = function(id){
+    const modal = document.querySelector(`#${id}.modal`);
+
+    modal.classList.remove("hide");
+
+    //set event to hide modal
+    if(!modal.onclick){
+        modal.onclick = e => {
+            if(e.target.classList.contains("modal") || e.target.classList.contains("modal-container")) //not body
+                modal.classList.add("hide");
+        }
+    }
+}

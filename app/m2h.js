@@ -230,7 +230,20 @@ function mdRenderer(){
         });
 }
 
+const _renderer = mdRenderer();
+
 // #####################################################
+//render markdown to html with customed extension
+export function markdownHtml(markdown){
+    let html = _renderer.render(markdown)
+    //html = renderRecord(html);
+    html = renderAltitude(html);
+    html = renderWeather(html);
+    html = renderTime(html);
+    html = renderArrow(html);
+    html = renderMap(html);
+    return html;
+}
 
 export function markdownElement(markdown, opt)
 {
@@ -240,12 +253,7 @@ export function markdownElement(markdown, opt)
     markdown += '\n\n[[toc]]\n';
 
     //amend html text ====
-    let html = mdRenderer().render(markdown)
-    //html = renderRecord(html);
-    html = renderAltitude(html);
-    html = renderWeather(html);
-    html = renderTime(html);
-    html = renderArrow(html);
+    let html = markdownHtml(markdown);
     html = `<div>${html}</div>`;  //wrap to single element
 
     //amend dom element ========
@@ -265,7 +273,6 @@ export function markdownElement(markdown, opt)
     el.querySelectorAll('.trkseg').forEach(trkseg => {
         extendRecBriefChart(trkseg);
     });
-    extendMap(el.querySelector('section#mapx'));
     extendVehicle(el.querySelector('section#transport'));
     //renderRecContent(el);
     el.querySelectorAll('section').forEach(sec => {
@@ -438,10 +445,9 @@ function extendSvg(el)
     });
 }
 
-function extendMap(el)
+function renderMap(html)
 {
-    if(!el) return;
-    el.innerHTML = el.innerHTML.replace(/{map:(.*?)}/g, (orig, mapid) => {
+    return html.replace(/{map:(.*?)}/g, (orig, mapid) => {
         if(mapid == 'trekkr') return templates.map_trekkr();
         //other maps...
         return orig;

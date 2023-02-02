@@ -4,6 +4,10 @@ button.switch.switch-on{ color: #000000; }
 button.switch.switch-on:hover{ color: #404040; }
 button.switch:not(:disabled):hover{ cursor: pointer;}
 
+button.push{ color: #000000; }
+button.push:hover{ color: #404040; }
+button.push:not(:disabled):hover{ cursor: pointer;}
+
 /*----------------------------------------------------------------*/
 
 .btn-group button{
@@ -29,6 +33,39 @@ button.switch:not(:disabled):hover{ cursor: pointer;}
 [data-weekday="5"]::after{ content: "(五)"; }
 [data-weekday="6"]::after{ content: "(六)"; }
 
+/*----------------------------------------------------------------*/
+
+.modal {
+  background-color: rgba(0,0,0,0.4); /* Transparent dimmed overlay */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: table;
+  z-index: 999;
+}
+
+.modal.hide {
+  display: none;
+}
+
+.modal .modal-container {
+ display: table-cell;
+ text-align: center;
+ vertical-align: middle;
+ width: 200px;
+}
+
+.modal .modal-body {
+  box-shadow: 5px 10px #d0d0d0;
+  display: inline-block;
+  max-width: 90%;
+  background-color: white;
+  border: 1px solid black;
+  padding: 10px;
+  overflow: auto;
+}
 /******************************************/
 
 header {
@@ -90,6 +127,12 @@ code {
     font-size: 85%;
     background-color: rgba(255,255,255,.4);
     border-radius: 4px;
+}
+
+blockquote {
+    padding: 0 1em;
+    color: #777;
+    border-left: .25em solid #ddd;
 }
 
 /******************************************/
@@ -593,6 +636,42 @@ pre code {
     left: calc(50vw - .5em);
 }
 
+/* ----------------- Tip Modal --------------------*/
+#tip .modal-body {
+    font-size: 12px;
+}
+
+#tip .dialect-basic::after { content: "B"; }
+#tip .dialect-ext::after { content: "E"; }
+#tip .dialect-custom::after { content: "C"; }
+#tip .dialect{
+    background: #e0e0e0;
+    padding: 2px 4px;
+    margin: 0 0 0 1px;
+    border-radius: 2px;
+}
+
+#tip .tip-tbl {
+    display: inline-block;
+    vertical-align:top;
+    margin-top: 2em;
+}
+
+#tip .tip-tbl thead {
+    text-align: left;
+}
+#tip .tip-tbl tbody {
+    text-align: left;
+}
+
+#tip .tip-legend {
+    margin: 1em;
+    text-align: right;
+    color: gray;
+    font-size: x-small;
+}
+
+
 /*
 #toolbar-sync.sync {
     color: black;
@@ -612,6 +691,8 @@ pre code {
     content: "⇎";
 }
 */
+
+/*----------------------------------------------------------------*/
 
 #container{
     position: relative;
