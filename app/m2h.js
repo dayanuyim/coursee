@@ -268,7 +268,9 @@ export function markdownElement(markdown, opt)
     extendSection(el);
     el.querySelectorAll('section').forEach(sec => {
         if(['trk-plan', 'trk-backup', 'trk-facto'].includes(sec.id) || sec.querySelectorAll('li code').length > 5)
-            extendRecBrief(sec.querySelector('h2+ul'));
+            sec.querySelectorAll('h2+ul, h3+ul, h4+ul, h5+ul, h6+ul').forEach(ul => {
+                extendRecBrief(ul);
+            })
     });
     el.querySelectorAll('.trkseg').forEach(trkseg => {
         extendRecBriefChart(trkseg);
