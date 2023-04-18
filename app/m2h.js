@@ -359,7 +359,7 @@ function extendNavigation(el){
     //toc
     const toc = el.querySelector('ul');
     toc.classList.add('nav-toc');
-    toc.insertAdjacentHTML('afterbegin', templates.navPageBack());
+    //toc.insertAdjacentHTML('afterbegin', templates.navPageBack());
     //utils
     el.insertAdjacentHTML('beforeend', templates.navUtils());
 

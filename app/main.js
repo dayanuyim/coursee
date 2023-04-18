@@ -470,13 +470,22 @@ function initEditor(fpath, text)
         uploadFile(fpath, editor.getValue(), 0);
     });
 
-    window._setEditorVim = (enabled) => {
-        if(enabled){
-            _editor_vim_plugin = initVimMode(editor, document.getElementById('editor-status'))
-        }
-        else if(_editor_vim_plugin){
-            _editor_vim_plugin.dispose();
-            _editor_vim_plugin = null;
+    // register editor methods
+    window._editor = {
+        setVimMode: (enabled) => {
+            if (enabled) {
+                _editor_vim_plugin = initVimMode(editor, document.getElementById('editor-status'))
+            }
+            else if (_editor_vim_plugin) {
+                _editor_vim_plugin.dispose();
+                _editor_vim_plugin = null;
+            }
+        },
+        insertText: (text, src=null) => {
+            let selection = editor.getSelection();
+            let id = { major: 1, minor: 1 };
+            let op = {identifier: id, range: selection, text, forceMoveMarkers: true};
+            editor.executeEdits(src, [op]);
         }
     };
 

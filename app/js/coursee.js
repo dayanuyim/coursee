@@ -1,5 +1,6 @@
 import { fireOnlyIfSingleClick } from '../dom-utils';
 import Cookies from 'js-cookie';
+import GpxParser from 'gpxparser';
 
 window.toggleMap = function(target){
     const url = "https://dayanuyim.github.io/maps/";  //TODO: get url by mapid
@@ -113,7 +114,7 @@ function resetBoundary()
 
 window.setEditorVim = (target) => {
     const enabled = target.classList.toggle('switch-on');
-    _setEditorVim(enabled);
+    _editor.setVimMode(enabled);
     Cookies.set("coursee-editor-vim", enabled, {sameSite: 'strict'});
 }
 
@@ -140,4 +141,79 @@ window.showModal = function(id){
                 modal.classList.add("hide");
         }
     }
+}
+
+window.importWpts = function(){
+    openFile(text => {
+        const gpx = new GpxParser();
+        gpx.parse(text);
+        const md = wpts2markdown(gpx.waypoints);
+        _editor.insertText(md);
+    },  ".gpx");
+}
+
+function wpts2markdown(wpts){
+    const pad = n => n.toString().padStart(2, '0');
+
+    let md = '';
+    let last_time;
+    wpts.sort((w1, w2) => w1.time - w2.time);
+    wpts.forEach(w => {
+        //table header
+        if(!onTheSameDate(last_time, w.time)){
+            const date = [w.time.getFullYear(), pad(w.time.getMonth()+1), pad(w.time.getDate())].join('-');
+            if(md) md += "\n";
+            md += `### ${date}\n\n`;
+            md += "| Time      | Desc\n";
+            md += "| :-------- | :------------------------------------------------------\n";
+        }
+        //wpt time -> name
+        const hhmm = pad(w.time.getHours()) + pad(w.time.getMinutes());
+        md += `| ${hhmm}      | ${w.name}\n`;
+
+        last_time = w.time;
+    });
+    return md;
+}
+
+function onTheSameDate(date1, date2){
+    return date1 && date2 &&
+           date1.getFullYear() == date2.getFullYear() &&
+           date1.getMonth() == date2.getMonth() &&
+           date1.getDate() == date2.getDate();
+}
+
+function openFile(callBack, acceptType){
+    let element = document.createElement('input');
+    //element.setAttribute('id', "btnOpenFile");
+    element.setAttribute('type', "file");
+    element.setAttribute('accept', acceptType);
+    element.onchange = function(){
+        readText(this, callBack);
+        document.body.removeChild(this);
+    }
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+}
+
+function readText(filePath, callBack) {
+    //check file object
+    if(!filePath.files || !filePath.files[0])
+        return false;
+    let file = filePath.files[0];
+
+    //check read support
+    if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
+        alert('The File APIs are not fully supported by your browser. Fallback required.');
+        return false;
+    }
+
+    let reader = new FileReader();
+    reader.onload = function (e) {
+        let text = e.target.result;
+        callBack(text);
+    };
+    reader.readAsText(file);
+    return true;
 }

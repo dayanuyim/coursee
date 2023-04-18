@@ -185,13 +185,15 @@ export const trek = Handlebars.compile(`
     <div id="container">
 
         <div id="toolbar">
+            <button class="btn-push" id="toolbar-main" title="回主目錄"><a href="#main"><img src="/favicon.png" width="16px"></a></button>
             <span class="btn-group">
-               <button class="switch" id="toolbar-edit" onclick="selectMode('edit')" title="編輯模式"><i class="fa-solid fa-pen-to-square"></i></button><!--
-            --><button class="switch" id="toolbar-both" onclick="selectMode('both')" title="並排模式"><i class="fa-solid fa-table-columns"></i></button><!--
-            --><button class="switch" id="toolbar-view" onclick="selectMode('view')" title="瀏覽模式"><i class="fa-solid fa-eye"></i></button>
+               <button class="btn-switch" id="toolbar-edit" onclick="selectMode('edit')" title="編輯模式"><i class="fa-solid fa-pen-to-square"></i></button><!--
+            --><button class="btn-switch" id="toolbar-both" onclick="selectMode('both')" title="並排模式"><i class="fa-solid fa-table-columns"></i></button><!--
+            --><button class="btn-switch" id="toolbar-view" onclick="selectMode('view')" title="瀏覽模式"><i class="fa-solid fa-eye"></i></button>
             </span>
-            <button class="push" id="toolbar-tip" onclick="showModal('tip')"><i class="fa fa-regular fa-circle-question"></i></button>
-            <button class="switch" id="toolbar-sync" onclick="setSyncScroll(this)" title="同步捲動"><i class="fa-solid fa-link-slash"></i></span></button>
+            <button class="btn-push" id="toolbar-tip" onclick="showModal('tip')" title="語法提示"><i class="fa-solid fa-circle-question"></i></button>
+            <button class="btn-push" id="toolbar-import-wpts" onclick="importWpts()" title="匯入航點"><i class="fa-solid fa-location-dot"></i><i class="fa-solid fa-pen"></i></button>
+            <button class="btn-switch" id="toolbar-sync" onclick="setSyncScroll(this)" title="同步捲動"><i class="fa-solid fa-link-slash"></i></span></button>
         </div>
 
         <div id="tip" class="modal hide">

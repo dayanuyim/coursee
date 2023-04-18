@@ -1,12 +1,12 @@
-button.switch { color: #808080; }
-button.switch:hover{ color: #A0A0A0;}
-button.switch.switch-on{ color: #000000; }
-button.switch.switch-on:hover{ color: #404040; }
-button.switch:not(:disabled):hover{ cursor: pointer;}
+.btn-switch { color: #808080; }
+.btn-switch:hover{ color: #A0A0A0; cursor: pointer;}
+.btn-switch.switch-on{ color: #000000; }
+.btn-switch.switch-on:hover{ color: #404040; }
+.btn-switch:not(:disabled):hover{ cursor: pointer;}
 
-button.push{ color: #000000; }
-button.push:hover{ color: #404040; }
-button.push:not(:disabled):hover{ cursor: pointer;}
+.btn-push{ color: #000000; }
+.btn-push:hover{ color: #404040; cursor: pointer;}
+.btn-push:not(:disabled):hover{ cursor: pointer;}
 
 /*----------------------------------------------------------------*/
 
@@ -628,6 +628,20 @@ pre code {
     font-size: 16px;
     background: transparent;
     border-width: 0;
+}
+
+#toolbar-main {
+    transform: translateY(2px);
+}
+
+#toolbar-tip svg {
+    color: seagreen
+}
+#toolbar-import-wpts svg{
+    color: darkred;
+}
+#toolbar-import-wpts svg.fa-pen{
+    transform: scale(0.5) translate(-16px, 8px);
 }
 
 #toolbar-sync {
