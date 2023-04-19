@@ -619,7 +619,19 @@ pre code {
 /********************* Coursee Layout ************************/
 #toolbar{
     position: fixed;
+    width: 100vw;
     z-index: 9;
+}
+
+#toolbar .toolbar-right {
+    float: right;
+    padding-right: 1em;
+}
+
+#toolbar .toolbar-center {
+    position: absolute;
+    top: 0;
+    left: calc(50vw - .5em);
 }
 
 #toolbar button{
@@ -634,20 +646,25 @@ pre code {
     transform: translateY(2px);
 }
 
-#toolbar-tip svg {
-    color: seagreen
+#toolbar .btn-group button {
+    background: #f8f8f0;
+    padding: 2px 6px;
+    border: solid #d0d0d0 1px;
 }
-#toolbar-import-wpts svg{
-    color: darkred;
+#toolbar .btn-group button:first-child {
+    border-width: 1px 0 1px 1px;
 }
-#toolbar-import-wpts svg.fa-pen{
-    transform: scale(0.5) translate(-16px, 8px);
+#toolbar .btn-group button:last-child {
+    border-width: 1px 1px 1px 0;
 }
 
-#toolbar-sync {
-    position: absolute;
-    top: 0;
-    left: calc(50vw - .5em);
+#toolbar-tip svg { color: #004000; }
+#toolbar-tip svg:hover { color: #206020; }
+
+#toolbar-import-wpts svg{ color: #600000; }
+#toolbar-import-wpts svg:hover{ color: #802020; }
+#toolbar-import-wpts svg.fa-pen{
+    transform: scale(0.5) translate(-16px, 8px);
 }
 
 /* ----------------- Tip Modal --------------------*/
@@ -714,7 +731,7 @@ pre code {
 
 #container #editor-content {
     position: fixed;
-    top: 25px;
+    top: 29px;
     left: 0;
     width: calc(100vw);
     height: calc(100vh - 45px);
@@ -723,7 +740,7 @@ pre code {
 #container #editor-status {
     position: fixed;
     box-sizing: border-box;
-    top: calc(100vh - 45px + 25px);
+    top: calc(100vh - 45px + 29px);
     left: 0;
     width: 100vw;
     padding-left: 1em;
@@ -736,7 +753,7 @@ pre code {
 
 #container #editor-settings {
     position: fixed;
-    top: calc(100vh - 45px + 25px);
+    top: calc(100vh - 45px + 29px);
     left: 0;
     width: 1em;
 }
@@ -760,7 +777,7 @@ pre code {
 
 #container #viewer{
     position: fixed;
-    margin-top: 25px;
+    margin-top: 29px;
     height: 100vh;
 }
 #container #viewer-content {
