@@ -36,17 +36,6 @@ Handlebars.registerHelper('timeStr', function(time) {
     return time.format();
 });
 
-Handlebars.registerHelper('eachYear', function(obj, options) {
-    return Object.keys(obj)
-        .sort((a, b) => {
-            const x = isNaN(+a)? 2100: +a;     //not number -> plan for future, like 2100
-            const y = isNaN(+b)? 2100: +b;
-            //return y - x;  //revert
-            return x - y;
-        })
-        .reduce((acc, key) => acc + options.fn({year: key, courses: obj[key]}), "");
-});
-
 export const main = Handlebars.compile(`
     <!--
     <nav><ul>
@@ -56,7 +45,7 @@ export const main = Handlebars.compile(`
 
     <section id="index"><a name="index"></a>
 
-    {{#eachYear this}}
+    {{#each this}}
     <h4>{{year}}</h4>
     <ul>
         {{#each courses}}
@@ -69,7 +58,7 @@ export const main = Handlebars.compile(`
         </li>
         {{/each}}
     </ul>
-    {{/eachYear}}
+    {{/each}}
 
     </section>
 

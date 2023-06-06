@@ -31,8 +31,9 @@ function getParam(s){
 
 async function showIndex()
 {
-    //const treks = utils.groupItems(require('./data.json'), trek => trek.date.slice(0, 4)); //group by years
-    //document.body.innerHTML = templates.main({treks});
+    const asc = false;
+    const order = (v: number) => asc? v: -v;
+    const {isNumber, groupItems, dictToArray} = utils;
 
     try{
         //fetch
@@ -41,8 +42,17 @@ async function showIndex()
         if(!resp.ok)
             throw new Error(`data.json not found`);
 
-        const json = await resp.json();
-        const data = utils.groupItems(json, course => course.date.slice(0, 4)); //group by years
+        const courses = await resp.json();
+        courses.sort(({date:d1}, {date:d2}) => order(d1.localeCompare(d2)));
+
+        let data = groupItems(courses, c => c.date.slice(0, 4)); //group by years
+        data = dictToArray(data, 'year', 'courses');
+        data.sort(({ year: y1 }, { year: y2 }) => {
+            if (isNumber(y1) && !isNumber(y2)) return -1;
+            if (!isNumber(y1) && isNumber(y2)) return 1;
+            return order(y1.localeCompare(y2));   //sort only if year is number
+        });
+
         document.body.innerHTML = templates.main(data);
     }
     catch(err){

@@ -1,4 +1,12 @@
 
+export function isNumber(n)
+{
+    return (typeof(n) === 'number' ||
+            n instanceof Number ||
+            (typeof(n) === 'string' && !isNaN(n))) &&
+        isFinite(n);
+}
+
 export function groupItems(arr, getKeyFun)
 {
     const group = {};
@@ -9,6 +17,18 @@ export function groupItems(arr, getKeyFun)
         group[key].push(item);
     });
     return group;
+}
+
+export function dictToArray(dict, key_name, val_name)
+{
+    const arr = [];
+    for(const [key, val] of Object.entries(dict)){
+        arr.push({
+            [key_name]: key,
+            [val_name]: val,
+        });
+    }
+    return arr;
 }
 
 export function joinpath(...paths){

@@ -121,6 +121,10 @@ mark {
     background-color:#ffff84;
 }
 
+pre code {
+    display: block;
+}
+
 code {
     padding: 2px;
     margin: 0;
