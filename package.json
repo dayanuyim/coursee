@@ -5,7 +5,7 @@
   "description": "Markdown Playground for Hiking Courses",
   "scripts": {
     "build": "webpack",
-    "start": "nodemon --ignore './sessions' server.js",
+    "start": "nodemon server.js",
     "test": "mocha --watch --reporter min"
   },
   "devDependencies": {

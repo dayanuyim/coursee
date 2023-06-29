@@ -37,10 +37,9 @@ async function showIndex()
 
     try{
         //fetch
-        //const resp = await fetch('./data.json');
         const resp = await fetch('/api/list');
         if(!resp.ok)
-            throw new Error(`data.json not found`);
+            throw new Error(`fail to fetch the list`);
 
         const courses = await resp.json();
         courses.sort(({date:d1}, {date:d2}) => order(d1.localeCompare(d2)));
