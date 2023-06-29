@@ -49,6 +49,7 @@ Markdown Viewer for Hiking Context
 ### Time Extension
 
 > Time string surronding with `` ` ``, for example, `` `0630` ``, acceptable formats:
+
 | Format     | Example    | Cond  |
 | :--------- | :--------- | :---: |
 | HHMM       | 0630       | &#96; |
@@ -63,11 +64,6 @@ The weather name surronding with `{}`, acceptable names are `晴`, `風`, `陰`,
 ### Legend-Arrow Extension
 
 Show the legend-arrow `-(LEGEND)->` in proper way.
-
-### Vehicle Extension (in `交通資訊` section)
-
-~~Anything surronding with `{}` will be highlighted, for example, `{台灣好行6732(東埔-水里)}`.~~
-Deprecated. Replaced by Mark tag.
 
 ### Map Extension (in `地圖` section)
 
