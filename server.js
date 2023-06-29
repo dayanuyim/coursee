@@ -21,9 +21,9 @@ const NODE_ENV = nconf.get('NODE_ENV');
 const isDev = NODE_ENV === 'development';
 console.log(`NODE_ENV ${NODE_ENV}`);
 
-const serviceUrl = new URL(nconf.get('serviceUrl'));
-const isHttps = serviceUrl.protocol === 'https:';
-const servicePort = serviceUrl.port || (isHttps? 8443 : 8080);
+const service = new URL(nconf.get('serviceUrl'));
+const isHttps = service.protocol === 'https:';
+const servicePort = service.port || (isHttps? 8443 : 8080);
 
 // Express =============================
 const logFormatter = () => {
@@ -140,10 +140,8 @@ if(isHttps){
     cert: fs.readFileSync(nconf.get('security:cert'))
   };
   https.createServer(httpsOptions, app)
-      .listen(servicePort, () => console.log(`Security Server on ${serviceUrl}:${servicePort}`));
+      .listen(servicePort, service.host, () => console.log(`Security Server on ${service}:${servicePort}`));
 }
 else{
-  app.listen(servicePort, () => console.log(`Server on ${serviceUrl}:${servicePort}`));
+  app.listen(servicePort, service.host, () => console.log(`Server on ${service}:${servicePort}`));
 }
-
-
