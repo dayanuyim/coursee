@@ -310,19 +310,17 @@ const _sync_scroll_context = {
     is_enabled: false,
     viewer: {
         top_line: 1,
-        curr_line: 1,
         scrollToLine: undefined,
+        //line_elems: undefined,
     },
     editor: {
         top_line: 1,
-        curr_line: 1,
         scrollToLine: undefined,
     },
 }
 
 function initViewer(fpath, text)
 {
-    let line_elems = [];
     const viewer = document.getElementById("viewer-content");
 
     setViewer = (txt) => {
@@ -331,8 +329,8 @@ function initViewer(fpath, text)
             dir: path.dirname(fpath),
             nav_collapse: str2bool(Cookies.get('coursee-nav-collapse'), false),
         }));
-        line_elems = Array.from(document.querySelectorAll('[data-source-line]'))
-                                .sort((e1, e2) => e1.dataset.sourceLine - e2.dataset.sourceLine);
+        //_sync_scroll_context.viewer.line_elems = Array.from(viewer.querySelectorAll('[data-source-line]'))
+        //                        .sort((e1, e2) => e1.dataset.sourceLine - e2.dataset.sourceLine);
                                 //.filter((e, idx, arr) => !(idx > 0 && e.dataset.sourceLine == arr[idx-1].dataset.sourceLine));  // to unique
                                 // ^filter^ is not mandatory; also, more elements with source-line info, even the same line number, improves scroll granularity
     }
@@ -341,13 +339,14 @@ function initViewer(fpath, text)
 
     //sync croll =======
     viewer.addEventListener("scroll", () => {
-        updateScrollStatus('viewer', getTopVisibleLine(viewer, line_elems));
+        updateScrollStatus('viewer', getTopVisibleLine(viewer));
     });
     viewer.addEventListener('focus', () => { _focus_elem = 'viewer'; });
     viewer.addEventListener('mouseover', () => { _focus_elem = 'viewer'; });
 
     _sync_scroll_context.viewer.scrollToLine = (num) => {
-        const el = line_elems.find(e => e.dataset.sourceLine == num)
+        //const el = _sync_scroll_context.viewer.line_elems.find(e => e.dataset.sourceLine == num)
+        const el = viewer.querySelector(`[data-source-line="${num}"]`);
         if(!el) return;
         el.scrollIntoView({
             behavior: "auto",
@@ -375,26 +374,32 @@ function initViewer(fpath, text)
 
 //TODO: more efficient way to do this?
 //  e.g. search from the last top line elment, instead from begining.
-function getTopVisibleLine(viewer, line_elems) {
-    /*
-    const is_overlay = (rect, rect2) => rect2.bottom > rect.top && rect2.top < rect.bottom;
+function getTopVisibleLine(viewer) {
     const rect_v = viewer.getBoundingClientRect();
-    for(const el of line_elems)
-        if(is_overlay(rect_v, el.getBoundingClientRect())) //visible in the viewer
-            return el.dataset.sourceLine;
-    return 0;
-    */
-    const rect_v = viewer.getBoundingClientRect();
-
     const distance = (el) =>{
         const rect = el.getBoundingClientRect();
-        if(rect.bottom > rect_v.top && rect.top < rect_v.bottom)   //visible?
-            return Math.min(Math.abs(rect.top - rect_v.top), Math.abs(rect.bottom - rect_v.top));
-        return Infinity;
+        if(rect.bottom <= rect_v.top || rect.top >= rect_v.bottom)  //not visible
+            return Infinity;
+        return 10000 * (rect.top < rect_v.top? 0: 1) +   // prefer the element cross the top
+               Math.min(Math.abs(rect.top - rect_v.top), Math.abs(rect.bottom - rect_v.top));
     }
 
-    const idx = indexOfMin(line_elems.map(distance), true); //the last elements which has smallest distance
+    /*
+    const line_elems = _sync_scroll_context.viewer.line_elems;
+    const idx = indexOfMin(line_elems.map(distance), true);
     return idx < 0? 0: line_elems[idx].dataset.sourceLine;
+
+    */
+    let min = Infinity;
+    let elem = null;
+    viewer.querySelectorAll('[data-source-line]').forEach(el => {
+        const v = distance(el);
+        if(v <= min) {         //if multiple elements with the min distance, choose the last one
+            min = v;
+            elem = el;
+        }
+    });
+    return elem? elem.dataset.sourceLine : 0;
 }
 
 
@@ -444,6 +449,7 @@ function initEditor(fpath, text)
         _editor_content_changed = true;
         const text = editor.getValue();
         setViewer(text);   //refresh viewer
+        syncTargetScroll();  //try to put the viewer in the fixed position
         uploadFile(fpath, text, AUTO_SAVE_DELAY);
     });
 
@@ -507,7 +513,7 @@ function syncTargetScroll(){
     if(!_sync_scroll_context.is_enabled) return;
     const lineno = _sync_scroll_context[_focus_elem].top_line;
     const target = (_focus_elem == 'viewer')? 'editor': 'viewer';
-    //console.log(`${_focus_elem}: scroll ${target} to line: ${lineno}`);
+    //console.log(`${_focus_elem}: scroll ${target} from ${_sync_scroll_context[target].top_line} to line: ${lineno}`);
     _sync_scroll_context[target].scrollToLine(lineno);
 }
 

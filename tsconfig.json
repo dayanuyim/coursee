@@ -3,12 +3,13 @@
         "outDir": "./dist/",
         "sourceMap": true,
         "module": "CommonJS",
-        "target": "ES5",
+        "esModuleInterop": true,
+        "target": "ES6",
         "lib": [
             "DOM",
-            "ES2015.Promise",
-            "ES5"
+            "ES2019"
         ],
+        "downlevelIteration": true,
         "allowJs": true,
         "alwaysStrict": true
     }
