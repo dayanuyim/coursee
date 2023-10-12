@@ -105,11 +105,17 @@ th, td{
 figure {
     display: inline-block;
     margin: 8px;
+    padding: 4px;
+    background-color: #f8f8f8;
+    border-radius: 4px;
+}
+figure img{
+    border-radius: 4px;
 }
 figure figcaption {
     /*font-size: larger;*/
     font-style: italic;
-    color:dimgray;
+    color: #202020;
     text-align: center;
 }
 figure figcaption::before { content: "<" }
@@ -323,7 +329,7 @@ nav,.nav {
     padding: 4px;
     font-size: 14px;
 }
-  
+
   section{
     margin: 1em 0;
     padding:1em;
@@ -340,7 +346,7 @@ nav,.nav {
       left: -0.5em;
       top: 1.5em;
   }
-  
+
   .sec-toggle::after{
       content: '▼';
   }
@@ -351,7 +357,7 @@ nav,.nav {
   .sec-toggle.collapse+h2~*{
     display:none;
   }
-  
+
   /*
   section{
     padding:1em;
@@ -377,20 +383,20 @@ nav,.nav {
     border-radius: 4px;
   */
   }
-  
+
   h1 datetime{
       font-size: 0.7em;
       margin-left: 1em;
   }
-  
+
   h2{
       margin-top: 0px;
   }
-  
+
   .lines > span{
     display: block;
   }
-  
+
   .tag{
       color: white;
       background: dimgray;
@@ -401,11 +407,11 @@ nav,.nav {
       display: inline-block;
       /* min-width: 4em;*/
   }
-  
+
   .join > :not(:last-child)::after {
     content: ' | '
   }
-  
+
   ul.join,
   ul.join > li {
     display: inline;
