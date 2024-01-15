@@ -396,11 +396,12 @@ function _fixLocalPath(url){
     if(!_opt || !_opt.host || !_opt.dir)
         return url;
 
-    if(!url.startsWith(_opt.host))
-        return url;
+    if(url.startsWith(_opt.host))
+        url = url.substring(_opt.host.length);  // to relative path
 
-    const relpath = url.substring(_opt.host.length);
-    return joinpath(_opt.host, _opt.dir, relpath);
+    return url.startsWith("http")?
+        url:
+        joinpath(_opt.host, _opt.dir, url);
 }
 
 /*
