@@ -1,22 +1,24 @@
 @font-face {
-    /*仿宋*/
-    font-family: 'cwTeXFangSong';
+    font-family: 'Noto Sans Mono TC';
     font-style: normal;
-    font-weight: 500;
-    src: url(//fonts.gstatic.com/ea/cwtexfangsong/v3/cwTeXFangSong-zhonly.eot);
-    src: url(//fonts.gstatic.com/ea/cwtexfangsong/v3/cwTeXFangSong-zhonly.eot?#iefix) format('embedded-opentype'),
-    url(//fonts.gstatic.com/ea/cwtexfangsong/v3/cwTeXFangSong-zhonly.woff2) format('woff2'),
-    url(//fonts.gstatic.com/ea/cwtexfangsong/v3/cwTeXFangSong-zhonly.woff) format('woff'),
-    url(//fonts.gstatic.com/ea/cwtexfangsong/v3/cwTeXFangSong-zhonly.ttf) format('truetype');
+    font-weight: 400;
+    src: url(https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/Mono/NotoSansMonoCJKtc-Regular.otf) format('opentype');
+    font-display: fallback;
 }
+
+/*
+@font-face {
+    font-family: 'Noto Sans Mono TC';
+    font-style: normal;
+    font-weight: 700;
+    src: url(https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/Mono/NotoSansMonoCJKtc-Bold.otf) format('opentype');
+    font-display: fallback;
+}
+*/
 
 body{
     /*font-family: Open Sans;*/
     font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
-    /*
-    color:silver;
-    background-color:#202020;
-    */
     padding: 1em;
     background: lightyellow;
 }
