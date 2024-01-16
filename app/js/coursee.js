@@ -1,6 +1,6 @@
 import { fireOnlyIfSingleClick } from '../dom-utils';
 import Cookies from 'js-cookie';
-import GpxParser from 'gpxparser';
+const {XMLParser} = require('fast-xml-parser');
 
 window.toggleMap = function(target){
     const url = "https://dayanuyim.github.io/maps/";  //TODO: get url by mapid
@@ -145,9 +145,9 @@ window.showModal = function(id){
 
 window.importWpts = function(){
     openFile(text => {
-        const gpx = new GpxParser();
-        gpx.parse(text);
-        const md = wpts2markdown(gpx.waypoints);
+        const parser = new XMLParser();
+        const xml = parser.parse(text);
+        const md = wpts2markdown(xml.gpx.wpt);
         _editor.insertText(md);
     },  ".gpx");
 }
@@ -159,19 +159,22 @@ function wpts2markdown(wpts){
     let last_time;
     wpts.sort((w1, w2) => w1.time - w2.time);
     wpts.forEach(w => {
-        //table header
-        if(!onTheSameDate(last_time, w.time)){
-            const date = [w.time.getFullYear(), pad(w.time.getMonth()+1), pad(w.time.getDate())].join('-');
+        const time = new Date(w.time);
+
+        // table header
+        if(!onTheSameDate(last_time, time)){
+            const date = [time.getFullYear(), pad(time.getMonth()+1), pad(time.getDate())].join('-');
             if(md) md += "\n";
             md += `### ${date}\n\n`;
             md += "| Time      | Desc\n";
             md += "| :-------- | :------------------------------------------------------\n";
         }
-        //wpt time -> name
-        const hhmm = pad(w.time.getHours()) + pad(w.time.getMinutes());
+
+        // table row: wpt time -> name
+        const hhmm = pad(time.getHours()) + pad(time.getMinutes());
         md += `| ${hhmm}      | ${w.name}\n`;
 
-        last_time = w.time;
+        last_time = time;
     });
     return md;
 }
