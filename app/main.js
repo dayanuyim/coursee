@@ -439,7 +439,7 @@ function initEditor(fpath, text)
         },
         theme: "vs-dark",
         fontSize: 15,
-        fontFamily: '等距更紗黑體 TC,Noto Sans Mono CJK TC,Noto Sans Mono TC,monospace',
+        fontFamily: '等距更紗黑體 TC,SarasaMonoTC,NotoSansMonoTC,monospace',
         scrollBeyondLastLine: false,
         automaticLayout: true,
         //wordWrap: 'wordWrapColumn',

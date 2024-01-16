@@ -1,17 +1,17 @@
 @font-face {
-    font-family: 'Noto Sans Mono TC';
+    font-family: 'SarasaMonoTC';
     font-style: normal;
     font-weight: 400;
-    src: url(https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/Mono/NotoSansMonoCJKtc-Regular.otf) format('opentype');
+    src: url(https://raw.githubusercontent.com/dayanuyim/fonts/main/SarasaMonoTC-Regular.ttf) format('truetype');
     font-display: fallback;
 }
 
 /*
 @font-face {
-    font-family: 'Noto Sans Mono TC';
+    font-family: 'NotoSansMonoTC';
     font-style: normal;
-    font-weight: 700;
-    src: url(https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/Mono/NotoSansMonoCJKtc-Bold.otf) format('opentype');
+    font-weight: 400;
+    src: url(https://raw.githubusercontent.com/dayanuyim/fonts/main/NotoSansMonoCJKtc-Regular.otf) format('opentype');
     font-display: fallback;
 }
 */
