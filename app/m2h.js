@@ -450,8 +450,17 @@ function extendSvg(el)
 
 function renderMap(html)
 {
-    return html.replace(/{map:(.*?)}/g, (orig, mapid) => {
-        if(mapid == 'trekkr') return templates.map_trekkr();
+    //format: {map:<mapid>}
+    //format: {map:<mapid>:<option>}
+    return html.replace(/{map:(.*?)}/g, (orig, desc) => {
+        const idx = desc.indexOf(":");
+        const mapid = (idx >= 0)? desc.substring(0, idx): desc;
+        const option = (idx >= 0)? desc.substring(idx + 1): null;
+
+        if(mapid == 'trekkr'){
+            const gpx = option? _fixLocalPath(option): null;
+            return templates.map_trekkr({gpx});
+        }
         //other maps...
         return orig;
     });

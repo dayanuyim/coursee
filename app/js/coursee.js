@@ -2,8 +2,9 @@ import { fireOnlyIfSingleClick } from '../dom-utils';
 import Cookies from 'js-cookie';
 const {XMLParser} = require('fast-xml-parser');
 
-window.toggleMap = function(target){
-    const url = "https://dayanuyim.github.io/maps/";  //TODO: get url by mapid
+window.toggleMap = function(target, gpx){
+    let url = "https://dayanuyim.github.io/maps/";  //TODO: get url by mapid
+    if(gpx) url += "?gpx=" + gpx;
 
     const mapobj = target.parentNode.querySelector('.mapobj');  //nextElementSibling
     mapobj.classList.toggle('hide');
