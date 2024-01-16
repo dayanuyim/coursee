@@ -6,6 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const express = require('express');
 const expressSession = require('express-session');
+const cors = require('cors');
 
 // config =============================
 nconf
@@ -39,6 +40,7 @@ const logFormatter = () => {
 
 const app = express();
 app.use(logFormatter());
+app.use(cors());
 app.set('json spaces', 2);
 app.get('/api/version', (req, res) => res.status(200).json(pkg.version));
 
