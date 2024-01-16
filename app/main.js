@@ -411,7 +411,7 @@ function tuneBoundary(diff)
 
     tuneWidthL(document.getElementById('editor-content'));
     tuneWidthL(document.getElementById('editor-status'));
-    tuneLeft(document.getElementById('toolbar-sync'));
+    tuneLeft(document.querySelector('.toolbar-center'));
     tuneLeft(document.getElementById('viewer'));
     tuneWidthR(document.getElementById('viewer-content'));
     //document.getElementById('editor-status').style.width = document.getElementById('editor-content').style.width;

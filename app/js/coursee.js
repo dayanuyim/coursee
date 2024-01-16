@@ -106,7 +106,7 @@ function resetBoundary()
 
     resetWidth(document.getElementById('editor-content'));
     resetWidth(document.getElementById('editor-status'));
-    resetLeft(document.getElementById('toolbar-sync'));
+    resetLeft(document.querySelector('.toolbar-center'));
     resetLeft(document.getElementById('viewer'));
     resetWidth(document.getElementById('viewer-content'));
 }
