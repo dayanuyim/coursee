@@ -40,7 +40,9 @@ const logFormatter = () => {
 
 const app = express();
 app.use(logFormatter());
-app.use(cors());
+app.use(cors({
+  origin: "https://dayanuyim.github.io",
+}));
 app.set('json spaces', 2);
 app.get('/api/version', (req, res) => res.status(200).json(pkg.version));
 
