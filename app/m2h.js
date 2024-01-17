@@ -448,21 +448,30 @@ function extendSvg(el)
     });
 }
 
+//format: {map:<mapid>}
+//format: {map:<mapid>:<option>}
 function renderMap(html)
 {
-    //format: {map:<mapid>}
-    //format: {map:<mapid>:<option>}
-    return html.replace(/{map:(.*?)}/g, (orig, desc) => {
-        const idx = desc.indexOf(":");
-        const mapid = (idx >= 0)? desc.substring(0, idx): desc;
-        const option = (idx >= 0)? desc.substring(idx + 1): null;
+    // The regex string is ok, but seems to be too complicated...
+    //    *?    non-greedy matching
+    //    (x)?  group x exists or not
+    //    (:?x) match x, but not save as a captured group
+    //return html.replace(/{map:([^:]*?)(?::(.*?))?}/g, (orig, mapid, option) => {
 
-        if(mapid == 'trekkr'){
-            const gpx = option? _fixLocalPath(option): null;
-            return templates.map_trekkr({gpx});
+    return html.replace(/{map:(.*?)}/g, (orig, desc) => {
+        const idx = desc.indexOf(":");   // split(":", 2) not work
+        const mapid  = (idx >= 0)? desc.substring(0, idx).trim(): desc;
+        const option = (idx >= 0)? desc.substring(idx +1).trim(): null;
+
+        switch(mapid) {
+            case "trekkr":
+                return templates.map_trekkr({
+                    gpx: option? _fixLocalPath(option): null,
+                });
+            //case "others":
+            default:
+                return orig;
         }
-        //other maps...
-        return orig;
     });
 }
 

@@ -152,8 +152,8 @@ Handlebars.registerHelper('tip', function() {
             { dialect: "c", text: "時間 `0630~0700`" },
             { dialect: "c", text: "時間 `5m`" },
             { dialect: "c", text: "高度 *3952*" },
-            { dialect: "c", text: "{晴} {霧} {變}" },
-            { dialect: "c", text: "{map:trekkr}" },
+            { dialect: "c", text: "{變} {晴} {風} {陰} {霧} {雨} {雷} {雪}" },
+            { dialect: "c", text: "{map:trekkr:ref.gpx}" },
         ], [
             { dialect: "b", text: `[連結](${host}/favicon.png "title")` },
             { dialect: "be", text: `![圖片](${host}/favicon.png "title" =16x)` },

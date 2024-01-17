@@ -679,7 +679,7 @@ pre code {
 
 /* ----------------- Tip Modal --------------------*/
 #tip .modal-body {
-    font-size: 12px;
+    font-size: 14px;
 }
 
 #tip .dialect-basic::after { content: "B"; }
