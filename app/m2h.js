@@ -466,7 +466,7 @@ function renderMap(html)
         switch(mapid) {
             case "trekkr":
                 return templates.map_trekkr({
-                    gpx: option? _fixLocalPath(option): null,
+                    data: option? _fixLocalPath(option): null,
                 });
             //case "others":
             default:
