@@ -8,19 +8,39 @@ const express = require('express');
 const expressSession = require('express-session');
 const cors = require('cors');
 
+function tryLoadObject(path){
+    try{
+        return require(path);
+    }
+    catch(e){
+        const {red} = require('colors/safe');
+        console.error(red(`load json file '${path}' error: ${e.message}`));
+        return {};
+    }
+}
+
 // config =============================
 nconf
   .argv()
   .env('__')
-  .defaults({NODE_ENV: 'development'})
-  .add('defaults2', { type: 'literal', store: {
-     conf: path.join(__dirname, `${nconf.get('NODE_ENV')}.config.json`)
-  }})
-  .file(nconf.get('conf'));
+  .defaults({NODE_ENV: 'development'});
+  //.add('defaults2', { type: 'literal', store: {
+     //conf: path.join(__dirname, `${nconf.get('NODE_ENV')}.config.json`)
+  //}})
+  //.file(nconf.get('conf'));
 
-const NODE_ENV = nconf.get('NODE_ENV');
-const isDev = NODE_ENV === 'development';
-console.log(`NODE_ENV ${NODE_ENV}`);
+const node_env = nconf.get('NODE_ENV');
+const is_dev = node_env === 'development';
+console.log(`NODE_ENV ${node_env}`);
+
+// multiple files are not support by nconf, so merge them by myself, be careful priority
+//nconf
+//  .file(path.join(__dirname, `${node_env}.local.config.json`))
+//  .file(path.join(__dirname, `${node_env}.config.json`));
+nconf.defaults({
+    ...tryLoadObject(`./${node_env}.config.json`),
+    ...tryLoadObject(`./${node_env}.local.config.json`),
+});
 
 const service = new URL(nconf.get('serviceUrl'));
 const isHttps = service.protocol === 'https:';
@@ -41,9 +61,10 @@ const logFormatter = () => {
 const app = express();
 app.use(logFormatter());
 app.use(cors({
-  origin: "https://dayanuyim.github.io",
+  origin: nconf.get('cors:origin'),
 }));
 app.set('json spaces', 2);
+
 app.get('/api/version', (req, res) => res.status(200).json(pkg.version));
 
 if(nconf.get('redis')){
@@ -70,7 +91,7 @@ else {
 
 
 // Serve webpack assets.
-if (isDev) {
+if (is_dev) {
   const webpack = require('webpack');
   const webpackMiddleware = require('webpack-dev-middleware');
   const webpackConfig = require('./webpack.config.js');

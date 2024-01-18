@@ -3,6 +3,7 @@ sessions/
 dist/
 app/data
 app/data.json
+*.local.config.json
 
 # Created by https://www.gitignore.io/api/vim,node,linux,macos,windows,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=vim,node,linux,macos,windows,visualstudiocode

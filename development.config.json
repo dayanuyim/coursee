@@ -8,5 +8,10 @@
     "key": "./server.key",
     "cert": "./server.pem"
   },
+  "cors": {
+    "origin": [
+        "https://dayanuyim.github.io"
+    ]
+  },
   "data-path": "app/data"
 }
