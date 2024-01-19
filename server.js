@@ -14,7 +14,7 @@ function tryLoadObject(path){
     }
     catch(e){
         const {red} = require('colors/safe');
-        console.error(red(`load json file '${path}' error: ${e.message}`));
+        console.warn(red(`[WARN] load json file '${path}' error: ${e.message}`));
         return {};
     }
 }
