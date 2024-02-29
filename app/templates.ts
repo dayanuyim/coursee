@@ -281,7 +281,7 @@ export const svgObject2 = Handlebars.compile(`
 export const map_trekkr = Handlebars.compile(`
     <div>
         <button onclick="toggleMap(this,'{{data}}')">線上地圖</button>
-        <a href="https://dayanuyim.github.io/maps/?data={{data}}" target="_blank"><i class="fa-solid fa-up-right-from-square"></i> 新視窗開啟</a>
+        <a class="maplink" href="https://dayanuyim.github.io/maps/?data={{data}}" target="_blank"><i class="fa-solid fa-up-right-from-square"></i> 新視窗開啟</a>
         <!--<embed class="mapobj hide" src="" width="100%" height="600" ></embed>-->
         <object class="mapobj hide" type="text/html" data="" width="100%" height="600">不支援嵌入</object>
     </div>

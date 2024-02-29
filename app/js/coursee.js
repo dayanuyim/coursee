@@ -2,14 +2,13 @@ import { fireOnlyIfSingleClick } from '../dom-utils';
 import Cookies from 'js-cookie';
 const {XMLParser} = require('fast-xml-parser');
 
-window.toggleMap = function(target, gpx){
-    let url = "https://dayanuyim.github.io/maps/";  //TODO: get url by mapid
-    if(gpx) url += "?gpx=" + gpx;
+window.toggleMap = function(target){
+    const maplink = target.parentNode.querySelector('a.maplink');  //anchor sibling
+    const mapobj = target.parentNode.querySelector('object.mapobj');  //objetct sibling
 
-    const mapobj = target.parentNode.querySelector('.mapobj');  //nextElementSibling
     mapobj.classList.toggle('hide');
-    if(mapobj.getAttribute('data') !== url)
-        mapobj.setAttribute('data', url);
+    if(mapobj.getAttribute('data') !== maplink.href)
+        mapobj.setAttribute('data', maplink.href);
     mapobj.focus();
 }
 
