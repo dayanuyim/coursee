@@ -120,22 +120,33 @@ time{
     font-weight: bold;
 } 
 
-.trk-gpx {
+.trk-tools {
     position: absolute;
     left: 70%;
 }
 
-.trk-rec{
+.trk-tools span:not(.active) a{
+    color: gray;
+}
+
+/*
+.trk-gpx {
     position: absolute;
     left: calc(70% + 1.5em);
 }
 
+.trk-rec{
+    position: absolute;
+    left: calc(70% + 3.0em);
+}
+
 .trk-keepon{
     position: absolute;
-    left: calc(70% + 3em);
+    left: calc(70% + 4.5em);
 }
 
 .trk-facebook {
     position: absolute;
-    left: calc(70% + 4.5em);
+    left: calc(70% + 6.0em);
 }
+*/

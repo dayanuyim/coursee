@@ -2,6 +2,10 @@ import * as Handlebars from '../node_modules/handlebars/dist/handlebars.js';
 import { markdownHtml } from './m2h';
 
 
+Handlebars.registerHelper('active', function(v) {
+    return v? 'active': '';
+});
+
 Handlebars.registerHelper('breaklines', function(text) {
     text = Handlebars.Utils.escapeExpression(text);
     text = text.replace(/(\r\n|\n|\r)/gm, '<br>');
@@ -14,12 +18,12 @@ Handlebars.registerHelper('defVal', function (value, defValue) {
     //return new Handlebars.SafeString(out);
 });
 
-Handlebars.registerHelper('fmtName', function ({date, days, title}) {
-    let out = date.replaceAll('-', '');
-    if(title) out += `-${title}`;
-    if(days) out += `-${days}`;
-    return out;
-    //return new Handlebars.SafeString(out);
+Handlebars.registerHelper('dataLink', function({name}, filename) {
+    return filename? `${window.location.origin}/data/${name}/${filename}` : 'javascript:void(0)';
+});
+
+Handlebars.registerHelper('downloadName', function({date, title}, filename) {
+    return filename? `${date.replaceAll('-', '')}-${title}.${filename.split('.').pop()}`: '';
 });
 
 Handlebars.registerHelper('fmtDate', function(date) {
@@ -52,9 +56,12 @@ export const main = Handlebars.compile(`
         <li>
             <time class="trk-date">{{fmtDate date}}</time>
             <span class="trk-days trk-days-{{defVal days 1}}">{{defVal days 1}}</span>
-            <label class="trk-title"><a href="#trek-{{fmtName this}}">{{title}}</a></label>
-            <span class="trk-gpx"><a href="data/{{fmtName this}}/course.gpx"><i class="fa-solid fa-location-dot"></i></a></span>
-            <span class="trk-rec"><a href="data/{{fmtName this}}/course.md"><i class="fa-regular fa-pen-to-square"></i></a></span>
+            <label class="trk-title"><a href="#trek-{{name}}">{{title}}</a></label>
+            <span class="trk-tools">
+                <span class="trk-map {{active gpx}}"><a href="https://dayanuyim.github.io/maps/?data={{dataLink this gpx}}" target="_blank"><i class="fa-solid fa-map-location-dot"></i></a></span>
+                <span class="trk-gpx {{active gpx}}"><a href="{{dataLink this gpx}}" download="{{downloadName this gpx}}"><i class="fa-solid fa-location-dot"></i></a></span>
+                <span class="trk-rec {{active txt}}"><a href="{{dataLink this txt}}" download="{{downloadName this txt}}"><i class="fa-regular fa-pen-to-square"></i></a></span>
+            </span>
         </li>
         {{/each}}
     </ul>

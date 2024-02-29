@@ -107,7 +107,7 @@ if (is_dev) {
 //app.use('/api', require('./lib/theater.js')());
 
 //@name should be the format of 'YYYYMMDD-title[-days]'
-function parseDataName(name){
+function parseCourseName(name){
   //date
   const date = `${name.substring(0, 4)}-${name.substring(4, 6)}-${name.substring(6, 8)}`.toUpperCase();
   if(date.length != 10 || (date != 'YYYY-MM-DD' && !Date.parse(date)))
@@ -128,13 +128,25 @@ function parseDataName(name){
   return { date, days, title };
 }
 
+function parseCourseDir(dir){
+  if(!fs.lstatSync(dir).isDirectory())
+    return null;
+
+  const name = path.basename(dir);
+  const tokens = parseCourseName(name);
+  if(!tokens)
+    return null;
+
+  return Object.assign(tokens, {
+    name,
+    gpx: fs.existsSync(`${dir}/course.gpx`)? 'course.gpx': null,
+    txt: fs.existsSync(`${dir}/course.md`)? 'course.md': null,
+  });
+}
+
 function getDataList(dir){
   return fs.readdirSync(dir)
-    .map(file => {
-      if(!fs.lstatSync(path.join(dir, file)).isDirectory())
-        return null;
-      return parseDataName(file);
-    })
+    .map(file => parseCourseDir(path.join(dir, file)))
     .filter(v => v);
 }
 

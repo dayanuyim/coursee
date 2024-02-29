@@ -42,14 +42,18 @@ async function showIndex()
             throw new Error(`fail to fetch the list`);
 
         const courses = await resp.json();
-        courses.sort(({date:d1}, {date:d2}) => order(d1.localeCompare(d2)));
-
         let data = groupItems(courses, c => c.date.slice(0, 4)); //group by years
         data = dictToArray(data, 'year', 'courses');
+
+        // sort year
         data.sort(({ year: y1 }, { year: y2 }) => {
             if (isNumber(y1) && !isNumber(y2)) return -1;
             if (!isNumber(y1) && isNumber(y2)) return 1;
             return order(y1.localeCompare(y2));   //sort only if year is number
+        });
+        // sort date for each yer
+        data.forEach(({courses}) => {
+            courses.sort(({date:d1}, {date:d2}) => order(d1.localeCompare(d2)));
         });
 
         document.body.innerHTML = templates.main(data);
