@@ -18,12 +18,28 @@ Handlebars.registerHelper('defVal', function (value, defValue) {
     //return new Handlebars.SafeString(out);
 });
 
-Handlebars.registerHelper('dataLink', function({name}, filename) {
-    return filename? `${window.location.origin}/data/${name}/${filename}` : 'javascript:void(0)';
+function dataLink(dirname, filename){
+    return filename? `${window.location.origin}/data/${dirname}/${filename}` : 'javascript:void(0)';
+}
+
+Handlebars.registerHelper('gpxLink', function({name, gpx}) {
+    return dataLink(name, gpx)
 });
 
-Handlebars.registerHelper('downloadName', function({date, title}, filename) {
+Handlebars.registerHelper('txtLink', function({name, txt}) {
+    return dataLink(name, txt)
+});
+
+function dataName(date, title, filename){
     return filename? `${date.replaceAll('-', '')}-${title}.${filename.split('.').pop()}`: '';
+}
+
+Handlebars.registerHelper('gpxName', function({date, title, gpx}) {
+    return dataName(date, title, gpx);
+});
+
+Handlebars.registerHelper('txtName', function({date, title, txt}) {
+    return dataName(date, title, txt);
 });
 
 Handlebars.registerHelper('fmtDate', function(date) {
@@ -58,9 +74,9 @@ export const main = Handlebars.compile(`
             <span class="trk-days trk-days-{{defVal days 1}}">{{defVal days 1}}</span>
             <label class="trk-title"><a href="#trek-{{name}}">{{title}}</a></label>
             <span class="trk-tools">
-                <span class="trk-map {{active gpx}}"><a href="https://dayanuyim.github.io/maps/?data={{dataLink this gpx}}" target="_blank"><i class="fa-solid fa-map-location-dot"></i></a></span>
-                <span class="trk-gpx {{active gpx}}"><a href="{{dataLink this gpx}}" download="{{downloadName this gpx}}"><i class="fa-solid fa-location-dot"></i></a></span>
-                <span class="trk-rec {{active txt}}"><a href="{{dataLink this txt}}" download="{{downloadName this txt}}"><i class="fa-regular fa-pen-to-square"></i></a></span>
+                <span class="trk-map {{active gpx}}"><a {{#if gpx}}href="https://dayanuyim.github.io/maps/?data={{gpxLink this}}&title={{name}}" target="_blank"{{/if}}><i class="fa-solid fa-map-location-dot"></i></a></span>
+                <span class="trk-gpx {{active gpx}}"><a {{#if gpx}}href="{{gpxLink this}}" download="{{gpxName this}}"{{/if}}><i class="fa-solid fa-location-dot"></i></a></span>
+                <span class="trk-rec {{active txt}}"><a {{#if txt}}href="{{txtLink this}}" download="{{txtName this}}"{{/if}}><i class="fa-regular fa-pen-to-square"></i></a></span>
             </span>
         </li>
         {{/each}}

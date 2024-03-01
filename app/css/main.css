@@ -49,8 +49,8 @@ nav + *{
 
 a {
     text-decoration: none;
-    color: #0366d6;
-    /*color:black;*/
+    /*color: #0366d6;*/
+    color:royalblue;
 }
 a:hover {
     text-decoration: underline;
@@ -126,7 +126,7 @@ time{
 }
 
 .trk-tools span:not(.active) a{
-    color: gray;
+    color: darkgray;
 }
 
 /*
