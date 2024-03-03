@@ -236,16 +236,16 @@ function setRecNotFound(recElem, msg)
 }
 
 // TODO @name -> @mdUrl
-export async function loadCourse(name)
+export async function loadCourse({name, txt, gpx})
 {
     if(!name)
         return alert("No such record.");
 
-    const gpxPath = `/data/${name}/course.gpx`;
-    const mdPath = `/data/${name}/course.md`;
+    const txtPath = `/data/${name}/${txt}`;
+    const gpxPath = `/data/${name}/${gpx}`;
 
-    setMarkdownDownload(mdPath);
-    loadMarkdown(mdPath);
+    //setMarkdownDownload(txtPath);
+    loadMarkdown(txtPath);
     /*
     const [ mapHandler, _ ] = await Promise.all([
         loadMap(gpxPath),
@@ -325,8 +325,9 @@ function initViewer(fpath, text)
 
     setViewer = (txt) => {
         innerElement(viewer, markdownElement(txt, {
-            host: path.dirname(window.location.href),
+            host: window.location.origin,
             dir: path.dirname(fpath),
+            course_name: path.basename(path.dirname(fpath)),
             nav_collapse: str2bool(Cookies.get('coursee-nav-collapse'), false),
         }));
         //_sync_scroll_context.viewer.line_elems = Array.from(viewer.querySelectorAll('[data-source-line]'))

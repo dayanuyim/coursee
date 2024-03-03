@@ -15,7 +15,7 @@ async function showView()
 
     if(view === '#main')
         return showIndex();
-    if(view.startsWith("#trek"))
+    if(view.startsWith("#course"))
         return showCourse(getParam(view));
     if(document.getElementById(view.substring(1)))  // normal anchor
         return;
@@ -26,36 +26,20 @@ async function showView()
 
 function getParam(s){
     const i = s.indexOf('-');
-    return  (i < 0)? "": s.substring(i+1);
+    return  (i < 0)? "": decodeURI(s.substring(i+1));
 }
 
+let _courses;
 async function showIndex()
 {
-    const asc = false;
-    const order = (v: number) => asc? v: -v;
-    const {isNumber, groupItems, dictToArray} = utils;
-
     try{
         //fetch
         const resp = await fetch('/api/list');
         if(!resp.ok)
             throw new Error(`fail to fetch the list`);
 
-        const courses = await resp.json();
-        let data = groupItems(courses, c => c.date.slice(0, 4)); //group by years
-        data = dictToArray(data, 'year', 'courses');
-
-        // sort year
-        data.sort(({ year: y1 }, { year: y2 }) => {
-            if (isNumber(y1) && !isNumber(y2)) return -1;
-            if (!isNumber(y1) && isNumber(y2)) return 1;
-            return order(y1.localeCompare(y2));   //sort only if year is number
-        });
-        // sort date for each yer
-        data.forEach(({courses}) => {
-            courses.sort(({date:d1}, {date:d2}) => order(d1.localeCompare(d2)));
-        });
-
+        _courses = await resp.json();
+        const data = groupCoursesByYear(_courses);
         document.body.innerHTML = templates.main(data);
     }
     catch(err){
@@ -63,9 +47,35 @@ async function showIndex()
     }
 }
 
+// [...] => [ {year: yyyy, courses:[...]}...]
+function groupCoursesByYear(courses){
+
+    const asc = false;
+    const order = (v: number) => asc? v: -v;
+    const {isNumber, groupItems, dictToArray} = utils;
+
+    let data = groupItems(courses, c => c.date.slice(0, 4)); //group by years
+    data = dictToArray(data, 'year', 'courses');
+
+    // sort year
+    data.sort(({ year: y1 }, { year: y2 }) => {
+        if (isNumber(y1) && !isNumber(y2)) return -1;
+        if (!isNumber(y1) && isNumber(y2)) return 1;
+        return order(y1.localeCompare(y2));   //sort only if year is number
+    });
+
+    // sort date for each yer
+    data.forEach(({courses}) => {
+        courses.sort(({date:d1}, {date:d2}) => order(d1.localeCompare(d2)));
+    });
+
+    return data;
+}
+
 function showCourse(name){
-    document.body.innerHTML = templates.trek();
-    loadCourse(name);
+    document.body.innerHTML = templates.course();
+    const course = _courses.find(c => c.name === name);
+    loadCourse(course);
 }
          
 (async () => {

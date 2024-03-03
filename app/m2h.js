@@ -396,8 +396,9 @@ function _fixLocalPath(url){
     if(!_opt || !_opt.host || !_opt.dir)
         return url;
 
+    // local url -> relative path
     if(url.startsWith(_opt.host))
-        url = url.substring(_opt.host.length);  // to relative path
+        url = url.substring(_opt.host.length);
 
     return url.startsWith("http")?
         url:
@@ -466,6 +467,7 @@ function renderMap(html)
         switch(mapid) {
             case "trekkr":
                 return templates.map_trekkr({
+                    title: _opt?.course_name,
                     data: option? _fixLocalPath(option): null,
                 });
             //case "others":
