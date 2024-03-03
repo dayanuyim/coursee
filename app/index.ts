@@ -16,7 +16,7 @@ async function showView()
     if(view === '#main')
         return showIndex();
     if(view.startsWith("#course"))
-        return showCourse(getParam(view));
+        return showCourse(getParams(view));
     if(document.getElementById(view.substring(1)))  // normal anchor
         return;
 
@@ -24,9 +24,9 @@ async function showView()
     throw Error(`Unrecognized view: ${view}`);
 }
 
-function getParam(s){
+function getParams(s){
     const i = s.indexOf('-');
-    return  (i < 0)? "": decodeURI(s.substring(i+1));
+    return  (i < 0)? []: decodeURI(s.substring(i+1)).split('-');
 }
 
 let _courses;
@@ -39,6 +39,7 @@ async function showIndex()
             throw new Error(`fail to fetch the list`);
 
         _courses = await resp.json();
+        _courses.forEach((c,i) => c.sn = i+1);
         const data = groupCoursesByYear(_courses);
         document.body.innerHTML = templates.main(data);
     }
@@ -72,10 +73,11 @@ function groupCoursesByYear(courses){
     return data;
 }
 
-function showCourse(name){
+function showCourse(params){
+    const [sn, name] = params;
     document.body.innerHTML = templates.course();
-    const course = _courses.find(c => c.name === name);
-    loadCourse(course);
+    //const course = _courses.find(c => c.name === name);
+    loadCourse(_courses[sn-1]);
 }
          
 (async () => {
