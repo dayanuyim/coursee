@@ -95,11 +95,19 @@ time{
 
 /************ Trk **********************/
 
+li.course {
+    padding: 0 2px;
+    border-radius: 2px;
+}
 li.course:hover {
     background-color: rgba(255, 255, 255, 0.4);
 }
 
-.trk-date{
+/* to vertical align with .trk-title */
+.trk-date,
+.trk-days,
+.trk-tools span {
+    vertical-align: sub;
 }
 
 .trk-days:before{ content:"("; }
