@@ -72,7 +72,7 @@ export const main = Handlebars.compile(`
         <li class="course">
             <time class="trk-date">{{fmtDate date}}</time>
             <span class="trk-days trk-days-{{defVal days 1}}">{{defVal days 1}}</span>
-            <label class="trk-title"><a href="#course-{{sn}}-{{title}}">{{title}}</a></label>
+            <label class="trk-title"><a href="#course-{{name}}">{{title}}</a></label>
             <span class="trk-tools">
                 <span class="trk-map {{active gpx}}"><a {{#if gpx}}href="https://dayanuyim.github.io/maps/?data={{gpxLink this}}&title={{name}}" target="_blank"{{/if}}><i class="fa-solid fa-map-location-dot"></i></a></span>
                 <span class="trk-gpx {{active gpx}}"><a {{#if gpx}}href="{{gpxLink this}}" download="{{gpxName this}}"{{/if}}><i class="fa-solid fa-location-dot"></i></a></span>

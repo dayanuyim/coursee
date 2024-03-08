@@ -15,32 +15,41 @@ async function showView()
 
     if(view === '#main')
         return showIndex();
-    if(view.startsWith("#course"))
-        return showCourse(getParams(view));
-    if(document.getElementById(view.substring(1)))  // normal anchor
-        return;
+    if(view.startsWith("#course-"))
+        return showCourse(getParams(view.substring(8)));
+    if(view.startsWith("#"))
+        return document.getElementById(view.substring(1));  // normal anchor
 
     //console.debug(`Unrecognized view: ${view}`);
     throw Error(`Unrecognized view: ${view}`);
 }
 
+// reutrn:
+//   params[0] is the original string
+//   parans[1..n-1] are tokens split by dash
 function getParams(s){
-    const i = s.indexOf('-');
-    return  (i < 0)? []: decodeURI(s.substring(i+1)).split('-');
+    s = decodeURI(s);
+    const params = s.split('-');
+    params.unshift(s);
+    return params;
 }
 
 let _courses;
-async function showIndex()
-{
-    try{
-        //fetch
+async function getCourses(){
+    if(!_courses){
         const resp = await fetch('/api/list');
         if(!resp.ok)
             throw new Error(`fail to fetch the list`);
-
         _courses = await resp.json();
-        _courses.forEach((c,i) => c.sn = i+1);
-        const data = groupCoursesByYear(_courses);
+    }
+    return _courses;
+}
+
+async function showIndex()
+{
+    try{
+        const courses = await getCourses();
+        const data = groupCoursesByYear(courses);
         document.body.innerHTML = templates.main(data);
     }
     catch(err){
@@ -73,11 +82,14 @@ function groupCoursesByYear(courses){
     return data;
 }
 
-function showCourse(params){
-    const [sn, name] = params;
+async function showCourse(params){
+    const name = params.shift();
+    const courses = await getCourses();
+    const course = courses.find(c => c.name === name);
+    if(!course)
+        throw new Error(`Course '${name}' not found`);
     document.body.innerHTML = templates.course();
-    //const course = _courses.find(c => c.name === name);
-    loadCourse(_courses[sn-1]);
+    loadCourse(course);
 }
          
 (async () => {
