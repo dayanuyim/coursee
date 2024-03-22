@@ -467,7 +467,7 @@ function renderMap(html)
         switch(mapid) {
             case "trekkr":
                 return templates.map_trekkr({
-                    title: _opt?.course_name,
+                    title: _opt?.course_name.split('-')[1],
                     data: option? _fixLocalPath(option): null,
                 });
             //case "others":
