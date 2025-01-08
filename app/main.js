@@ -443,6 +443,7 @@ function initEditor(fpath, text)
         fontFamily: '等距更紗黑體 TC,SarasaMonoTC,NotoSansMonoTC,monospace',
         scrollBeyondLastLine: false,
         automaticLayout: true,
+        unusualLineTerminators: "auto",  //remove without prompt
         //wordWrap: 'wordWrapColumn',
         //wordWrapColumn: 60,
         //wrappingIndent: 'indent',
