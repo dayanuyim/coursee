@@ -496,7 +496,7 @@ function renderTime(html)
         })
         .replace(/([01][0-9])\/([0-3][0-9])\(W\)/g, (orig, m, d) => {   // short date format
             if(_course_date && d >= 1 && d <= 31){
-                const cmp = cmpAdjacentMonth(_course_date.getMonth(), m, 1);
+                const cmp = cmpAdjacentMonth(_course_date.getMonth()+1, m, 1);  // getMonth starts from 0
                 if(cmp <= 1){
                     const y = _course_date.getFullYear() + cmp;
                     const date = new Date(y, m-1, d);  //m is index
