@@ -165,7 +165,7 @@ function addTimeTag(line, date)
         return templates.toTimestamp2(data);
     else if(data.time1)
         return templates.toTimestamp(data);
-    else 
+    else
         return templates.toTimethru(data);
 }
 
@@ -444,6 +444,7 @@ function initEditor(fpath, text)
         scrollBeyondLastLine: false,
         automaticLayout: true,
         unusualLineTerminators: "auto",  //remove without prompt
+        lineNumbers: 'relative',
         //wordWrap: 'wordWrapColumn',
         //wordWrapColumn: 60,
         //wrappingIndent: 'indent',
