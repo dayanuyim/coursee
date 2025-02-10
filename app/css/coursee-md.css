@@ -611,12 +611,12 @@ nav,.nav {
 }
 
 .fa-sun{ color:darkorange; }
-.fa-wind{ color: green; }
+.fa-wind{ color: yellow; }
 .fa-cloud{ color:gray; }
 .fa-cloud-bolt{ color:steelblue; }
 .fa-cloud-rain{ color:dimgray; }
 .fa-cloud-sun-rain{ color:brown; }
-.fa-smog{ color:lightgray; }
+.fa-smog{ color:darkgray; }
 .fa-snowflake{ color:skyblue; }
 
 /* track record */
