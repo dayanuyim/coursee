@@ -2,6 +2,7 @@
 
 import './css/coursee-md.css';
 import './css/editor.css';
+import './css/markdown-it-admonition.css';
 import './js/coursee';
 import {GPXParser} from './loadgpx';
 import * as googleMaps from 'google-maps-api';

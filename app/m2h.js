@@ -2,6 +2,7 @@ import * as templates from './templates';
 import { htmlToElement} from './dom-utils';
 import { joinpath} from './utils';
 import BiMap from 'bidirectional-map';
+//import markdown_it_alert from "markdown-it-alert";
 
 function partition(array, filter) {
     let pass = [], fail = [];
@@ -210,6 +211,9 @@ function mdRenderer(){
     return require('markdown-it')()
         .use(require('./markdown-it-inject-linenumbers'))
         .use(require('markdown-it-mark'))
+        //.use(markdown_it_alert)             // admonition
+        //.use(require('markdown-it-div'))    // admonition
+        .use(require('markdown-it-admon'))  // admonition
         .use(require('markdown-it-ins'))
         .use(require('markdown-it-sup'))
         .use(require('markdown-it-sub'))

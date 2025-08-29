@@ -6,10 +6,8 @@ Handlebars.registerHelper('active', function(v) {
     return v? 'active': '';
 });
 
-Handlebars.registerHelper('breaklines', function(text) {
-    text = Handlebars.Utils.escapeExpression(text);
-    text = text.replace(/(\r\n|\n|\r)/gm, '<br>');
-    return new Handlebars.SafeString(text);
+Handlebars.registerHelper('preformat', function(text) {
+    return new Handlebars.SafeString(`<pre>${text}</pre>`);
 });
 
 Handlebars.registerHelper('defVal', function (value, defValue) {
@@ -122,7 +120,7 @@ export const tip = Handlebars.compile(`
             {{#each this}}
             <tr>
                 <td>{{dialect dialect}}</td>
-                <td>{{breaklines text}}</td>
+                <td>{{preformat text}}</td>
                 <td>{{mdhtml text}}</td>
             </tr>
             {{/each}}
@@ -157,8 +155,8 @@ Handlebars.registerHelper('tip', function() {
             { dialect: "b", text: "1. 有序清單" },
             { dialect: "b", text: "- 無序清單" },
             { dialect: "e", text: "- [x] 待辦事項" },
-        ], [
             { dialect: "b", text: "> 引用" },
+        ], [
             { dialect: "b", text: "*斜體*" },
             { dialect: "b", text: "**粗體**" },
             { dialect: "b", text: "***斜粗體***" },
@@ -168,6 +166,7 @@ Handlebars.registerHelper('tip', function() {
             { dialect: "e", text: "下標 H~2~O" },
             { dialect: "e", text: "++底線/插入++" },
             { dialect: "e", text: "==標記==" },
+            { dialect: "e", text: "!!! info\n    提示框" },
         ], [
             { dialect: "c", text: 'A-(5min)->B'},
             { dialect: "c", text: "日期 2023-01-01" },
@@ -175,7 +174,7 @@ Handlebars.registerHelper('tip', function() {
             { dialect: "c", text: "時間 `0630~0700`" },
             { dialect: "c", text: "時間 `5m`" },
             { dialect: "c", text: "高度 *3952*" },
-            { dialect: "c", text: "{變} {晴} {風} {陰} {霧} {雨} {雷} {雪}" },
+            { dialect: "c", text: "{變} {晴} {風} {陰}\n{霧} {雨} {雷} {雪}" },
             { dialect: "c", text: "{map:trekkr:ref.gpx}" },
         ], [
             { dialect: "b", text: `[連結](${host}/favicon.png "title")` },
