@@ -23,7 +23,7 @@ module.exports = {
   },
   plugins: [
       new HtmlWebpackPlugin({
-          title: "Coursee",
+          title: "HikeMD",
           favicon: 'app/images/favicon.png',
       }),
       new webpack.ProvidePlugin({
