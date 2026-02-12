@@ -166,7 +166,7 @@ Handlebars.registerHelper('tip', function() {
             { dialect: "e", text: "下標 H~2~O" },
             { dialect: "e", text: "++底線/插入++" },
             { dialect: "e", text: "==標記==" },
-            { dialect: "e", text: "!!! info\n    提示框" },
+            { dialect: "e", text: "> [!info] 標題\nCallout" },
         ], [
             { dialect: "c", text: 'A-(5min)->B'},
             { dialect: "c", text: "日期 2023-01-01" },
@@ -176,6 +176,7 @@ Handlebars.registerHelper('tip', function() {
             { dialect: "c", text: "高度 *3952*" },
             { dialect: "c", text: "{變} {晴} {風} {陰}\n{霧} {雨} {雷} {雪}" },
             { dialect: "c", text: "{map:trekkr:ref.gpx}" },
+            { dialect: "e", text: "!!! info\n    Admonitions" },
         ], [
             { dialect: "b", text: `[連結](${host}/favicon.png "title")` },
             { dialect: "be", text: `![圖片](${host}/favicon.png "title" =16x)` },

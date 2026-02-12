@@ -211,9 +211,8 @@ function mdRenderer(){
     return require('markdown-it')()
         .use(require('./markdown-it-inject-linenumbers'))
         .use(require('markdown-it-mark'))
-        //.use(markdown_it_alert)             // admonition
-        //.use(require('markdown-it-div'))    // admonition
         .use(require('markdown-it-admon'))  // admonition
+        .use(require('markdown-it-obsidian-callouts'))
         .use(require('markdown-it-ins'))
         .use(require('markdown-it-sup'))
         .use(require('markdown-it-sub'))
