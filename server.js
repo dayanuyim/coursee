@@ -158,8 +158,16 @@ app.get('/api/list', function(req, res){
 app.use('/data', express.static(nconf.get('data-path')));
 
 // upload file
-app.put('/data/*', express.json(), function(req, res, next){
-  const fpath = path.join(nconf.get('data-path'), req.params[0]);
+app.put('/data/*path', express.json(), function(req, res, next){
+  const subpath = Array.isArray(req.params.path)?
+                    req.params.path.join('/'):
+                    req.params.path;
+
+  const wwwroot = nconf.get('data-path');
+  const fpath = path.join(wwwroot, subpath);
+  if (!fpath.startsWith(wwwroot))
+    return res.status(403).json({done: false, error: 'Forbidden path'});
+
   const text = req.body.text;
   console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
 
