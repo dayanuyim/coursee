@@ -1,6 +1,6 @@
 'use strict';
 
-import './css/coursee-md.css';
+import './css/viewer.css';
 import './css/editor.css';
 import './css/markdown-it-admonition.css';
 import './js/coursee';

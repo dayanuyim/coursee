@@ -2,7 +2,6 @@ import * as templates from './templates';
 import { htmlToElement} from './dom-utils';
 import { joinpath} from './utils';
 import BiMap from 'bidirectional-map';
-//import markdown_it_alert from "markdown-it-alert";
 
 function partition(array, filter) {
     let pass = [], fail = [];

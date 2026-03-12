@@ -1,3 +1,9 @@
+s {
+    color: gray;
+}
+
+/*----------------------------------------------------------------*/
+
 .btn-switch { color: #808080; }
 .btn-switch:hover{ color: #A0A0A0; cursor: pointer;}
 .btn-switch.switch-on{ color: #000000; }
