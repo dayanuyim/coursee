@@ -1,3 +1,51 @@
+@media print {
+    /* hidden non-viwer area */
+    #toolbar, #editor, #viewer-boundary, div.nav {
+        display: none;
+    }
+
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* undo the layout for editor */
+    #viewer {
+        left: 0 !important;
+    }
+    #viewer-content {
+        width: 100vw !important;
+        padding-left: 1em !important;
+    }
+
+    /* fix to show the whole page (not just a A4 size) */
+    /*
+    html, body {
+        position: static !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+    */
+    #container, #viewer, #viewer-content {
+        position: static !important;
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+        transform: none !important;
+    }
+    #viewer, #viewer * {
+        max-height: none !important;
+    }
+
+    /*
+    section {
+        break-inside: avoid;
+        break-after: page;
+    }
+    */
+}
+
+/*----------------------------------------------------------------*/
+
 s {
     color: gray;
 }
