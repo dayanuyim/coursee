@@ -1,0 +1,27 @@
+.ribbon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 120px;
+    overflow: hidden;
+    z-index:900;
+}
+
+.ribbon::before {
+    content: ""; /* 文字可改 */
+    position: absolute;
+    top: 20px;
+    right: -40px;
+
+    width: 160px;
+    padding: 6px 0;
+
+    background: linear-gradient(#d00, #a00,);
+    color: white;
+    text-align: center;
+    font-weight: bold;
+
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    transform: rotate(45deg);
+}

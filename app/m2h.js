@@ -2,6 +2,7 @@ import * as templates from './templates';
 import { htmlToElement} from './dom-utils';
 import { joinpath} from './utils';
 import BiMap from 'bidirectional-map';
+import * as path from 'path';
 
 function partition(array, filter) {
     let pass = [], fail = [];
@@ -288,6 +289,7 @@ export function markdownElement(markdown, opt)
     return el;
 }
 
+
 function extendHeader(el){
     if(!el) return;
     const h1 = el.querySelector('h1');
@@ -395,7 +397,7 @@ function fixLocalPath(el)
 }
 
 function _fixLocalPath(url){
-    if(!_opt || !_opt.host || !_opt.dir)
+    if(!_opt || !_opt.host || !_opt.filepath)
         return url;
 
     // local url -> relative path
@@ -404,7 +406,7 @@ function _fixLocalPath(url){
 
     return url.startsWith("http")?
         url:
-        joinpath(_opt.host, _opt.dir, url);
+        joinpath(_opt.host, path.dirname(_opt.filepath), url);
 }
 
 /*
@@ -469,7 +471,7 @@ function renderMap(html)
         switch(mapid) {
             case "trekkr":
                 return templates.map_trekkr({
-                    title: _opt?.course_name.split('-')[1],
+                    title: _opt?.title,
                     data: option? _fixLocalPath(option): null,
                 });
             //case "others":

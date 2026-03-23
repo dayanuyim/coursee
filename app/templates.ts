@@ -188,14 +188,7 @@ Handlebars.registerHelper('tip', function() {
 });
 
 export const course = Handlebars.compile(`
-    <div id="download" style="display: none">
-    下載:
-    <a id="download-trk"><i class="fa-solid fa-location-dot"></i>航跡</a>&nbsp;
-    <a id="download-rec"><i class="fa-regular fa-pen-to-square"></i>記錄</a>
-    </div>
-
     <div id="container">
-
         <div id="toolbar">
             <span class="toolbar-left">
                 <button class="btn-push" id="toolbar-main" title="回主目錄"><a href="#main"><img src="/favicon.png" width="16px"></a></button>
@@ -206,6 +199,12 @@ export const course = Handlebars.compile(`
                 </span>
                 <button class="btn-push" id="toolbar-tip" onclick="showModal('tip')" title="語法提示"><i class="fa-solid fa-circle-question"></i></button>
                 <button class="btn-push" id="toolbar-import-wpts" onclick="importWpts()" title="匯入航點"><i class="fa-solid fa-location-dot"></i><i class="fa-solid fa-pen"></i></button>
+                <!-- Dup Mode -->
+                <span id="toolbar-dup">
+                    <div class="ribbon toolbar-dup-ribbon"></div>
+                    <button class="btn-switch" id="toolbar-dup-mode" title="副本模式"><i class="fa-solid fa-copy"></i></button><!--
+                 --><button class="btn-push"   id="toolbar-dup-redo" title="副本重匯"><i class="fa-solid fa-file-import"></i></button>
+                </span>
             </span>
             <span class="toolbar-center">
                 <button class="btn-switch" id="toolbar-sync" onclick="setSyncScroll(this)" title="同步捲動"><i class="fa-solid fa-link-slash"></i></span></button>

@@ -3,6 +3,7 @@
 import './css/viewer.css';
 import './css/editor.css';
 import './css/markdown-it-admonition.css';
+import './css/ribbon.css';
 import './js/coursee';
 import {GPXParser} from './loadgpx';
 import * as googleMaps from 'google-maps-api';
@@ -12,7 +13,6 @@ import { innerElement } from './dom-utils';
 import { markdownElement } from './m2h';
 import * as monaco from 'monaco-editor';
 import { initVimMode, VimMode } from 'monaco-vim';
-import * as path from 'path';
 import Cookies from 'js-cookie';
 
 const AUTO_SAVE_DELAY = 5000;  //ms
@@ -197,112 +197,50 @@ function toMoment(date, hh, mm){
     return moment([date.getFullYear(), date.getMonth(), date.getDate(), hh, mm ])
 }
 
-function formatRecTag(txt, date)
+export async function loadCourse(course)
 {
-    const lines = txt.split(/[\r\n]+/);
-    return lines.reduce((acc, line) => acc + addTimeTag(line, date), '');
-}
+    if(!course)
+        return alert("No course specified");
 
-function loadText(elem, fname)
-{
-    fetch(fname, {contentType: "text/plain;charset=UTF-8;"})
-        .then(function(res){
-            res = formatRecTag(res);
-            elem.innerHTML = "<pre>" + res + "</pre>";
-        })
-        .catch(function(err){
-            elem.innerHTML = "Record Not Found";
-        });
-}
+    const indup = location.hash.startsWith('#dup');
+    const {name, txt, dup} = course;
+    const origpath = `/data/${name}/${txt}`;
+    const currpath = indup? `/data/${name}/${dup}`: origpath;
 
-function setRecNotFound(recElem, msg)
-{
-    recElem.innerHTML = msg;
-    document.getElementById('download-rec').hidden = true;
-
-    //adjust rec section
-    document.getElementById("container").style.display = "flex";
-    document.getElementById("container").style["flex-flow"] = "column";
-    document.getElementById("viewer").style.flex = "none";
-
-    //adjust map section
-    const mapElem = document.getElementById("map");
-    mapElem.style.position = "static";
-    mapElem.style.flex = "auto";
-    mapElem.style.width = "100%";
-
-    const map = document.getElementById('map-content');
-    const adjust_height = map.scrollHeight - recElem.scrollHeight - 40;
-    map.style.height = `${adjust_height}px`;
-}
-
-// TODO @name -> @mdUrl
-export async function loadCourse({name, txt, gpx})
-{
-    if(!name)
-        return alert("No such record.");
-
-    const txtPath = `/data/${name}/${txt}`;
-    const gpxPath = `/data/${name}/${gpx}`;
-
-    //setMarkdownDownload(txtPath);
-    loadMarkdown(txtPath);
-    /*
-    const [ mapHandler, _ ] = await Promise.all([
-        loadMap(gpxPath),
-        loadMarkdown(mdPath),
-    ]);
-
-    if(mapHandler)
-        setRecTimestampFocus(mapHandler);
-    */
-}
-
-function setMarkdownDownload(fpath)
-{
-    const el = document.getElementById('download-rec');
-    el.href = fpath;
-    el.download = decodeURI(fpath.split('/')[1]) + ".md";   // data/<name>/course.md
-}
-
-function addPx(px, val){
-    if(!val)
-        return px;
-    px = px? parseInt(px.replace(/px$/, '')): 0;
-    return `${px+val}px`;
-}
-
-let setViewer;
-async function loadMarkdown(fpath)
-{
     try{
         //fetch
-        const resp = await fetch(fpath, {contentType: "text/markdown;charset=UTF-8;"});
+        const resp = await fetch(currpath, {contentType: "text/markdown;charset=UTF-8;"});
         if(!resp.ok)
-            throw new Error(`Markdown '${fpath}' not found`);
+            throw new Error(`Markdown '${currpath}' not found`);
         const text = await resp.text();
 
         //init layout
-        const editor = initEditor(fpath, text);
-        const viewer = initViewer(fpath, text);
-        viewer.focus(); //or, editor.focus();
-
-        //init status
-        const editor_vim = str2bool(Cookies.get('coursee-editor-vim'), false);
-        const sync_scroll = str2bool(Cookies.get('coursee-sync-scroll'), true);
-        let layout_mode = Cookies.get('coursee-layout-mode');
-        if(!['view', 'edit', 'both'].includes(layout_mode))
-            layout_mode = 'both';  //default
-
-        if(sync_scroll)  document.getElementById('toolbar-sync').click();
-        if(editor_vim)   document.getElementById('editor-vim').click();
-        selectMode(layout_mode);
+        initToolbar(indup, origpath);
+        loadMarkdown(name, currpath, text);
     }
     catch(err){
         console.error(err);
-        return setRecNotFound(document.getElementById("viewer-content"), `Load Rec Error: ${err}`);
     }
 }
+
+let setViewer;
+function loadMarkdown(title, fpath, text){
+    const editor = initEditor(title, fpath, text);
+    const viewer = initViewer(title, fpath, text);
+    viewer.focus(); //or, editor.focus();
+
+    //init status
+    const editor_vim = str2bool(Cookies.get('coursee-editor-vim'), false);
+    const sync_scroll = str2bool(Cookies.get('coursee-sync-scroll'), true);
+    let layout_mode = Cookies.get('coursee-layout-mode');
+    if(!['view', 'edit', 'both'].includes(layout_mode))
+        layout_mode = 'both';  //default
+
+    if(sync_scroll) document.getElementById('toolbar-sync').click();
+    if(editor_vim)  document.getElementById('editor-vim').click();
+    selectMode(layout_mode);
+}
+
 
 
 let _focus_elem = 'viewer';  // sync from viewer for the first place
@@ -320,15 +258,15 @@ const _sync_scroll_context = {
     },
 }
 
-function initViewer(fpath, text)
+function initViewer(title, fpath, text)
 {
     const viewer = document.getElementById("viewer-content");
 
     setViewer = (txt) => {
         innerElement(viewer, markdownElement(txt, {
             host: window.location.origin,
-            dir: path.dirname(fpath),
-            course_name: path.basename(path.dirname(fpath)),
+            filepath: fpath,
+            title,
             nav_collapse: str2bool(Cookies.get('coursee-nav-collapse'), false),
         }));
         //_sync_scroll_context.viewer.line_elems = Array.from(viewer.querySelectorAll('[data-source-line]'))
@@ -430,7 +368,45 @@ function uploadFile(fpath, text, ms){
     });
 }
 
-function initEditor(fpath, text)
+function initToolbar(indup, fpath){
+    const dup = document.getElementById('toolbar-dup');
+    const mode_btn = dup.querySelector(`#toolbar-dup-mode`);
+    const redo_btn = dup.querySelector(`#toolbar-dup-redo`);
+
+    // set dup status
+    dup.classList.toggle('indup', indup);
+
+    // init mode button
+    // the event will toggle to enter/quit the dup mole
+    mode_btn.classList.toggle('switch-on', indup);
+    mode_btn.onclick = async () => {
+        const to_dup = !document.getElementById('toolbar-dup').classList.contains('indup'); //to toggle
+        if(to_dup){
+            const resp = await fetch(`/dup${fpath}`);
+            if(!resp.ok && resp.status != 403)    //403: the duplicatd file has existed
+                return console.error(`error (${resp.status})`, await resp.text());
+            window.location.hash = window.location.hash.replace('#course-', '#dup-');
+        }
+        else{
+            window.location.hash = window.location.hash.replace('#dup-', '#course-');
+        }
+    };
+
+    // init redo button
+    // the event must be trigged in the dup mode, not dont change its mode
+    redo_btn.onclick = async () => {
+        const resp = await fetch(`/dup${fpath}?force=1`);
+        if(!resp.ok)
+            return console.error(`error (${resp.status})`, await resp.text());
+        
+        location.reload();
+    }
+}
+
+
+
+
+function initEditor(title, fpath, text)
 {
     //editor
     const editor = monaco.editor.create(document.getElementById('editor-content'), {

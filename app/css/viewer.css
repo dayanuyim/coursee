@@ -790,6 +790,27 @@ pre code {
 }
 */
 
+/* ----------------- Dup Mode --------------------*/
+
+#toolbar-dup:not(.indup) #toolbar-dup-redo,
+#toolbar-dup:not(.indup) .ribbon {
+    display: none;
+}
+
+.ribbon.toolbar-dup-ribbon::before {
+    background: linear-gradient(rgb(221, 151, 0), rgb(170, 116, 0));
+    content: "副本";
+}
+
+#toolbar-dup-mode.switch-on,
+#toolbar-dup-redo
+{ color: rgb(141, 96, 0); }
+
+#toolbar-dup-mode.switch-on:hover,
+#toolbar-dup-redo:hover
+{ color: rgb(170, 116, 0); }
+
+
 /*----------------------------------------------------------------*/
 
 #container{

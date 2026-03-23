@@ -11,12 +11,15 @@ import { loadCourse } from './main';
 
 async function showView()
 {
-    const view = window.location.hash;
+    const to_course_name = (s) => decodeURI(s.substring(s.indexOf('-')+1));
 
+    const view = window.location.hash;
     if(view === '#main')
         return showIndex();
     if(view.startsWith("#course-"))
-        return showCourse(getParams(view.substring(8)));
+        return showCourse(to_course_name(view));
+    if(view.startsWith("#dup-"))
+        return showCourse(to_course_name(view), true);
     if(view.startsWith("#"))
         return document.getElementById(view.substring(1));  // normal anchor
 
@@ -34,14 +37,15 @@ function getParams(s){
     return params;
 }
 
+// Note: not cache courses anymore, a dup may be created in the server side
 let _courses;
 async function getCourses(){
-    if(!_courses){
+    //if(!_courses){
         const resp = await fetch('/api/list');
         if(!resp.ok)
             throw new Error(`fail to fetch the list`);
         _courses = await resp.json();
-    }
+    //}
     return _courses;
 }
 
@@ -82,12 +86,12 @@ function groupCoursesByYear(courses){
     return data;
 }
 
-async function showCourse(params){
-    const name = params.shift();
+async function showCourse(name, dup=false){
     const courses = await getCourses();
     const course = courses.find(c => c.name === name);
     if(!course)
         throw new Error(`Course '${name}' not found`);
+
     document.body.innerHTML = templates.course();
     loadCourse(course);
 }

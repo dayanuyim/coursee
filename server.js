@@ -137,10 +137,13 @@ function parseCourseDir(dir){
   if(!tokens)
     return null;
 
+  const fexist = (fname) => fs.existsSync(`${dir}/${fname}`)? fname: null;
+
   return Object.assign(tokens, {
     name,
-    gpx: fs.existsSync(`${dir}/course.gpx`)? 'course.gpx': null,
-    txt: fs.existsSync(`${dir}/course.md`)? 'course.md': null,
+    gpx: fexist('course.gpx'),
+    txt: fexist('course.md'),
+    dup: fexist('course-dup.md'),
   });
 }
 
@@ -176,6 +179,32 @@ app.put('/data/*path', express.json(), function(req, res, next){
     res.status(200).json({done: true});
   });
 });
+
+// Duplicate a file.
+//   from /a/path/to/file.ext
+//     to /a/path/to/file-dup.ext
+app.get('/dup/data/*path', function(req, res){
+  const force = req.query.force === '1';
+  const subpath = Array.isArray(req.params.path)?
+                    req.params.path.join('/'):
+                    req.params.path;
+  const subpaths = path.parse(subpath);
+
+  const wwwroot = nconf.get('data-path');
+  const srcpath = path.join(wwwroot, subpath);
+  const dstpath = path.join(wwwroot, subpaths.dir, `${subpaths.name}-dup${subpaths.ext}`);
+
+  const mode = force ? 0 : fs.constants.COPYFILE_EXCL;  // overwrite (default): exclusive
+  fs.copyFile(srcpath, dstpath, mode, (err)=>{
+    if(!err)                  return res.status(200).json({done: true});
+    if(err.code === 'EEXIST') return res.status(403).json({done: false, error: 'target file already exists'});
+    if(err.code === 'ENOENT') return res.status(404).json({done: false, error: 'source file not found'});
+    console.error(err);
+    res.status(500).json({done: false, error: 'internal server error'});
+  });
+});
+
+
 
 // Startup Server
 if(isHttps){
