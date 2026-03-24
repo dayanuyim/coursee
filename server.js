@@ -45,6 +45,7 @@ nconf.defaults({
 const service = new URL(nconf.get('serviceUrl'));
 const isHttps = service.protocol === 'https:';
 const servicePort = service.port || (isHttps? 8443 : 8080);
+const wwwroot = nconf.get('data-path').replaceAll(/\/|\\/g, path.sep);  //normalize to platform-specific path
 
 // Express =============================
 const logFormatter = () => {
@@ -153,6 +154,13 @@ function getDataList(dir){
     .filter(v => v);
 }
 
+function getfpath(...paths){
+  const fpath = path.join(wwwroot, ...paths);  // NOTE: join() return a platform-specific string,
+  if (!fpath.startsWith(wwwroot))              //       so wwwroot should be normalized to platform-specific path too.
+    return console.error(`error: file path ${fpath} is out of data path ${wwwroot}`);
+  return fpath
+}
+
 app.get('/api/list', function(req, res){
   res.status(200).json(getDataList(nconf.get('data-path')));
 });
@@ -162,14 +170,13 @@ app.use('/data', express.static(nconf.get('data-path')));
 
 // upload file
 app.put('/data/*path', express.json(), function(req, res, next){
-  const subpath = Array.isArray(req.params.path)?
+  const relpath = Array.isArray(req.params.path)?
                     req.params.path.join('/'):
                     req.params.path;
 
-  const wwwroot = nconf.get('data-path');
-  const fpath = path.join(wwwroot, subpath);
-  if (!fpath.startsWith(wwwroot))
-    return res.status(403).json({done: false, error: 'Forbidden path'});
+  const fpath = getfpath(relpath);
+  if (!fpath)
+    return res.status(400).json({done: false, error: 'bad request path'});
 
   const text = req.body.text;
   console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
@@ -185,14 +192,15 @@ app.put('/data/*path', express.json(), function(req, res, next){
 //     to /a/path/to/file-dup.ext
 app.get('/dup/data/*path', function(req, res){
   const force = req.query.force === '1';
-  const subpath = Array.isArray(req.params.path)?
+  const relpath = Array.isArray(req.params.path)?
                     req.params.path.join('/'):
                     req.params.path;
-  const subpaths = path.parse(subpath);
+  const relpaths = path.parse(relpath);
 
-  const wwwroot = nconf.get('data-path');
-  const srcpath = path.join(wwwroot, subpath);
-  const dstpath = path.join(wwwroot, subpaths.dir, `${subpaths.name}-dup${subpaths.ext}`);
+  const srcpath = getfpath(relpath);
+  const dstpath = getfpath(relpaths.dir, `${relpaths.name}-dup${relpaths.ext}`);
+  if (!srcpath || !dstpath)
+    return res.status(400).json({ done: false, error: 'bad request path' });
 
   const mode = force ? 0 : fs.constants.COPYFILE_EXCL;  // overwrite (default): exclusive
   fs.copyFile(srcpath, dstpath, mode, (err)=>{
