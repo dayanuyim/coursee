@@ -19,7 +19,7 @@ async function showView()
     if(view.startsWith("#course-"))
         return showCourse(to_course_name(view));
     if(view.startsWith("#dup-"))
-        return showCourse(to_course_name(view), true);
+        return showCourse(to_course_name(view));
     if(view.startsWith("#"))
         return document.getElementById(view.substring(1));  // normal anchor
 
@@ -86,7 +86,7 @@ function groupCoursesByYear(courses){
     return data;
 }
 
-async function showCourse(name, dup=false){
+async function showCourse(name){
     const courses = await getCourses();
     const course = courses.find(c => c.name === name);
     if(!course)
