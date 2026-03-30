@@ -61,6 +61,7 @@ const logFormatter = () => {
 
 const app = express();
 app.use(logFormatter());
+app.use(express.json());
 app.use(cors({
   origin: nconf.get('cors:origin'),
 }));
@@ -155,6 +156,7 @@ function getDataList(dir){
 }
 
 function getfpath(...paths){
+  if(!paths || !paths.length) return undefined;
   const fpath = path.join(wwwroot, ...paths);  // NOTE: join() return a platform-specific string,
   if (!fpath.startsWith(wwwroot))              //       so wwwroot should be normalized to platform-specific path too.
     return console.error(`error: file path ${fpath} is out of data path ${wwwroot}`);
@@ -187,10 +189,33 @@ app.put('/data/*path', express.json(), function(req, res, next){
   });
 });
 
+function _handleResult(res, err) {
+  if (!err)
+    return res.status(200).json({ done: true });
+
+  console.error(err);
+  switch (err.code) {
+    case 'ENOSRC':   //customed
+      return res.status(400).json({ done: false, error: 'src not spcified' });
+    case 'ENODST':   //customed
+      return res.status(400).json({ done: false, error: 'dst not spcified' });
+    case 'EACCES':
+    case 'EPERM':
+      return res.status(403).json({ done: false, error: 'access deny' });
+    case 'ENOENT':
+      return res.status(404).json({ done: false, error: 'source file not found' });
+    case 'EEXIST':
+    case 'ERR_FS_CP_EEXIST':
+      return res.status(409).json({ done: false, error: 'target file already exists' });
+    default:
+      return res.status(500).json({ done: false, error: 'internal server error' });
+  }
+}
+
 // Duplicate a file.
 //   from /a/path/to/file.ext
 //     to /a/path/to/file-dup.ext
-app.get('/dup/data/*path', function(req, res){
+app.post('/data/*path/dup', function(req, res){
   const force = req.query.force === '1';
   const relpath = Array.isArray(req.params.path)?
                     req.params.path.join('/'):
@@ -203,15 +228,33 @@ app.get('/dup/data/*path', function(req, res){
     return res.status(400).json({ done: false, error: 'bad request path' });
 
   const mode = force ? 0 : fs.constants.COPYFILE_EXCL;  // overwrite (default): exclusive
-  fs.copyFile(srcpath, dstpath, mode, (err)=>{
-    if(!err)                  return res.status(200).json({done: true});
-    if(err.code === 'EEXIST') return res.status(403).json({done: false, error: 'target file already exists'});
-    if(err.code === 'ENOENT') return res.status(404).json({done: false, error: 'source file not found'});
-    console.error(err);
-    res.status(500).json({done: false, error: 'internal server error'});
-  });
+  fs.copyFile(srcpath, dstpath, mode, (err)=>_handleResult(res, err));
 });
 
+// copy a course
+app.post('/course/:name/copy', function(req, res){
+  const srcpath = getfpath(req.params.name);
+  const dstpath = getfpath(req.body? req.body.name: undefined);
+  if(!srcpath) return _handleResult(res, {code: 'ENOSRC'});
+  if(!dstpath) return _handleResult(res, {code: 'ENODST'});
+
+  fs.cp(srcpath, dstpath, {
+    recursive: true,
+    errorOnExist: true,
+    force: false
+  }, (err) => _handleResult(res, err));
+});
+
+// rename a course
+app.patch('/course/:name/rename', function(req, res){
+  const srcpath = getfpath(req.params.name);
+  const dstpath = getfpath(req.body? req.body.name: undefined);
+  if(!srcpath) return _handleResult(res, {code: 'ENOSRC'});
+  if(!dstpath) return _handleResult(res, {code: 'ENODST'});
+  if(fs.existsSync(dstpath))
+    return _handleResult(res, {code: 'EEXIST'});
+  fs.rename(srcpath, dstpath, (err)=>_handleResult(res, err));
+});
 
 
 // Startup Server

@@ -382,8 +382,8 @@ function initToolbar(indup, fpath){
     mode_btn.onclick = async () => {
         const to_dup = !document.getElementById('toolbar-dup').classList.contains('indup'); //to toggle
         if(to_dup){
-            const resp = await fetch(`/dup${fpath}`);
-            if(!resp.ok && resp.status != 403)    //403: the duplicatd file has existed
+            const resp = await fetch(`${fpath}/dup`, {method: 'POST'});
+            if(!resp.ok && resp.status != 409)    //409: the duplicatd file has existed
                 return console.error(`error (${resp.status})`, await resp.text());
             window.location.hash = window.location.hash.replace('#course-', '#dup-');
         }
@@ -395,7 +395,7 @@ function initToolbar(indup, fpath){
     // init redo button
     // the event must be trigged in the dup mode, not dont change its mode
     redo_btn.onclick = async () => {
-        const resp = await fetch(`/dup${fpath}?force=1`);
+        const resp = await fetch(`${fpath}/dup?force=1`, {method: 'POST'});
         if(!resp.ok)
             return console.error(`error (${resp.status})`, await resp.text());
         

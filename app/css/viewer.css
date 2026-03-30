@@ -822,13 +822,13 @@ pre code {
     top: 29px;
     left: 0;
     width: calc(100vw);
-    height: calc(100vh - 45px);
+    height: calc(100vh - 53px);
 }
 
 #container #editor-status {
     position: fixed;
     box-sizing: border-box;
-    top: calc(100vh - 45px + 29px);
+    top: calc(100vh - 53px + 29px);
     left: 0;
     width: 100vw;
     padding-left: 1em;
@@ -841,7 +841,7 @@ pre code {
 
 #container #editor-settings {
     position: fixed;
-    top: calc(100vh - 45px + 29px);
+    top: calc(100vh - 53px + 29px);
     left: 0;
     width: 1em;
 }
