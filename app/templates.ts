@@ -54,7 +54,7 @@ Handlebars.registerHelper('timeStr', function(time) {
     return time.format();
 });
 
-export const main = Handlebars.compile(`
+export const index = Handlebars.compile(`
     <!--
     <nav><ul>
         <li><a href="#index">Index</a></li>
@@ -72,14 +72,24 @@ export const main = Handlebars.compile(`
             <span class="trk-days trk-days-{{defVal days 1}}">{{defVal days 1}}</span>
             <label class="trk-title"><a href="#course-{{name}}">{{title}}</a></label>
             <span class="trk-tools">
-                <span class="trk-map {{active gpx}}"><a {{#if gpx}}href="https://dayanuyim.github.io/maps/?data={{gpxLink this}}&title={{title}}" target="_blank"{{/if}}><i class="fa-solid fa-map-location-dot"></i></a></span>
-                <span class="trk-gpx {{active gpx}}"><a {{#if gpx}}href="{{gpxLink this}}" download="{{gpxName this}}"{{/if}}><i class="fa-solid fa-location-dot"></i></a></span>
-                <span class="trk-rec {{active txt}}"><a {{#if txt}}href="{{txtLink this}}" download="{{txtName this}}"{{/if}}><i class="fa-regular fa-pen-to-square"></i></a></span>
+                <span class="trk-map {{active gpx}}"><a {{#if gpx}}href="https://dayanuyim.github.io/maps/?data={{gpxLink this}}&title={{title}}" target="_blank"{{/if}}><i class="fa-solid fa-map-location-dot"></i></a></span><!--
+             --><span class="trk-gpx {{active gpx}}"><a {{#if gpx}}href="{{gpxLink this}}" download="{{gpxName this}}"{{/if}}><i class="fa-solid fa-location-dot"></i></a></span><!--
+             --><span class="trk-rec {{active txt}}"><a {{#if txt}}href="{{txtLink this}}" download="{{txtName this}}"{{/if}}><i class="fa-solid fa-file-invoice"></i></a></span>
+                <span class="trk-clone  active lowkey"><button onclick="doCourseOp('clone','{{name}}')" ><i class="fa-solid fa-folder-plus"></i></a></span><!--
+             --><span class="trk-rename active lowkey"><button onclick="doCourseOp('rename','{{name}}')" ><i class="fa-solid fa-pen-to-square"></i></a></span>
             </span>
         </li>
         {{/each}}
     </ul>
     {{/each}}
+
+    <div id="course-info" class="modal hide">
+        <div class="modal-container">
+            <div class="modal-body">
+                {{courseInfo}}
+            </div>
+        </div>
+    </div>
 
     </section>
 
@@ -88,6 +98,27 @@ export const main = Handlebars.compile(`
         <p>&copy; 2023</p>
     </footer>
 `);
+
+Handlebars.registerHelper('courseInfo', () => new Handlebars.SafeString(`
+    <h4 id="course-info-header"></h4>
+    <div>
+        <input type="hidden" id="course-info-op">
+        <input type="hidden" id="course-info-orig">
+    </div>
+    <div>
+        <label>Date</label>
+        <input type="text" id="course-info-date" placeholder="YYYYMMDD">
+    </div>
+    <div>
+        <label>Name</label>
+        <input type="text" id="course-info-name">
+    </div>
+    <div>
+        <label>Days</label>
+        <input type="number" id="course-info-days" min="1">
+    </div>
+    <button id="course-info-submit" disabled>Submit</button>
+`));
 
 Handlebars.registerHelper('dialect', function(kinds) {
 

@@ -137,8 +137,22 @@ li.course:hover {
     left: 70%;
 }
 
-.trk-tools span:not(.active) a{
+.trk-tools span * {
+    color: royalblue;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: medium;
+    padding: 0;
+    margin: 0 1px;
+}
+
+.trk-tools span:not(.active) *{
     color: darkgray;
+}
+
+li.course:not(:hover) .trk-tools span.lowkey *{
+    visibility: hidden;
 }
 
 /*
@@ -162,3 +176,28 @@ li.course:hover {
     left: calc(70% + 6.0em);
 }
 */
+
+/************ Modal Input **********************/
+
+input.valid {
+    background-color: #d4edda !important;
+}
+
+input.invalid {
+    background-color: #f8d7da !important;
+}
+
+#course-info .modal-body {
+    padding: 1em 2em;
+}
+
+#course-info .modal-body input{
+    width: 15em;
+    border-style: none;
+    background: #EEE;
+    font-size: 16px;
+}
+
+#course-info .modal-body #course-info-submit{
+    margin: 1em;
+}

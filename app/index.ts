@@ -54,7 +54,8 @@ async function showIndex()
     try{
         const courses = await getCourses();
         const data = groupCoursesByYear(courses);
-        document.body.innerHTML = templates.main(data);
+        document.body.innerHTML = templates.index(data);
+        initCourseInfoModal();
     }
     catch(err){
         console.error(err);
@@ -96,6 +97,165 @@ async function showCourse(name){
     loadCourse(course);
 }
          
+function initCourseInfoModal() {
+    const opEl   = document.getElementById('course-info-op')   as HTMLInputElement;
+    const origEl = document.getElementById('course-info-orig') as HTMLInputElement;
+    const dateEl = document.getElementById("course-info-date") as HTMLInputElement;
+    const nameEl = document.getElementById("course-info-name") as HTMLInputElement;
+    const daysEl = document.getElementById("course-info-days") as HTMLInputElement;
+    const submitEl = document.getElementById("course-info-submit") as HTMLInputElement;
+
+    const DEBOUNCE_DELAY = 500; // ms
+
+    function debounce(fn, delay) {
+      let timer;
+      return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+      };
+    }
+
+    function isValidDate(str) {
+      if (str === "YYYYMMDD") return true;
+      if (!/^\d{8}$/.test(str)) return false;
+
+      const y = +str.slice(0, 4);
+      const m = +str.slice(4, 6);
+      const d = +str.slice(6, 8);
+
+      const date = new Date(y, m - 1, d);
+      return date.getFullYear() === y &&
+             date.getMonth() === m - 1 &&
+             date.getDate() === d;
+    }
+
+    function validateDate() {
+      return isValidDate(dateEl.value.trim());
+    }
+
+    function validateName() {
+      return nameEl.value.trim().length > 0;
+    }
+
+    function validateDays() {
+      const val = Number(daysEl.value);
+      return Number.isInteger(val) && val >= 1;
+    }
+
+    function applyValidation(el, isValid) {
+      clearValidation(el);
+      el.classList.toggle("valid", isValid);
+      el.classList.toggle("invalid", !isValid);
+    }
+
+    function clearValidation(el){
+      el.classList.remove("valid", "invalid");
+    }
+
+    function checkAllValid() {
+      const allValid =
+        validateDate() &&
+        validateName() &&
+        validateDays();
+
+      submitEl.disabled = !allValid;
+    }
+
+    function handleValidate(el, validator) {
+      /*
+      // 空值時：不顯示顏色，但仍視為 invalid
+      const value = el.value.trim();
+      if (value === "") {
+        el.classList.remove("valid", "invalid");
+        submitEl.disabled = true;
+        return;
+      }
+      */  
+      const isValid = validator();
+      applyValidation(el, isValid);
+      checkAllValid();
+    }
+
+    // 建立 debounce handler
+    const debouncedDate = debounce(() => handleValidate(dateEl, validateDate), DEBOUNCE_DELAY);
+    const debouncedName = debounce(() => handleValidate(nameEl, validateName), DEBOUNCE_DELAY);
+    const debouncedDays = debounce(() => handleValidate(daysEl, validateDays), DEBOUNCE_DELAY);
+
+    // input 事件（輸入時觸發 debounce）
+    dateEl.addEventListener("input", () => {
+      clearValidation(dateEl);
+      debouncedDate();
+    });
+
+    nameEl.addEventListener("input", () => {
+      clearValidation(nameEl);
+      debouncedName();
+    });
+
+    daysEl.addEventListener("input", () => {
+      clearValidation(daysEl);
+      debouncedDays();
+    });
+
+    submitEl.addEventListener("click", async ()=>{
+        const op = opEl.value.trim();
+        const orig = origEl.value.trim();
+        const name = [
+            dateEl.value.trim(),
+            nameEl.value.trim(),
+            Number(daysEl.value) > 1? daysEl.value: undefined,
+        ].filter(e => e)
+         .join("-");
+
+         try{
+            console.log(`${op} '${orig} to ${name}`)
+            const resp = await postJson(`/course/${orig}/${op}`, {name});
+            if(!resp.ok)
+                return alert(await resp.text());
+            location.reload();
+         }
+         catch(err){
+            alert(err);
+         }
+    });
+
+    //function action(data) {
+    //  console.log("送出資料:", data);
+    //}
+}
+
+function action(data) {
+    console.log("送出資料:", data);
+    // 這裡放你的處理邏輯
+}
+
+async function postJson(url, data){
+    const resp = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    return resp;
+}
+
+
+/*
+async function cloneCourse(name){
+    try {
+        showModal('course-name');
+        //get the new name
+        await postJson(`/course/${name}/clone`, {
+            name: name + "-2",
+        });
+    }
+    catch (err) {
+        console.error(`clone the course ${name}`, err);
+    }
+}
+*/
+
 (async () => {
     window.addEventListener('hashchange', showView);
     showView().catch(err => window.location.hash = '#main');

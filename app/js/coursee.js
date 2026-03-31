@@ -220,3 +220,22 @@ function readText(filePath, callBack) {
     reader.readAsText(file);
     return true;
 }
+
+window.doCourseOp = function(op, name){
+    const reset_el = function(el, value){
+        el.value = value;
+        el.classList.remove('valid');
+        el.classList.remove('invalid');
+    }
+
+    const [date, title, days] = name.split("-");
+    document.getElementById('course-info-header').textContent = `Course ${op.replace(/^./, c=>c.toUpperCase())}`
+    reset_el(document.getElementById('course-info-op'), op);
+    reset_el(document.getElementById('course-info-orig'), name);
+    reset_el(document.getElementById('course-info-date'), date);
+    reset_el(document.getElementById('course-info-name'), title);
+    reset_el(document.getElementById('course-info-days'), days? days: '1');
+    document.getElementById('course-info-submit').disabled = true;
+
+    showModal('course-info');
+}

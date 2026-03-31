@@ -156,7 +156,8 @@ function getDataList(dir){
 }
 
 function getfpath(...paths){
-  if(!paths || !paths.length) return undefined;
+  if(!paths || !paths.length || paths.some(item => !item))
+    return undefined;
   const fpath = path.join(wwwroot, ...paths);  // NOTE: join() return a platform-specific string,
   if (!fpath.startsWith(wwwroot))              //       so wwwroot should be normalized to platform-specific path too.
     return console.error(`error: file path ${fpath} is out of data path ${wwwroot}`);
@@ -232,12 +233,13 @@ app.post('/data/*path/dup', function(req, res){
 });
 
 // copy a course
-app.post('/course/:name/copy', function(req, res){
+app.post('/course/:name/clone', function(req, res){
   const srcpath = getfpath(req.params.name);
   const dstpath = getfpath(req.body? req.body.name: undefined);
   if(!srcpath) return _handleResult(res, {code: 'ENOSRC'});
   if(!dstpath) return _handleResult(res, {code: 'ENODST'});
 
+  console.log(`clone '${srcpath}' to '${dstpath}`);
   fs.cp(srcpath, dstpath, {
     recursive: true,
     errorOnExist: true,
@@ -246,13 +248,15 @@ app.post('/course/:name/copy', function(req, res){
 });
 
 // rename a course
-app.patch('/course/:name/rename', function(req, res){
+app.post('/course/:name/rename', function(req, res){
   const srcpath = getfpath(req.params.name);
   const dstpath = getfpath(req.body? req.body.name: undefined);
   if(!srcpath) return _handleResult(res, {code: 'ENOSRC'});
   if(!dstpath) return _handleResult(res, {code: 'ENODST'});
   if(fs.existsSync(dstpath))
     return _handleResult(res, {code: 'EEXIST'});
+
+  console.log(`rename '${srcpath}' to '${dstpath}`);
   fs.rename(srcpath, dstpath, (err)=>_handleResult(res, err));
 });
 
