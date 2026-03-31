@@ -7,7 +7,7 @@ import '@fortawesome/fontawesome-free/js/regular'
 import '@fortawesome/fontawesome-free/js/brands'
 import * as templates from './templates';
 import * as utils from './utils'
-import { loadCourse } from './main';
+import { loadCourse } from './course';
 
 async function showView()
 {

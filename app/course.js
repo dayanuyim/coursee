@@ -4,7 +4,7 @@ import './css/viewer.css';
 import './css/editor.css';
 import './css/markdown-it-admonition.css';
 import './css/ribbon.css';
-import './js/coursee';
+import './js/events';
 import {GPXParser} from './loadgpx';
 import * as googleMaps from 'google-maps-api';
 import * as templates from './templates';
