@@ -106,10 +106,6 @@ li.course:hover {
 /* to vertical align with .trk-title */
 .trk-date,
 .trk-days,
-.trk-tools span {
-    vertical-align: sub;
-}
-
 .trk-days:before{ content:"("; }
 .trk-days:after{ content:")"; }
 
@@ -137,6 +133,10 @@ li.course:hover {
     left: 70%;
 }
 
+.trk-tools span {
+    vertical-align: sub;
+}
+
 .trk-tools span * {
     color: royalblue;
     background: none;
@@ -147,8 +147,13 @@ li.course:hover {
     margin: 0 1px;
 }
 
+.trk-tools span.trk-tools-op *{
+    color: indianred;
+}
+
 .trk-tools span:not(.active) *{
     color: darkgray;
+    cursor: default;
 }
 
 li.course:not(:hover) .trk-tools span.lowkey *{
@@ -196,6 +201,12 @@ input.invalid {
     border-style: none;
     background: #EEE;
     font-size: 16px;
+    margin: 2px 0;
+}
+
+#course-info .modal-body #course-info-header{
+    border-style: outset;
+    padding: 4px 0;
 }
 
 #course-info .modal-body #course-info-submit{

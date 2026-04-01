@@ -72,11 +72,11 @@ export const index = Handlebars.compile(`
             <span class="trk-days trk-days-{{defVal days 1}}">{{defVal days 1}}</span>
             <label class="trk-title"><a href="#course-{{name}}">{{title}}</a></label>
             <span class="trk-tools">
-                <span class="trk-map {{active gpx}}"><a {{#if gpx}}href="https://dayanuyim.github.io/maps/?data={{gpxLink this}}&title={{title}}" target="_blank"{{/if}}><i class="fa-solid fa-map-location-dot"></i></a></span><!--
-             --><span class="trk-gpx {{active gpx}}"><a {{#if gpx}}href="{{gpxLink this}}" download="{{gpxName this}}"{{/if}}><i class="fa-solid fa-location-dot"></i></a></span><!--
-             --><span class="trk-rec {{active txt}}"><a {{#if txt}}href="{{txtLink this}}" download="{{txtName this}}"{{/if}}><i class="fa-solid fa-file-invoice"></i></a></span>
-                <span class="trk-clone  active lowkey"><button onclick="doCourseOp('clone','{{name}}')" ><i class="fa-solid fa-folder-plus"></i></a></span><!--
-             --><span class="trk-rename active lowkey"><button onclick="doCourseOp('rename','{{name}}')" ><i class="fa-solid fa-pen-to-square"></i></a></span>
+                <span title="線上地圖" class="trk-tools-link trk-map {{active gpx}}"><a {{#if gpx}}href="https://dayanuyim.github.io/maps/?data={{gpxLink this}}&title={{title}}" target="_blank"{{/if}}><i class="fa-solid fa-map-location-dot"></i></a></span><!--
+             --><span title="航跡下載" class="trk-tools-link trk-gpx {{active gpx}}"><a {{#if gpx}}href="{{gpxLink this}}" download="{{gpxName this}}"{{/if}}><i class="fa-solid fa-location-dot"></i></a></span><!--
+             --><span title="記錄下載" class="trk-tools-link trk-rec {{active txt}}"><a {{#if txt}}href="{{txtLink this}}" download="{{txtName this}}"{{/if}}><i class="fa-solid fa-file-invoice"></i></a></span>
+                <span title="行程複製" class="trk-tools-op trk-clone  active lowkey"><button onclick="doCourseOp('clone','{{name}}')" ><i class="fa-solid fa-file-circle-plus"></i></button></span><!--
+             --><span title="行程改名" class="trk-tools-op trk-rename active lowkey"><button onclick="doCourseOp('rename','{{name}}')"><i class="fa-solid fa-file-pen"></i></button></span>
             </span>
         </li>
         {{/each}}
