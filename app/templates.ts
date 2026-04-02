@@ -76,7 +76,7 @@ export const index = Handlebars.compile(`
              --><span title="航跡下載" class="trk-tools-link trk-gpx {{active gpx}}"><a {{#if gpx}}href="{{gpxLink this}}" download="{{gpxName this}}"{{/if}}><i class="fa-solid fa-location-dot"></i></a></span><!--
              --><span title="記錄下載" class="trk-tools-link trk-rec {{active txt}}"><a {{#if txt}}href="{{txtLink this}}" download="{{txtName this}}"{{/if}}><i class="fa-solid fa-file-invoice"></i></a></span>
                 <span title="行程複製" class="trk-tools-op   trk-copy active lowkey"><button onclick="doCourseOp('copy','{{name}}')"><i class="fa-solid fa-file-circle-plus"></i></button></span><!--
-             --><span title="行程改名" class="trk-tools-op   trk-move active lowkey"><button onclick="doCourseOp('move','{{name}}')"><i class="fa-solid fa-file-pen"></i></button></span>
+             --><span title="行程更名" class="trk-tools-op   trk-move active lowkey"><button onclick="doCourseOp('move','{{name}}')"><i class="fa-solid fa-file-pen"></i></button></span>
             </span>
         </li>
         {{/each}}

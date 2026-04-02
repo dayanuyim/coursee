@@ -206,16 +206,16 @@ function initCourseInfoModal() {
         ].filter(e => e)
          .join("-");
 
-         try{
-            console.log(`${op} '${src} to ${dst}`)
-            const {done, error} = await postJson(`/course/${dst}`, {op, src});
-            if(!done)
-                return alert(`error: ${error}`);
-            location.reload();
-         }
-         catch(err){
-            alert(err);
-         }
+        try{
+           console.log(`${op} '${src} to ${dst}`)
+           const {done, error} = await postJson(`/course/${dst}`, {op, src});
+           if(!done)
+               return alert(`error: ${error}`);
+           location.reload();
+        }
+        catch(err){
+           alert(err);
+        }
     });
 }
 
