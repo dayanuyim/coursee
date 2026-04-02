@@ -98,11 +98,11 @@ async function showCourse(name){
 }
          
 function initCourseInfoModal() {
-    const opEl   = document.getElementById('course-info-op')   as HTMLInputElement;
-    const origEl = document.getElementById('course-info-orig') as HTMLInputElement;
-    const dateEl = document.getElementById("course-info-date") as HTMLInputElement;
-    const nameEl = document.getElementById("course-info-name") as HTMLInputElement;
-    const daysEl = document.getElementById("course-info-days") as HTMLInputElement;
+    const opEl     = document.getElementById('course-info-op')     as HTMLInputElement;
+    const srcEl    = document.getElementById('course-info-src')    as HTMLInputElement;
+    const dateEl   = document.getElementById("course-info-date")   as HTMLInputElement;
+    const nameEl   = document.getElementById("course-info-name")   as HTMLInputElement;
+    const daysEl   = document.getElementById("course-info-days")   as HTMLInputElement;
     const submitEl = document.getElementById("course-info-submit") as HTMLInputElement;
 
     const DEBOUNCE_DELAY = 500; // ms
@@ -199,8 +199,8 @@ function initCourseInfoModal() {
 
     submitEl.addEventListener("click", async ()=>{
         const op = opEl.value.trim();
-        const orig = origEl.value.trim();
-        const name = [
+        const src = srcEl.value.trim();
+        const dst = [
             dateEl.value.trim(),
             nameEl.value.trim(),
             Number(daysEl.value) > 1? daysEl.value: undefined,
@@ -208,8 +208,8 @@ function initCourseInfoModal() {
          .join("-");
 
          try{
-            console.log(`${op} '${orig} to ${name}`)
-            const resp = await postJson(`/course/${orig}/${op}`, {name});
+            console.log(`${op} '${src} to ${dst}`)
+            const resp = await postJson(`/course/${dst}`, {op, src});
             if(!resp.ok)
                 return alert(await resp.text());
             location.reload();
@@ -218,15 +218,6 @@ function initCourseInfoModal() {
             alert(err);
          }
     });
-
-    //function action(data) {
-    //  console.log("送出資料:", data);
-    //}
-}
-
-function action(data) {
-    console.log("送出資料:", data);
-    // 這裡放你的處理邏輯
 }
 
 async function postJson(url, data){
@@ -239,22 +230,6 @@ async function postJson(url, data){
     });
     return resp;
 }
-
-
-/*
-async function cloneCourse(name){
-    try {
-        showModal('course-name');
-        //get the new name
-        await postJson(`/course/${name}/clone`, {
-            name: name + "-2",
-        });
-    }
-    catch (err) {
-        console.error(`clone the course ${name}`, err);
-    }
-}
-*/
 
 (async () => {
     window.addEventListener('hashchange', showView);

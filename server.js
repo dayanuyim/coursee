@@ -200,6 +200,8 @@ function _handleResult(res, err) {
       return res.status(400).json({ done: false, error: 'src not spcified' });
     case 'ENODST':   //customed
       return res.status(400).json({ done: false, error: 'dst not spcified' });
+    case 'EPARAM':  //customed
+      return res.status(400).json({ done: false, error: 'not support parameters' });
     case 'EACCES':
     case 'EPERM':
       return res.status(403).json({ done: false, error: 'access deny' });
@@ -232,34 +234,28 @@ app.post('/data/*path/dup', function(req, res){
   fs.copyFile(srcpath, dstpath, mode, (err)=>_handleResult(res, err));
 });
 
-// copy a course
-app.post('/course/:name/clone', function(req, res){
-  const srcpath = getfpath(req.params.name);
-  const dstpath = getfpath(req.body? req.body.name: undefined);
+// create a course from the other
+app.post('/course/:name', function(req, res){
+  const dstpath = getfpath(req.params.name);
+  const srcpath = getfpath(req.body?.src);
+  const op = req.body?.op;
   if(!srcpath) return _handleResult(res, {code: 'ENOSRC'});
   if(!dstpath) return _handleResult(res, {code: 'ENODST'});
 
-  console.log(`clone '${srcpath}' to '${dstpath}`);
-  fs.cp(srcpath, dstpath, {
-    recursive: true,
-    errorOnExist: true,
-    force: false
-  }, (err) => _handleResult(res, err));
+  console.log(`${op} '${srcpath}' to '${dstpath}`);
+  switch(op){
+    case "copy":
+      return fs.cp(srcpath, dstpath, {
+        recursive: true,
+        errorOnExist: true,
+        force: false
+      }, (err) => _handleResult(res, err));
+    case "move":
+      return fs.rename(srcpath, dstpath, (err)=>_handleResult(res, err));
+    default:
+      return _handleResult(res, { code: 'EPARAM' });
+  }
 });
-
-// rename a course
-app.post('/course/:name/rename', function(req, res){
-  const srcpath = getfpath(req.params.name);
-  const dstpath = getfpath(req.body? req.body.name: undefined);
-  if(!srcpath) return _handleResult(res, {code: 'ENOSRC'});
-  if(!dstpath) return _handleResult(res, {code: 'ENODST'});
-  if(fs.existsSync(dstpath))
-    return _handleResult(res, {code: 'EEXIST'});
-
-  console.log(`rename '${srcpath}' to '${dstpath}`);
-  fs.rename(srcpath, dstpath, (err)=>_handleResult(res, err));
-});
-
 
 // Startup Server
 if(isHttps){
