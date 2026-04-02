@@ -43,3 +43,28 @@ export function joinpath(...paths){
     }
     return sum;
 }
+
+async function fetchJson(method, url, obj){
+    let status = 0;
+    try{
+        const resp = await fetch(url, {
+            method,
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+                //'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: JSON.stringify(obj),
+        });
+        status = resp.status;
+        const json = await resp.json();
+        return Object.assign(json, {status});
+    }
+    catch(error){
+        console.error(error);
+        return {done: false, error, status};
+    }
+}
+
+export async function putJson(url, obj){ return await fetchJson('PUT', url, obj); }
+export async function postJson(url, obj){ return await fetchJson('POST', url, obj); }

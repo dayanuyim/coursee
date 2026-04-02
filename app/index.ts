@@ -6,7 +6,7 @@ import '@fortawesome/fontawesome-free/js/solid'
 import '@fortawesome/fontawesome-free/js/regular'
 import '@fortawesome/fontawesome-free/js/brands'
 import * as templates from './templates';
-import * as utils from './utils'
+import { isNumber, groupItems, dictToArray, postJson} from './utils'
 import { loadCourse } from './course';
 
 async function showView()
@@ -67,7 +67,6 @@ function groupCoursesByYear(courses){
 
     const asc = false;
     const order = (v: number) => asc? v: -v;
-    const {isNumber, groupItems, dictToArray} = utils;
 
     let data = groupItems(courses, c => c.date.slice(0, 4)); //group by years
     data = dictToArray(data, 'year', 'courses');
@@ -209,26 +208,15 @@ function initCourseInfoModal() {
 
          try{
             console.log(`${op} '${src} to ${dst}`)
-            const resp = await postJson(`/course/${dst}`, {op, src});
-            if(!resp.ok)
-                return alert(await resp.text());
+            const {done, error} = await postJson(`/course/${dst}`, {op, src});
+            if(!done)
+                return alert(`error: ${error}`);
             location.reload();
          }
          catch(err){
             alert(err);
          }
     });
-}
-
-async function postJson(url, data){
-    const resp = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    });
-    return resp;
 }
 
 (async () => {

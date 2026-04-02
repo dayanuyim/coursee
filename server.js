@@ -145,7 +145,6 @@ function parseCourseDir(dir){
     name,
     gpx: fexist('course.gpx'),
     txt: fexist('course.md'),
-    dup: fexist('course-dup.md'),
   });
 }
 
@@ -164,31 +163,11 @@ function getfpath(...paths){
   return fpath
 }
 
-app.get('/api/list', function(req, res){
-  res.status(200).json(getDataList(nconf.get('data-path')));
-});
-
-// get file
-app.use('/data', express.static(nconf.get('data-path')));
-
-// upload file
-app.put('/data/*path', express.json(), function(req, res, next){
-  const relpath = Array.isArray(req.params.path)?
-                    req.params.path.join('/'):
-                    req.params.path;
-
-  const fpath = getfpath(relpath);
-  if (!fpath)
-    return res.status(400).json({done: false, error: 'bad request path'});
-
-  const text = req.body.text;
-  console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
-
-  fs.writeFile(fpath, text, function(error, data){
-    if(error) return res.status(500).json({done: false, error});
-    res.status(200).json({done: true});
-  });
-});
+function getReqPath(req){
+  return Array.isArray(req.params.path) ?
+    req.params.path.join('/') :
+    req.params.path;
+}
 
 function _handleResult(res, err) {
   if (!err)
@@ -215,23 +194,53 @@ function _handleResult(res, err) {
   }
 }
 
-// Duplicate a file.
-//   from /a/path/to/file.ext
-//     to /a/path/to/file-dup.ext
-app.post('/data/*path/dup', function(req, res){
-  const force = req.query.force === '1';
-  const relpath = Array.isArray(req.params.path)?
-                    req.params.path.join('/'):
-                    req.params.path;
-  const relpaths = path.parse(relpath);
+function copyFile(src, dst, force, callback){
+  const srcpath = getfpath((src && src.startsWith("/data/"))? src.slice(6): src);
+  const dstpath = getfpath(dst);
+  if(!srcpath) return callback({code: 'ENOSRC'});
+  if(!dstpath) return callback({code: 'ENODST'});
 
-  const srcpath = getfpath(relpath);
-  const dstpath = getfpath(relpaths.dir, `${relpaths.name}-dup${relpaths.ext}`);
-  if (!srcpath || !dstpath)
-    return res.status(400).json({ done: false, error: 'bad request path' });
-
+  console.log(`copy file '${dstpath}', from '${srcpath}'`);
   const mode = force ? 0 : fs.constants.COPYFILE_EXCL;  // overwrite (default): exclusive
-  fs.copyFile(srcpath, dstpath, mode, (err)=>_handleResult(res, err));
+  fs.copyFile(srcpath, dstpath, mode, callback);
+}
+
+function writeFile(dst, txt, force, callback){
+  const dstpath = getfpath(dst);
+  if(!txt)     return callback({code: 'EPARAM'});
+  if(!dstpath) return callback({code: 'ENODST'});
+
+  console.log(`write file '${dstpath}', length ${txt.length}, text [${txt.substring(0, 15)}...]`);
+  const flag = force? 'w': 'wx';    // w: overwrite; wx: fails if the path exists
+  fs.writeFile(dstpath, txt, {flag}, callback);
+}
+
+app.get('/api/list', function(req, res){
+  res.status(200).json(getDataList(nconf.get('data-path')));
+});
+
+// get file
+app.use('/data', express.static(nconf.get('data-path')));
+
+function _uploadData(req, res, force){
+  const dst = getReqPath(req);
+  const src = req.body?.src;
+  const txt = req.body?.text;
+  const cb = (err) => _handleResult(res, err);
+
+  if(txt) return writeFile(dst, txt, force, cb);
+  if(src) return copyFile(src, dst, force, cb);
+  return cb({code: 'EPARAM'});
+}
+
+// update a file from another file or text
+app.put('/data/*path', function(req, res){
+  return _uploadData(req, res, true);
+});
+
+// create a file from another file.
+app.post('/data/*path', function(req, res){
+  return _uploadData(req, res, false);
 });
 
 // create a course from the other
@@ -239,8 +248,9 @@ app.post('/course/:name', function(req, res){
   const dstpath = getfpath(req.params.name);
   const srcpath = getfpath(req.body?.src);
   const op = req.body?.op;
-  if(!srcpath) return _handleResult(res, {code: 'ENOSRC'});
-  if(!dstpath) return _handleResult(res, {code: 'ENODST'});
+  const cb = (err) => _handleResult(res, err);
+  if(!srcpath) return cb({code: 'ENOSRC'});
+  if(!dstpath) return cb({code: 'ENODST'});
 
   console.log(`${op} '${srcpath}' to '${dstpath}`);
   switch(op){
@@ -249,11 +259,11 @@ app.post('/course/:name', function(req, res){
         recursive: true,
         errorOnExist: true,
         force: false
-      }, (err) => _handleResult(res, err));
+      }, cb);
     case "move":
-      return fs.rename(srcpath, dstpath, (err)=>_handleResult(res, err));
+      return fs.rename(srcpath, dstpath, cb);
     default:
-      return _handleResult(res, { code: 'EPARAM' });
+      return cb({code: 'EPARAM'});
   }
 });
 

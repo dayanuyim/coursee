@@ -9,11 +9,13 @@ import {GPXParser} from './loadgpx';
 import * as googleMaps from 'google-maps-api';
 import * as templates from './templates';
 import * as moment from 'moment-timezone';
-import { innerElement } from './dom-utils';
-import { markdownElement } from './m2h';
 import * as monaco from 'monaco-editor';
+import * as path from 'path';
 import { initVimMode, VimMode } from 'monaco-vim';
 import Cookies from 'js-cookie';
+import { innerElement } from './dom-utils';
+import { postJson, putJson} from './utils'
+import { markdownElement } from './m2h';
 
 const AUTO_SAVE_DELAY = 5000;  //ms
 
@@ -47,25 +49,6 @@ Date.prototype.addDays = function(days) {
     return result;
 }
 
-async function putJson(url, obj){
-    try{
-        const resp = await fetch(url, {
-            method: 'PUT',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-                //'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: JSON.stringify(obj),
-        });
-        return resp.json();
-    }
-    catch(error){
-        console.error(error);
-        return {error};
-    }
-}
-
 const _upload_file_timers = {};
 function uploadFileLazy(fpath, text, ms, callback) {
     //clear old timer if any
@@ -77,7 +60,7 @@ function uploadFileLazy(fpath, text, ms, callback) {
 
     const action = async() => {
         //console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
-        const resp = await putJson(fpath, { text });
+        const resp = await putJson(fpath, {text});
         delete _upload_file_timers[fpath];
         callback(resp);
     };
@@ -197,15 +180,23 @@ function toMoment(date, hh, mm){
     return moment([date.getFullYear(), date.getMonth(), date.getDate(), hh, mm ])
 }
 
+const toDupPath = (s) => {
+    const {dir, name, ext} = path.parse(s);
+    return `${dir}/${name}-dup${ext}`;
+}
+
 export async function loadCourse(course)
 {
     if(!course)
         return alert("No course specified");
 
+    const {name, txt} = course;
+    if(!txt)
+        return alert("The course has no record text");
+
     const indup = location.hash.startsWith('#dup');
-    const {name, txt, dup} = course;
     const origpath = `/data/${name}/${txt}`;
-    const currpath = indup? `/data/${name}/${dup}`: origpath;
+    const currpath = indup? toDupPath(origpath): origpath;
 
     try{
         //fetch
@@ -364,7 +355,7 @@ function uploadFile(fpath, text, ms){
     uploadFileLazy(fpath, text, ms, (resp)=>{
         _editor_content_changed = !resp.done;
         if(!resp.done)
-            console.error('save resp error', resp.error);
+            alert(`save error: ${resp.error}`);
     });
 }
 
@@ -372,19 +363,21 @@ function initToolbar(indup, fpath){
     const dup = document.getElementById('toolbar-dup');
     const mode_btn = dup.querySelector(`#toolbar-dup-mode`);
     const redo_btn = dup.querySelector(`#toolbar-dup-redo`);
-
+    
     // set dup status
     dup.classList.toggle('indup', indup);
 
     // init mode button
     // the event will toggle to enter/quit the dup mole
+    const duppath = toDupPath(fpath);
+
     mode_btn.classList.toggle('switch-on', indup);
     mode_btn.onclick = async () => {
         const to_dup = !document.getElementById('toolbar-dup').classList.contains('indup'); //to toggle
         if(to_dup){
-            const resp = await fetch(`${fpath}/dup`, {method: 'POST'});
-            if(!resp.ok && resp.status != 409)    //409: the duplicatd file has existed
-                return console.error(`error (${resp.status})`, await resp.text());
+            const {done, status, error} = await postJson(duppath, {src: fpath});
+            if(!done && status != 409)    //409: the duplicatd file has existed
+                return alert(`error (${status}): ${error}`);
             window.location.hash = window.location.hash.replace('#course-', '#dup-');
         }
         else{
@@ -395,10 +388,9 @@ function initToolbar(indup, fpath){
     // init redo button
     // the event must be trigged in the dup mode, not dont change its mode
     redo_btn.onclick = async () => {
-        const resp = await fetch(`${fpath}/dup?force=1`, {method: 'POST'});
-        if(!resp.ok)
-            return console.error(`error (${resp.status})`, await resp.text());
-        
+        const {done, status, error} = await putJson(duppath, { src: fpath });
+        if(!done)
+            return alert(`error (${status}): ${error}`);
         location.reload();
     }
 }
