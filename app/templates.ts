@@ -168,7 +168,7 @@ export const tip = Handlebars.compile(`
 
 function arraySplit(arr, grp_size)
 {
-    const grps = [];
+    const grps: object[]  = [];
     for(let i = 0; i < arr.length; i += grp_size)
         grps.push(arr.slice(i, i + grp_size));
     return grps;

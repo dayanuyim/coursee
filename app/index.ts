@@ -6,12 +6,22 @@ import '@fortawesome/fontawesome-free/js/solid'
 import '@fortawesome/fontawesome-free/js/regular'
 import '@fortawesome/fontawesome-free/js/brands'
 import * as templates from './templates';
-import { isNumber, groupItems, dictToArray, postJson} from './utils'
+import { isNumber, groupItems, dictToArray, postJson, debounce} from './utils'
 import { loadCourse } from './course';
+
+
+interface Course {
+    date: string,
+    days: number,
+    title: string,
+    name: string,
+    gpx: string,
+    txt: string,
+}
 
 async function showView()
 {
-    const to_course_name = (s) => decodeURI(s.substring(s.indexOf('-')+1));
+    const to_course_name = (s: string) => decodeURI(s.substring(s.indexOf('-')+1));
 
     const view = window.location.hash;
     if(view === '#main')
@@ -30,7 +40,7 @@ async function showView()
 // reutrn:
 //   params[0] is the original string
 //   parans[1..n-1] are tokens split by dash
-function getParams(s){
+function getParams(s: string){
     s = decodeURI(s);
     const params = s.split('-');
     params.unshift(s);
@@ -63,12 +73,12 @@ async function showIndex()
 }
 
 // [...] => [ {year: yyyy, courses:[...]}...]
-function groupCoursesByYear(courses){
+function groupCoursesByYear(courses: Course[]){
 
     const asc = false;
     const order = (v: number) => asc? v: -v;
 
-    let data = groupItems(courses, c => c.date.slice(0, 4)); //group by years
+    let data = groupItems(courses, (c: Course) => c.date.slice(0, 4)); //group by years
     data = dictToArray(data, 'year', 'courses');
 
     // sort year
@@ -86,11 +96,13 @@ function groupCoursesByYear(courses){
     return data;
 }
 
-async function showCourse(name){
+async function showCourse(name: string){
     const courses = await getCourses();
-    const course = courses.find(c => c.name === name);
+    const course = courses.find((c: Course) => c.name === name);
     if(!course)
-        throw new Error(`Course '${name}' not found`);
+        return alert(`Course '${name}' not found`);
+    if(!course.txt)
+        return alert("The course has no record text");
 
     document.body.innerHTML = templates.course();
     loadCourse(course);
@@ -105,14 +117,6 @@ function initCourseInfoModal() {
     const submitEl = document.getElementById("course-info-submit") as HTMLInputElement;
 
     const DEBOUNCE_DELAY = 500; // ms
-
-    function debounce(fn, delay) {
-      let timer;
-      return function (...args) {
-        clearTimeout(timer);
-        timer = setTimeout(() => fn.apply(this, args), delay);
-      };
-    }
 
     function isValidDate(str) {
       if (str === "YYYYMMDD") return true;

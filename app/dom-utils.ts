@@ -190,8 +190,9 @@ export const toggle = function (elem, timing)
 */
 
 export function clearChildren(el: Element){
-    while(el.firstChild)
-        el.removeChild(el.lastChild);
+    //while(el.firstChild)
+    //    el.removeChild(el.lastChild!);
+    el.replaceChildren();
 }
 
 // like innerHTML, but Element version
@@ -223,20 +224,22 @@ export function htmlToElements(html) {
 }
 
 export const prevSibling = (elem: Element, selector) => {
-	if(elem){
-		while((elem = elem. previousElementSibling)){
-			if(elem.matches(selector))
-				return elem;
+    let curr: Element | null = elem;
+	if(curr){
+		while((curr = curr.previousElementSibling)){
+			if(curr.matches(selector))
+				return curr;
 		}
 	}
 	return undefined;
 }
 
-export const nextSibling = (elem, selector) => {
-	if(elem){
-		while((elem = elem.nextElementSibling)){
-			if(elem.matches(selector))
-				return elem;
+export const nextSibling = (elem: Element, selector) => {
+    let curr: Element | null = elem;
+	if(curr){
+		while((curr = curr.nextElementSibling)){
+			if(curr.matches(selector))
+				return curr;
 		}
 	}
 	return undefined;
@@ -278,7 +281,11 @@ function detectTextAreaConf(el: HTMLTextAreaElement)
 /*
     @tips: ["show-when-normal", "show-when-toggled"]
 */
-export function toggleButton(btn: Element, tips=undefined, toggled?, callback?)
+export function toggleButton(
+    btn: Element, 
+    tips: [string, string] | undefined = undefined,
+    toggled?: boolean | null, 
+    callback?: (toggled: boolean) => void)
 {
     // undefind means toggle
     if(toggled === undefined || toggled === null)

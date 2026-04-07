@@ -120,7 +120,7 @@ function parseCourseName(name){
 
   //days
   const has_days = /-\d+$/.exec(name);
-  const days = (has_days && has_days.index > 8)? name.substring(has_days.index+1): '';
+  const days = (has_days && has_days.index > 8)? Number(name.substring(has_days.index+1)): 1;
 
   //title
   const title = name.substring(9, has_days? has_days.index: name.length);

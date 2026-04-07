@@ -44,6 +44,14 @@ export function joinpath(...paths){
     return sum;
 }
 
+export function debounce(fn, delay) {
+    let timer;
+    return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+}
+
 async function fetchJson(method, url, obj){
     let status = 0;
     try{
