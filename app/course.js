@@ -14,7 +14,7 @@ import * as path from 'path';
 import { initVimMode, VimMode } from 'monaco-vim';
 import Cookies from 'js-cookie';
 import { innerElement } from './dom-utils';
-import { postJson, putJson} from './utils'
+import { postJson, putJson, debounce} from './utils'
 import { markdownElement } from './m2h';
 
 const AUTO_SAVE_DELAY = 5000;  //ms
@@ -47,28 +47,6 @@ Date.prototype.addDays = function(days) {
     var result = new Date(this);
     result.setDate(result.getDate() + days);
     return result;
-}
-
-const _upload_file_timers = {};
-function uploadFileLazy(fpath, text, ms, callback) {
-    //clear old timer if any
-    const last = _upload_file_timers[fpath];
-    if(last){
-        clearTimeout(last);
-        delete _upload_file_timers[fpath];
-    }
-
-    const action = async() => {
-        //console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
-        const resp = await putJson(fpath, {text});
-        delete _upload_file_timers[fpath];
-        callback(resp);
-    };
-
-    //if(ms == 0)
-    //    action();   //do it right away, no timer cached
-    //else
-        _upload_file_timers[fpath] = setTimeout(action, ms);
 }
 
 // map ===============================
@@ -185,15 +163,8 @@ const toDupPath = (s) => {
     return `${dir}/${name}-dup${ext}`;
 }
 
-export async function loadCourse(course)
+export async function loadCourse({name, txt})
 {
-    if(!course)
-        return alert("No course specified");
-
-    const {name, txt} = course;
-    if(!txt)
-        return alert("The course has no record text");
-
     const indup = location.hash.startsWith('#dup');
     const origpath = `/data/${name}/${txt}`;
     const currpath = indup? toDupPath(origpath): origpath;
@@ -202,7 +173,7 @@ export async function loadCourse(course)
         //fetch
         const resp = await fetch(currpath, {contentType: "text/markdown;charset=UTF-8;"});
         if(!resp.ok)
-            throw new Error(`Markdown '${currpath}' not found`);
+            throw new Error(`error to fetch '${currpath}', status (${resp.status})`);
         const text = await resp.text();
 
         //init layout
@@ -352,11 +323,13 @@ let _editor_content_changed = false;
 let _editor_vim_plugin = null;
 
 function uploadFile(fpath, text, ms){
-    uploadFileLazy(fpath, text, ms, (resp)=>{
+    debounce(async() => {
+        //console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
+        const resp = await putJson(fpath, {text});
         _editor_content_changed = !resp.done;
         if(!resp.done)
             alert(`save error: ${resp.error}`);
-    });
+    }, ms);
 }
 
 function initToolbar(indup, fpath){
