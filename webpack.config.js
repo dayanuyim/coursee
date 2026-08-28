@@ -3,7 +3,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CopyPlugin = require('copy-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const webpack = require('webpack');
 
 module.exports = {
@@ -20,12 +21,20 @@ module.exports = {
           path: require.resolve('path-browserify'),
           fs: false,
       },
+      // hotfix for monaco-vim 4.4.0 + monaco-editor 0.56.0
+      alias: {
+          'monaco-editor/esm/vs/editor/editor.api': path.resolve(
+              __dirname,
+              'node_modules/monaco-editor/esm/vs/editor/editor.api.js'
+          ),
+      },
   },
   plugins: [
       new HtmlWebpackPlugin({
           title: "HikeMD",
           favicon: 'app/images/favicon.png',
       }),
+      new MonacoWebpackPlugin(),
       new webpack.ProvidePlugin({
           $: 'jquery',
           jQuery: 'jquery',
