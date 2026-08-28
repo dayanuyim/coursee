@@ -14,7 +14,8 @@ import * as path from 'path';
 import { initVimMode, VimMode } from 'monaco-vim';
 import Cookies from 'js-cookie';
 import { innerElement } from './dom-utils';
-import { postJson, putJson, debounce} from './utils'
+import { postJson, putJson } from './utils'
+import { throttle } from 'lodash';
 import { markdownElement } from './m2h';
 
 const AUTO_SAVE_DELAY = 5000;  //ms
@@ -319,17 +320,31 @@ function tuneBoundary(diff)
     //document.getElementById('editor-status').style.width = document.getElementById('editor-content').style.width;
 }
 
-let _editor_content_changed = false;
+let _editor_content_dirty = 0;
+let _editor_content_clean = 0;
 let _editor_vim_plugin = null;
 
-function uploadFile(fpath, text, ms){
-    debounce(async() => {
-        //console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
-        const resp = await putJson(fpath, {text});
-        _editor_content_changed = !resp.done;
-        if(!resp.done)
-            alert(`save error: ${resp.error}`);
-    }, ms);
+const _uploadFile = async (fpath, text, done_cb=null) => {
+    console.log(`save path [${fpath}]: data: ${text.length}: [${text.substring(0, 15)}...]`);
+    const resp = await putJson(fpath, {text});
+    if(!resp.done)
+        return alert(`save error: ${resp.error}`);
+    if (done_cb) done_cb();
+}
+
+const _uploadFileDelay = throttle(_uploadFile, AUTO_SAVE_DELAY, {
+    trailing: true, leading: true
+});
+
+const uploadFileDelay = async (fpath, text, delay=true) => {
+    const now = Date.now();
+    _editor_content_dirty = now;
+    const cb = () => { _editor_content_clean = now; };
+
+    if(delay)
+        await _uploadFileDelay(fpath, text, cb);
+    else
+        await _uploadFile(fpath, text, cb);
 }
 
 function initToolbar(indup, fpath){
@@ -392,11 +407,10 @@ function initEditor(title, fpath, text)
         //wrappingIndent: 'indent',
     });
     editor.onDidChangeModelContent(e => {
-        _editor_content_changed = true;
         const text = editor.getValue();
         setViewer(text);   //refresh viewer
         syncTargetScroll();  //try to put the viewer in the fixed position
-        uploadFile(fpath, text, AUTO_SAVE_DELAY);
+        uploadFileDelay(fpath, text);
     });
 
     editor.onDidScrollChange(function (e) {
@@ -413,13 +427,13 @@ function initEditor(title, fpath, text)
 
     //save on exit if changed
     window.addEventListener('beforeunload', ()=>{
-        if(_editor_content_changed)
-            uploadFile(fpath, editor.getValue(), 0);
+        if(_editor_content_dirty > _editor_content_clean)  // content is dirty
+            uploadFileDelay(fpath, editor.getValue(), false);
     })
 
     //vim plugin
     VimMode.Vim.defineEx('write', 'w', function() {
-        uploadFile(fpath, editor.getValue(), 0);
+        uploadFileDelay(fpath, editor.getValue(), false);
     });
 
     // register editor methods
