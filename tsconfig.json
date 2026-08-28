@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+
         "outDir": "./dist/",
         "rootDir": "./app",
         "sourceMap": true,
@@ -14,6 +15,8 @@
         "allowJs": true,
         "alwaysStrict": true,
         "noImplicitAny": false, // TODO: fix this
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
     },
     "include": [
         "app/**/*",
