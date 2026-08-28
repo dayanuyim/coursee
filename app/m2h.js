@@ -104,15 +104,15 @@ function timestr2min(str){
 //       -1: adjacent to the previous year, e.g. base=1, other=12
 //        0: adjacent the same year
 //        1: adjacent to the next year, e.g. base=12, other=1
-function cmpAdjacentMonth(base, other, diff){
+function cmpAdjacentMonth(base, other, dist){
     if(base < 1 || base > 12) return 2;
     if(other < 1 || other > 12) return 2;
-    const diff1 = Math.abs(base - other);
-    if(diff1 <= diff) return 0;
+    let diff = Math.abs(base - other);
+    if(diff <= dist) return 0;
 
     //wrap
-    const diff2 = 12 - diff1;
-    if(diff2 <= diff) return other > base? -1: 1
+    diff = 12 - diff;
+    if(diff <= dist) return other > base? -1: 1
 
     return 2;
 }
